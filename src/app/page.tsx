@@ -25,7 +25,7 @@ export default function Home() {
                 href="https://www.linkedin.com/in/sauel-almonte/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="z-10 my-2 text-base text-blue-700 font-medium hover:text-blue-800 hover:underline hover:underline-offset-4 hover:decoration-blue-700 transition-transform duration-300 ease-in-out transform hover:scale-105 inline-block"
+                className="z-10 my-2 px-6 py-2 text-base text-white font-medium bg-blue-700 rounded-full shadow hover:bg-blue-800 transition-transform duration-300 ease-in-out transform hover:scale-105"
             >
                 Connect with me on LinkedIn
             </a>
