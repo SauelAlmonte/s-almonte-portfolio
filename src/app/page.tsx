@@ -13,6 +13,10 @@ export default function Home() {
                 />
             </div>
 
+            <p className="tech-info">
+                Currently updating portfolio using Next.js, TypeScript, TailwindCSS, and Framer Motion.
+            </p>
+
             <a
                 href="https://www.linkedin.com/in/sauel-almonte/"
                 target="_blank"
