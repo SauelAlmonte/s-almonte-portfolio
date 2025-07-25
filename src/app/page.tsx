@@ -1,5 +1,8 @@
+'use client';
+
 import Image from "next/image";
 import "./globals.css";
+import BouncingBall from "@/app/component/BouncingBall";
 
 export default function Home() {
     return (
@@ -14,7 +17,7 @@ export default function Home() {
                 />
             </div>
 
-            <p className="mt-4 z-10 text-lg leading-relaxed text-gray-800 dark:text-gray-200 text-center max-w-full">
+            <p className="mt-4 z-10 text-lg leading-relaxed text-gray-800 dark:text-gray-100 text-center max-w-full">
                 Currently updating portfolio using Next.js, TypeScript, TailwindCSS, and Framer Motion.
             </p>
 
@@ -22,10 +25,11 @@ export default function Home() {
                 href="https://www.linkedin.com/in/sauel-almonte/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="z-10 mt-2 text-base text-blue-700 font-medium hover:text-blue-800 hover:underline hover:underline-offset-4 hover:decoration-blue-700 transition-transform duration-300 ease-in-out transform hover:scale-105 inline-block"
+                className="z-10 my-2 text-base text-blue-700 font-medium hover:text-blue-800 hover:underline hover:underline-offset-4 hover:decoration-blue-700 transition-transform duration-300 ease-in-out transform hover:scale-105 inline-block"
             >
                 Connect with me on LinkedIn
             </a>
+            <BouncingBall />
         </main>
     );
 }
