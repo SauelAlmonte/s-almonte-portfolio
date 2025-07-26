@@ -6,14 +6,34 @@ import React from 'react';
 const BouncingBall: React.FC = () => {
     return (
         <motion.div
-            className="z-10 w-6 h-6 mt-4 rounded-full bg-orange-500 "
+            className="z-10 w-6 h-6 mt-6 rounded-full bg-orange-500"
+            initial={{ opacity: 0, y: 20 }}
             animate={{
-                x: [-100, 100, -100]
+                opacity: 1,
+                y: 0,
+                x: [-100, 100, -100],
             }}
             transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
+                // Entrance
+                opacity: {
+                    duration: 0.6,
+                    ease: "easeInOut",
+                    delay: 6.5, // appears after button
+                },
+                y: {
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 8,
+                    duration: 0.6,
+                    delay: 1,
+                },
+                // Bounce loop
+                x: {
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 1,
+                },
             }}
         />
     );
