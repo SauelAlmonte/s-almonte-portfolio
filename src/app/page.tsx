@@ -2,15 +2,20 @@
 
 // import Image from "next/image";
 import "./globals.css";
-import BouncingBall from "@/app/component/BouncingBall";
-import UnderConstructionImage from "@/app/component/UnderConstructionImage";
-import CallToAction from "@/app/component/CallToAction";
+// import Home from "@/components/Home/Home";
+import BouncingBall from "@/components/BouncingBall";
+import UnderConstructionImage from "@/components/UnderConstructionImage";
+import CallToAction from "@/components/CallToAction";
 
-export default function Home() {
+const HomePage = ()=> {
     return (
+
+        // <Home/>
+
         <>
             <main
-                className="relative flex flex-col justify-center items-center min-h-screen p-4 text-center bg-gray-400 ">
+                className="relative flex flex-col justify-center items-center min-h-screen p-4 text-center bg-gray-400 "
+            >
 
                 <UnderConstructionImage/>
 
@@ -21,3 +26,4 @@ export default function Home() {
         </>
     );
 }
+export default HomePage;
