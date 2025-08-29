@@ -14,7 +14,8 @@ const HomePage = ()=> {
 
         <>
             <main
-                className="relative flex flex-col justify-center items-center min-h-screen p-4 text-center bg-gray-400 "
+                className="relative flex flex-col justify-center
+                            items-center min-h-screen p-4 text-center bg-gray-400 "
             >
 
                 <UnderConstructionImage/>

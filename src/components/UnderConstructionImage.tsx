@@ -20,6 +20,7 @@ const UnderConstructionImage: React.FC = () => {
         >
             <Image
                 src="/under-construction.jpg"
+                sizes="(width: 50px)"
                 alt="Under Construction"
                 fill
                 priority
