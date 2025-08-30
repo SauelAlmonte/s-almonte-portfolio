@@ -19,7 +19,7 @@ const UnderConstructionImage: React.FC = () => {
             }}
         >
             <Image
-                src="/under-construction.jpg"
+                src="/images/under-construction.jpg"
                 sizes="(width: 50px)"
                 alt="Under Construction"
                 fill
