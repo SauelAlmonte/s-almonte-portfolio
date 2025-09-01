@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@next/font": "^14.2.15",
     "@tsparticles/engine": "^3.9.1",
     "@tsparticles/plugin-emitters": "^3.9.1",
     "@tsparticles/react": "^3.0.0",
