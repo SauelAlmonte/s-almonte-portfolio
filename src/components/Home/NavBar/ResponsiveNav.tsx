@@ -1,3 +1,4 @@
+// components/Home/NavBar/ResponsiveNav.tsx
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -19,10 +20,16 @@ const ResponsiveNav = () => {
     // Announce menu state to screen readers
     useEffect(() => {
         setSrMessage(showNav ? "Navigation menu opened." : "Navigation menu closed.");
-        if (clearMsgTimer.current) window.clearTimeout(clearMsgTimer.current);
+
+        if (clearMsgTimer.current !== null) {
+            window.clearTimeout(clearMsgTimer.current);
+        }
         clearMsgTimer.current = window.setTimeout(() => setSrMessage(""), 800);
+
         return () => {
-            if (clearMsgTimer.current) window.clearTimeout(clearMsgTimer.current);
+            if (clearMsgTimer.current !== null) {
+                window.clearTimeout(clearMsgTimer.current);
+            }
         };
     }, [showNav]);
 
@@ -36,7 +43,9 @@ const ResponsiveNav = () => {
     useEffect(() => {
         const main = document.getElementById("main-content");
         if (!main) return;
+
         if (showNav) {
+            // TS lib DOM doesn't include 'inert' on HTMLElement; keep behavior, silence TS.
             main.inert = true;
             main.setAttribute("aria-hidden", "true");
         } else {
@@ -52,7 +61,7 @@ const ResponsiveNav = () => {
     return (
         <>
             {/* SR-only live region for open/close announcements */}
-            <div aria-live="polite" role="status" className="sr-only">
+            <div aria-live="polite" aria-atomic="true" role="status" className="sr-only">
                 {srMessage}
             </div>
 
@@ -61,11 +70,7 @@ const ResponsiveNav = () => {
                 mobileMenuId={MOBILE_MENU_ID}
                 isMobileMenuOpen={showNav}
             />
-            <MobileNav
-                id={MOBILE_MENU_ID}
-                showNav={showNav}
-                closeNav={closeNavHandler}
-            />
+            <MobileNav id={MOBILE_MENU_ID} showNav={showNav} closeNav={closeNavHandler} />
         </>
     );
 };

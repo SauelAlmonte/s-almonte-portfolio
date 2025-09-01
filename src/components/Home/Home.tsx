@@ -1,5 +1,6 @@
 import React from "react";
 import Hero from "@/components/Home/Hero/Hero";
+import Services from "@/components/Home/Services/Services"
 
 const Home = () => {
     return (
@@ -12,6 +13,7 @@ const Home = () => {
             className="w-full overflow-hidden focus:outline-none"
         >
             <Hero />
+            <Services />
         </main>
     );
 };
