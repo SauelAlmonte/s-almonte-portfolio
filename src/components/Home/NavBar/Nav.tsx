@@ -8,6 +8,8 @@ import { FaCode } from "react-icons/fa";
 import { BiDownload } from "react-icons/bi";
 import { HiBars3BottomRight } from "react-icons/hi2";
 import { NavLinks } from "@/constants/nav.constant";
+import SecretTrigger from "@/components/Home/Admin/SecretTrigger";
+import AdminLoginModal from "@/components/Home/Admin/AdminLoginModal";
 
 type Props = {
     openNav: () => void;               // If this ever crosses server boundary, rename to openNavAction
@@ -30,6 +32,8 @@ const Nav = ({
         window.addEventListener("scroll", handler, { passive: true });
         return () => window.removeEventListener("scroll", handler);
     }, []);
+
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
     return (
         <>
@@ -64,6 +68,8 @@ const Nav = ({
                                 S. Almonte
                             </h1>
                         </Link>
+                        <SecretTrigger onOpen={() => setShowLoginModal(true)} />
+
                     </div>
 
                     {/* Primary Navigation */}
@@ -112,6 +118,11 @@ const Nav = ({
                     </div>
                 </div>
             </header>
+            {/* Place the modal here */}
+            <AdminLoginModal
+                open={showLoginModal}
+                onClose={() => setShowLoginModal(false)}
+            />
         </>
     );
 };
