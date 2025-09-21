@@ -52,8 +52,8 @@ export default function ServiceHeading({
                         : { duration: 0.22, ease: "easeOut", delay: delay + 1 * stagger }
                 }
             >
-                and agencies to{" "}
-                <span className="text-cyan-300 font-bold">deliver bold</span>,
+                and agencies to deliver{" "}
+                <span className="text-cyan-300 font-bold">bold</span>,
             </motion.span>
 
             {/* Line 3 (cyan accents inside) */}

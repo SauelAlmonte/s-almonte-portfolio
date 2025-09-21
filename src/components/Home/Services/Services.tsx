@@ -6,11 +6,11 @@ import { SERVICES } from "@/constants/services.constants";
 
 const Services = () => {
     return (
-        <section className="py-16">
-            <div className="mx-auto max-w-7xl px-8">
+        <section className="flex justify-center items-center py-16 ">
+            <div className="mx-auto max-w-7xl p-8 ">
                 <ServicesHeading delay={6} stagger={0.22} />
 
-                <div className="mt-16 grid grid-cols-1 gap-8 sm:gap-6 md:grid-cols-2 xl:grid-cols-4 items-stretch">
+                <div className="mt-12 grid grid-cols-1 gap-8 sm:gap-6 md:grid-cols-2 xl:grid-cols-4 items-stretch">
                     {SERVICES.map(({ id, icon, name, description }, i) => (
                         <MotionServiceCard
                             key={id}

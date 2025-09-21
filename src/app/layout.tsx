@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Inter, Sansation } from "next/font/google";
-// import ResponsiveNav from "@/components/Home/NavBar/ResponsiveNav";
+import ResponsiveNav from "@/components/Home/NavBar/ResponsiveNav";
 import React from "react";
 
 const inter = Inter({
@@ -64,7 +64,7 @@ export default function RootLayout({children,}: {
             <body
                 className="font-inter text-cyan-50 bg-[#0d0d1f] antialiased w-auto"
             >
-                {/*<ResponsiveNav/>*/}
+                <ResponsiveNav/>
                 {children}
             </body>
         </html>

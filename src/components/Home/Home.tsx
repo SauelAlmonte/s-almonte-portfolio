@@ -1,6 +1,8 @@
 import React from "react";
 import Hero from "@/components/Home/Hero/Hero";
 import Services from "@/components/Home/Services/Services"
+import Resume from "@/components/Home/Resume/Resume";
+import SkillsProjects from "@/components/Home/SkillsProjects/SkillsProjects";
 
 const Home = () => {
     return (
@@ -14,6 +16,8 @@ const Home = () => {
         >
             <Hero />
             <Services />
+            <Resume/>
+            <SkillsProjects/>
         </main>
     );
 };

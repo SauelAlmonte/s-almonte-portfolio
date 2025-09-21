@@ -82,7 +82,7 @@ const Nav = ({
                                 <Link
                                     key={link.id}
                                     href={link.url}
-                                    className="text-sm xl:text-base 2xl:text-xl hover:text-cyan-300 hover:font-semibold text-cyan-50 font-medium font-inter transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 rounded motion-reduce:transition-none"
+                                    className="flex-1 text-sm xl:text-base 2xl:text-xl hover:text-cyan-300 hover:font-semibold text-cyan-50 font-medium font-inter transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 rounded motion-reduce:transition-none w-fit"
                                     aria-current={isCurrent ? "page" : undefined}
                                 >
                                     {link.label}
@@ -94,15 +94,15 @@ const Nav = ({
                     {/* Actions */}
                     <div className="flex items-center space-x-4">
                         {/* Resume: anchor for native download */}
-                        <a
-                            href="/resume/sauel_almonte_resume.pdf"
-                            download
-                            className="flex items-center space-x-2 text-sm xl:text-base 2xl:text-xl rounded-full px-4 py-2 xl:px-6 xl:py-3  cursor-pointer bg-cyan-600 hover:bg-cyan-700 transition-all duration-200 text-cyan-50 font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-[#0f142e] motion-reduce:transition-none"
-                            aria-label="Download resume (PDF)"
-                        >
-                            <BiDownload className="w-5 h-5 2xl:w-8 2xl:h-8" aria-hidden focusable="false" />
-                            <span>Resume</span>
-                        </a>
+                        {/*<a*/}
+                        {/*    href="/resume/sauel_almonte_resume.pdf"*/}
+                        {/*    download*/}
+                        {/*    className="flex items-center space-x-2 text-sm xl:text-base 2xl:text-xl rounded-full px-4 py-2 xl:px-6 xl:py-3  cursor-pointer bg-cyan-600 hover:bg-cyan-700 transition-all duration-200 text-cyan-50 font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-[#0f142e] motion-reduce:transition-none"*/}
+                        {/*    aria-label="Download resume (PDF)"*/}
+                        {/*>*/}
+                        {/*    <BiDownload className="w-5 h-5 2xl:w-8 2xl:h-8" aria-hidden focusable="false" />*/}
+                        {/*    <span>Resume</span>*/}
+                        {/*</a>*/}
 
                         {/* Mobile menu button */}
                         <button

@@ -28,6 +28,6 @@ export const SERVICES = [
         icon: "dev" as ServiceKey,
         name: "Development",
         description:
-            "Building secure, reliable, and scalable systems with clean code, advanced frameworks, and proven development tools.",
+            "Building secure, reliable, and scalable systems with clean code, using modern advanced frameworks.",
     },
 ] as const;
