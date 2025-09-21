@@ -29,7 +29,7 @@ const SkillsProjectsCard: React.FC<SkillsProjectsCardProps> = ({
         <CardContent>
             <ChartContainer
                 config={chartConfig}
-                className="mx-auto aspect-square max-h-[300px] border"
+                className="mx-auto aspect-square max-h-[300px]"
             >
                 <PieChart width={320} height={320}>
                     <ChartTooltip
