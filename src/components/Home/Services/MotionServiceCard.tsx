@@ -20,7 +20,7 @@ type Props = Readonly<{
 
 // Use cubic-bezier array for TS-safe easing (avoids string "easeOut" error)
 const cardVariants: Variants = {
-    hidden: { opacity: 0, y: 18, scale: 0.98 },
+    // hidden: { opacity: 0, y: 18, scale: 0.98 },
     show: (d: number = 0) => ({
         opacity: 1,
         y: 0,

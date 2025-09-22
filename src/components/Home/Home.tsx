@@ -3,6 +3,7 @@ import Hero from "@/components/Home/Hero/Hero";
 import Services from "@/components/Home/Services/Services"
 import Resume from "@/components/Home/Resume/Resume";
 import SkillsProjects from "@/components/Home/SkillsProjects/SkillsProjects";
+import ClientReview from "@/components/Home/ClientReview/ClientReview";
 
 const Home = () => {
     return (
@@ -18,6 +19,7 @@ const Home = () => {
             <Services />
             <Resume/>
             <SkillsProjects/>
+            <ClientReview/>
         </main>
     );
 };
