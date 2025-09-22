@@ -46,7 +46,7 @@ const ClientReview = () => {
         <div className="py-24">
             <h2 className="text-center text-2xl md:text-4xl xl:text5xl font-bold text-zinc-50">
                 Words from our <br />
-                <span className="text-cyan-300">satisfied clients</span>
+                <span className="text-cyan-300">Satisfied Clients&#33;</span>
             </h2>
             <div className="px-10 mt-8 max-w-7xl mx-auto">
                 <Carousel

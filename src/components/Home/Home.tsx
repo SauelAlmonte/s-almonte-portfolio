@@ -4,6 +4,7 @@ import Services from "@/components/Home/Services/Services"
 import Resume from "@/components/Home/Resume/Resume";
 import SkillsProjects from "@/components/Home/SkillsProjects/SkillsProjects";
 import ClientReview from "@/components/Home/ClientReview/ClientReview";
+import Blogs from "@/components/Home/Blogs/Blogs";
 
 const Home = () => {
     return (
@@ -20,6 +21,7 @@ const Home = () => {
             <Resume/>
             <SkillsProjects/>
             <ClientReview/>
+            <Blogs/>
         </main>
     );
 };
