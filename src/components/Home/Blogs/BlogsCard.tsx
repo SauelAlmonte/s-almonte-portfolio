@@ -11,7 +11,7 @@ type Props = {
 
 const BlogsCard = ({image, title, date, href, tags} : Props) => {
     return (
-        <div className="h-full flex flex-col rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md p-6 shadow-lg shadow-cyan-500/10 hover:shadow-cyan-400/20 transition duration-300 m-2">
+        <div className=" h-full w-auto flex flex-col rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md p-6 shadow-lg shadow-cyan-500/10 hover:shadow-cyan-400/20 transition duration-300 m-2">
             <div className="relative w-full h-52 rounded-lg overflow-hidden">
                 <Image
                     src={image}

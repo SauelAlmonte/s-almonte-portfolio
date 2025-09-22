@@ -7,7 +7,7 @@ import { LuMonitorPlay } from "react-icons/lu";
 
 const Resume = () => {
     return (
-        <section className="py-16 ">
+        <section className="py-24 ">
                 <div
                     className="mx-auto max-w-7xl grid grid-cols-1 gap-8 lg:grid-cols-2 px-10"
                 >

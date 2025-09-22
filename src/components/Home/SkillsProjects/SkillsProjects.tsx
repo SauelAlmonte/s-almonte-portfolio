@@ -48,7 +48,7 @@ const chartConfigCpp = {
 } as const;
 
 const SkillsProjects = () => (
-    <div className="py-16">
+    <div className="py-24">
         <h2 className="text-center text-2xl md:text-4xl xl:text-5xl font-bold text-cyan-50">
             Tech Stack
             <br />

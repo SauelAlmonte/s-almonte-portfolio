@@ -3,6 +3,7 @@ import "./globals.css";
 import { Inter, Sansation } from "next/font/google";
 import ResponsiveNav from "@/components/Home/NavBar/ResponsiveNav";
 import React from "react";
+import Footer from "@/components/Home/Footer/Footer";
 
 const inter = Inter({
     weight: ["100","200","300","400","500","600","700","800","900"],
@@ -66,6 +67,7 @@ export default function RootLayout({children,}: {
             >
                 <ResponsiveNav/>
                 {children}
+            <Footer/>
             </body>
         </html>
     )

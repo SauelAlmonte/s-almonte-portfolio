@@ -4,16 +4,16 @@ import SocialIcons from "@/components/Home/Hero/SocialIcons";
 
 const Contact = () => {
     return (
-        <div className="py-16">
+        <div className="mx-auto py-24 ">
             <h2
                 className="text-center text-2xl md:text-4xl xl:text-5xl font-bold text-zinc-50 mb-4"
             >
                 Let&#39;s <span className="text-cyan-300">Connect</span>
             </h2>
-            <div className=" max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 items-stretch">
+            <div className=" max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center justify-center">
                 {/* Left Card */}
                 <div className="p-8">
-                    <div className="p-8 h-full flex flex-col bg-white/5 rounded-xl">
+                    <div className="p-8 h-full flex flex-col">
                         <h2 className="text-left text-lg lg:text-2xl xl:text-3xl text-pretty font-bold text-zinc-50">
                             Let&#39;s Talk&#44; <span className="text-cyan-300">Book a Time</span>
                             <br />
@@ -35,7 +35,7 @@ const Contact = () => {
                 </div>
                 {/* Right Card (Form) */}
                 <div className="p-8">
-                    <div className="p-8 h-full flex flex-col bg-white/5 rounded-xl">
+                    <div className="p-8 h-full flex flex-col rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md p-6 shadow-lg shadow-cyan-500/10 hover:shadow-cyan-400/20 transition duration-300 m-2">
                         <form className="max-w-md mx-auto w-full">
                             <div className="grid md:grid-cols-2 md:gap-6">
                                 <div className="relative z-0 w-full mb-5 group">

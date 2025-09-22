@@ -28,4 +28,11 @@ export const blogLinks: BlogLink[] = [
         href: "#socialmedia", // unique
         tags: ["React.js", "Next.js", "Tailwind CSS"],
     },
+    {
+        image: "/images/b2.jpg",
+        title: "Learn how to build an amazing Blog website using next js",
+        date: "Date",
+        href: "#other", // unique
+        tags: ["React.js", "Next.js", "Tailwind CSS"],
+    },
 ];

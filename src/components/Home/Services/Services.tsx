@@ -6,7 +6,7 @@ import { SERVICES } from "@/constants/services.constants";
 
 const Services = () => {
     return (
-        <section className="flex justify-center items-center py-16 ">
+        <section className="flex justify-center items-center py-24 ">
             <div className="mx-auto max-w-7xl p-8 ">
                 <ServicesHeading delay={0} stagger={0.22} />
 
