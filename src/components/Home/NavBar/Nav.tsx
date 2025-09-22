@@ -50,7 +50,7 @@ const Nav = ({
                     navBg ? "bg-[#0f142ed9] shadow-md backdrop-blur-sm" : ""
                 }`}
             >
-                <div className="flex items-center h-full justify-between w-full px-8 mx-auto">
+                <div className=" flex items-center h-full justify-between max-w-7xl px-8 mx-auto">
                     {/* Logo / Home */}
                     <div className="flex w-auto">
                         <Link href="/" aria-label="Go to homepage"
@@ -92,7 +92,7 @@ const Nav = ({
                     </nav>
 
                     {/* Actions */}
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-4  lg:hidden" >
                         {/* Resume: anchor for native download */}
                         {/*<a*/}
                         {/*    href="/resume/sauel_almonte_resume.pdf"*/}
