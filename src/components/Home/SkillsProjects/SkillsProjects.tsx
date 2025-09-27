@@ -1,57 +1,58 @@
 import React from "react";
-import SkillsProjectsCard from "@/components/Home/SkillsProjects/SkillsProjectsCard"; // adjust path as needed
+import SkillsProjectsCard from "@/components/Home/SkillsProjects/SkillsProjectsCard";
+import UnderConstruction from "@/components/UnderConstruction"; // adjust path as needed
 
 // JavaScript/TypeScript, with frameworks
 const chartDataJS = [
-    { id: "javascript", value: 95, fill: "#0ea5e9" },   // tailwind cyan-600
-    { id: "typescript", value: 95, fill: "#06b6d4" },   // cyan-500
-    { id: "react", value: 92, fill: "#22d3ee" },        // cyan-400
-    { id: "nextjs", value: 88, fill: "#67e8f9" },       // cyan-300
+    {id: "javascript", value: 95, fill: "#0ea5e9"},   // tailwind cyan-600
+    {id: "typescript", value: 95, fill: "#06b6d4"},   // cyan-500
+    {id: "react", value: 92, fill: "#22d3ee"},        // cyan-400
+    {id: "nextjs", value: 88, fill: "#67e8f9"},       // cyan-300
 ];
 const chartConfigJS = {
-    javascript: { label: "JavaScript" },
-    typescript: { label: "TypeScript" },
-    react: { label: "React.js" },
-    nextjs: { label: "Next.js" },
+    javascript: {label: "JavaScript"},
+    typescript: {label: "TypeScript"},
+    react: {label: "React.js"},
+    nextjs: {label: "Next.js"},
 } as const;
 
 // Python, with frameworks
 const chartDataPython = [
-    { id: "python", value: 93, fill: "#0ea5e9" },       // cyan-600
-    { id: "django", value: 85, fill: "#06b6d4" },       // cyan-500
-    { id: "flask", value: 75, fill: "#22d3ee" },        // cyan-400
+    {id: "python", value: 93, fill: "#0ea5e9"},       // cyan-600
+    {id: "django", value: 85, fill: "#06b6d4"},       // cyan-500
+    {id: "flask", value: 75, fill: "#22d3ee"},        // cyan-400
 ];
 const chartConfigPython = {
-    python: { label: "Python" },
-    django: { label: "Django" },
-    flask: { label: "Flask" },
+    python: {label: "Python"},
+    django: {label: "Django"},
+    flask: {label: "Flask"},
 } as const;
 
 // Java
 const chartDataJava = [
-    { id: "java", value: 90, fill: "#06b6d4" },         // cyan-500
-    { id: "spring", value: 78, fill: "#67e8f9" },       // cyan-300
+    {id: "java", value: 90, fill: "#06b6d4"},         // cyan-500
+    {id: "spring", value: 78, fill: "#67e8f9"},       // cyan-300
 ];
 const chartConfigJava = {
-    java: { label: "Java" },
-    spring: { label: "Spring" },
+    java: {label: "Java"},
+    spring: {label: "Spring"},
 } as const;
 
 // C++
 const chartDataCpp = [
-    { id: "cpp", value: 88, fill: "#0ea5e9" },          // cyan-600
-    { id: "stl", value: 75, fill: "#06b6d4" },          // cyan-500
+    {id: "cpp", value: 88, fill: "#0ea5e9"},          // cyan-600
+    {id: "stl", value: 75, fill: "#06b6d4"},          // cyan-500
 ];
 const chartConfigCpp = {
-    cpp: { label: "C++" },
-    stl: { label: "STL" },
+    cpp: {label: "C++"},
+    stl: {label: "STL"},
 } as const;
 
 const SkillsProjects = () => (
-    <div className="py-24">
+    <section className="py-24 relative mt-10">
         <h2 className="text-center text-2xl md:text-4xl xl:text-5xl font-bold text-cyan-50">
             Tech Stack
-            <br />
+            <br/>
             <span className="text-cyan-300">Skills</span>{" "}
             <span className="text-3xl">&</span>{" "}
             <span className="text-cyan-300">Projects</span>
@@ -78,7 +79,8 @@ const SkillsProjects = () => (
                 chartConfig={chartConfigCpp}
             />
         </div>
-    </div>
+        <UnderConstruction/>
+    </section>
 );
 
 export default SkillsProjects;

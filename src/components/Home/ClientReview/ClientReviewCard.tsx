@@ -7,7 +7,7 @@ type Props = {
     role: string;
 }
 
-const ClientReviewCard = ({image, name, role} : Props) => {
+const ClientReviewCard = ({image, name, role}: Props) => {
     return (
         <div
             className="mt-2 rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md p-6
@@ -38,7 +38,8 @@ const ClientReviewCard = ({image, name, role} : Props) => {
                 <p
                     className="mt-2 text-base text-zinc-300 font-medium"
                 >
-                    &#8220;Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam sint mollitia similique blanditiis nemo, praesentium provident et a hic quam.&#8221;
+                    &#8220;Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam sint mollitia similique
+                    blanditiis nemo, praesentium provident et a hic quam.&#8221;
                 </p>
             </div>
         </div>

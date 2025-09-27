@@ -9,8 +9,7 @@ import { NavLinks } from "@/constants/nav.constant";
 
 type Props = {
     showNav: boolean;
-    closeNav: () => void;      // If passed from a server component, rename to closeNavAction
-    /** Optional id to match the toggle's aria-controls */
+    closeNav: () => void;
     id?: string;
 };
 
@@ -41,12 +40,12 @@ const MobileNav = ({ closeNav, showNav, id = "mobile-menu" }: Props) => {
                 return;
             }
             if (e.key === "Tab" && panelRef.current) {
-                const focusables = panelRef.current.querySelectorAll<HTMLElement>(
+                const focusable = panelRef.current.querySelectorAll<HTMLElement>(
                     'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
                 );
-                if (!focusables.length) return;
-                const first = focusables[0];
-                const last = focusables[focusables.length - 1];
+                if (!focusable.length) return;
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
                 const active = document.activeElement as HTMLElement;
 
                 if (!e.shiftKey && active === last) {
