@@ -49,15 +49,33 @@ const chartConfigCpp = {
 } as const;
 
 const SkillsProjects = () => (
-    <section className="py-24 relative mt-10">
-        <h2 className="text-center text-2xl md:text-4xl xl:text-5xl font-bold text-cyan-50">
+    <section
+		className="py-24 relative mt-10"
+	>
+        <h2
+			className="text-center text-2xl md:text-4xl xl:text-5xl font-bold text-cyan-50"
+		>
             Tech Stack
             <br/>
-            <span className="text-cyan-300">Skills</span>{" "}
-            <span className="text-3xl">&</span>{" "}
-            <span className="text-cyan-300">Projects</span>
+            <span
+				className="text-cyan-300"
+			>
+				Skills
+			</span>{" "}
+            <span
+				className="text-3xl"
+			>
+				&
+			</span>{" "}
+            <span
+				  className="text-cyan-300"
+			>
+				Projects
+			</span>
         </h2>
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8 mt-16 px-10 ">
+        <div
+			className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8 mt-16 px-10 "
+		>
             <SkillsProjectsCard
                 title="JavaScript/TypeScript & Frameworks"
                 chartData={chartDataJS}

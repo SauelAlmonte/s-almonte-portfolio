@@ -12,11 +12,7 @@ export type SkillsProjectsCardProps = {
     chartConfig: ChartConfig;
 };
 
-const SkillsProjectsCard: React.FC<SkillsProjectsCardProps> = ({
-                                                                   title,
-                                                                   chartData,
-                                                                   chartConfig,
-                                                               }) => (
+const SkillsProjectsCard: React.FC<SkillsProjectsCardProps> = ({title, chartData, chartConfig,}) => (
     <Card
         className="
             rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md
@@ -24,14 +20,21 @@ const SkillsProjectsCard: React.FC<SkillsProjectsCardProps> = ({
             transition duration-300 hover:border-cyan-300 hover:bg-cyan-300/10 max-w-xl "
     >
         <CardHeader>
-            <CardTitle className="text-cyan-50 text-sm lg:text-base font-semibold">{title}</CardTitle>
+            <CardTitle
+				className="text-cyan-50 text-sm lg:text-base font-semibold"
+			>
+				{title}
+			</CardTitle>
         </CardHeader>
         <CardContent>
             <ChartContainer
                 config={chartConfig}
                 className="mx-auto aspect-square max-h-[300px]"
             >
-                <PieChart width={320} height={320}>
+                <PieChart
+					width={320}
+					height={320}
+				>
                     <ChartTooltip
                         content={<ChartTooltipContent nameKey="value" hideLabel />}
                     />
