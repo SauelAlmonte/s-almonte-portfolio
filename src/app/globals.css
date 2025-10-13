@@ -125,3 +125,31 @@
     }
 }
 
+/* Autofill fix (scoped) */
+@layer utilities {
+    .autofill-fix input:-webkit-autofill,
+    .autofill-fix textarea:-webkit-autofill,
+    .autofill-fix select:-webkit-autofill {
+        /* paint over Chrome's white autofill background */
+        -webkit-box-shadow: 0 0 0 1000px var(--card) inset !important;
+        box-shadow: 0 0 0 1000px var(--card) inset !important;
+        -webkit-text-fill-color: var(--foreground) !important;
+        caret-color: var(--foreground);
+        transition: background-color 9999s ease-in-out 0s; /* prevent flash */
+    }
+
+    .autofill-fix input:-webkit-autofill:focus,
+    .autofill-fix textarea:-webkit-autofill:focus,
+    .autofill-fix select:-webkit-autofill:focus {
+        -webkit-text-fill-color: var(--foreground) !important;
+    }
+
+    /* Non-WebKit (safe no-op where unsupported) */
+    .autofill-fix input:autofill,
+    .autofill-fix textarea:autofill,
+    .autofill-fix select:autofill {
+        box-shadow: 0 0 0 1000px var(--card) inset !important;
+        color: var(--foreground);
+        caret-color: var(--foreground);
+    }
+}
