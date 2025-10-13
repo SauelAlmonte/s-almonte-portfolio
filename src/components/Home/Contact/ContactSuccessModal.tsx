@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 type Props = {
     open: boolean;
-    onCloseAction: () => void; // ✅ name ends with Action
+    onCloseAction: () => void; // keep Action suffix
 };
 
 export default function ContactSuccessModal({ open, onCloseAction }: Props) {
@@ -18,15 +18,21 @@ export default function ContactSuccessModal({ open, onCloseAction }: Props) {
             aria-labelledby="contact-success-title"
             className="fixed inset-0 z-[1000] flex items-center justify-center"
         >
-            {/* Backdrop */}
+            {/* Backdrop — darker + real blur */}
             <button
                 type="button"
                 aria-label="Close"
                 onClick={onCloseAction}
-                className="absolute inset-0 bg-black/60"
+                className="
+          absolute inset-0
+          bg-black/70
+          supports-[backdrop-filter]:backdrop-blur-sm
+          cursor-pointer
+        "
             />
 
-            <div className="relative w-[92vw] max-w-lg rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md shadow-xl shadow-cyan-500/10 p-6 sm:p-8">
+            {/* Card — opaque (no backdrop blur on the card) */}
+            <div className="relative w-[92vw] max-w-lg rounded-2xl border border-cyan-400/30 bg-[#0f1325] shadow-xl shadow-cyan-500/10 p-6 sm:p-8">
                 <div className="flex items-start gap-3">
                     <div className="mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full border border-cyan-400/30 bg-cyan-300/10">
                         <svg
@@ -55,7 +61,7 @@ export default function ContactSuccessModal({ open, onCloseAction }: Props) {
                             <button
                                 type="button"
                                 onClick={onCloseAction}
-                                className="inline-flex items-center justify-center rounded-lg border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-cyan-50 hover:bg-cyan-500/20 transition"
+                                className="inline-flex items-center justify-center rounded-lg border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-cyan-50 hover:bg-cyan-500/20 transition cursor-pointer"
                             >
                                 Close
                             </button>
@@ -64,7 +70,7 @@ export default function ContactSuccessModal({ open, onCloseAction }: Props) {
                                 href="/#contact"
                                 prefetch={false}
                                 onClick={onCloseAction}
-                                className="inline-flex items-center justify-center rounded-lg border border-zinc-600/40 px-4 py-2 text-zinc-200 hover:bg-white/5 transition"
+                                className="inline-flex items-center justify-center rounded-lg border border-zinc-600/40 px-4 py-2 text-zinc-200 hover:bg-white/5 transition cursor-pointer"
                             >
                                 Send another message
                             </Link>
@@ -77,11 +83,12 @@ export default function ContactSuccessModal({ open, onCloseAction }: Props) {
                     </div>
                 </div>
 
+                {/* X button */}
                 <button
                     type="button"
                     onClick={onCloseAction}
                     aria-label="Close"
-                    className="absolute right-3 top-3 rounded-md p-2 text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
+                    className="absolute right-3 top-3 rounded-md p-2 text-zinc-400 hover:text-zinc-200 hover:bg-white/5 cursor-pointer"
                 >
                     <svg width="18" height="18" viewBox="0 0 24 24">
                         <path

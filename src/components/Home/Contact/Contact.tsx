@@ -5,7 +5,7 @@ import SocialIcons from '@/components/Home/Hero/SocialIcons';
 
 const Contact = () => {
     return (
-        <div
+        <section
             id="contact"
             className="flex flex-col items-center justify-center py-24 min-h-dvh border-2"
         >
@@ -205,7 +205,7 @@ const Contact = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     );
 };
 

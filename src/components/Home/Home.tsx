@@ -18,9 +18,6 @@ const Home = () => {
             tabIndex={-1} // allows skip link focus
             className="w-full overflow-hidden focus:outline-none"
         >
-            <Suspense fallback={null}>
-                <ContactSuccessGate />
-            </Suspense>
             <Hero />
             <Services />
             <Resume />
@@ -28,6 +25,9 @@ const Home = () => {
             <ClientReview />
             <Blogs />
             <Contact />
+            <Suspense fallback={null}>
+                <ContactSuccessGate />
+            </Suspense>
         </main>
     );
 };
