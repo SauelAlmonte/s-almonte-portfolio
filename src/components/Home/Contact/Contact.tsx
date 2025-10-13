@@ -59,8 +59,18 @@ const Contact = () => {
                                 name="_captcha"
                                 value="false"
                             />
-                            {/* Optional redirect after success */}
-                            {/* <input type="hidden" name="_next" value="https://s-almonte.vercel.app/thanks" /> */}
+                            {/* Success redirect (create /thanks if you want a custom page) */}
+                            <input
+                                type="hidden"
+                                name="_next"
+                                value="https://s-almonte.vercel.app/thanks"
+                            />
+                            {/* Optional autoresponse to the sender */}
+                            <input
+                                type="hidden"
+                                name="_autoresponse"
+                                value="Thanks for reaching out — I’ll get back to you shortly."
+                            />
                             {/* Honeypot */}
                             <input
                                 type="text"
