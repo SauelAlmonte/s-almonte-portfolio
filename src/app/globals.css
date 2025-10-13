@@ -125,33 +125,3 @@
     }
 }
 
-/* === Autofill (Chrome/WebKit) dark-theme fix === */
-/* Use your existing surface vars so it blends with the card */
-:root { --surface-autofill: var(--card); }
-.dark { --surface-autofill: var(--card); }
-
-.autofill-dark input:-webkit-autofill,
-.autofill-dark textarea:-webkit-autofill,
-.autofill-dark select:-webkit-autofill {
-    /* paint over the browser's autofill bg */
-    box-shadow: 0 0 0 1000px var(--surface-autofill) inset !important;
-    -webkit-text-fill-color: #e4e4e7; /* zinc-200 */
-    caret-color: #e4e4e7;
-    /* stop the flash back to white */
-    transition: background-color 9999s ease-in-out 0s;
-}
-
-.autofill-dark input:-webkit-autofill:focus,
-.autofill-dark textarea:-webkit-autofill:focus,
-.autofill-dark select:-webkit-autofill:focus {
-    -webkit-text-fill-color: #ecfeff; /* near cyan-50 when focused */
-}
-
-/* Non-WebKit (limited support, harmless fallback) */
-.autofill-dark input:autofill,
-.autofill-dark textarea:autofill,
-.autofill-dark select:autofill {
-    box-shadow: 0 0 0 1000px var(--surface-autofill) inset !important;
-    color: #e4e4e7;
-    caret-color: #e4e4e7;
-}
