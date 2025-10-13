@@ -5,7 +5,10 @@ import SocialIcons from '@/components/Home/Hero/SocialIcons';
 
 const Contact = () => {
     return (
-        <div className="flex flex-col items-center justify-center py-24 min-h-dvh border-2">
+        <div
+            id="contact"
+            className="flex flex-col items-center justify-center py-24 min-h-dvh border-2"
+        >
             <h2 className="text-center text-2xl md:text-3xl xl:text-4xl mt-4 pretty font-bold text-zinc-50 mb-4">
                 Let&#39;s <span className="text-cyan-300">Connect</span>
             </h2>
@@ -21,7 +24,7 @@ const Contact = () => {
                             and See If I&#39;m the{' '}
                             <span className="text-cyan-300">Right Fit</span>
                         </h2>
-                        <p className="text-zinc-200 text-left text-base text-pretty mt-3 w-5/6 sm:w-full lg:w-5/6">
+                        <p className="text-zinc-200 text-left text-base text-pretty mt-3 w-5/6 sm:w/full lg:w-5/6">
                             Reach out to me today and let’s discuss how I can
                             help you achieve your goals.
                         </p>
@@ -42,6 +45,8 @@ const Contact = () => {
                             className="max-w-md mx-auto w-full"
                             action="https://formsubmit.co/almontesauel@gmail.com"
                             method="POST"
+                            target="_self"
+                            accept-charset="UTF-8"
                         >
                             {/* FormSubmit options */}
                             <input
@@ -59,11 +64,11 @@ const Contact = () => {
                                 name="_captcha"
                                 value="false"
                             />
-                            {/* Success redirect (create /thanks if you want a custom page) */}
+                            {/* Redirect back to homepage + open success modal + scroll to contact */}
                             <input
                                 type="hidden"
                                 name="_next"
-                                value="https://s-almonte.vercel.app/thanks"
+                                value="https://s-almonte.vercel.app/?sent=1#contact"
                             />
                             {/* Optional autoresponse to the sender */}
                             <input
@@ -119,11 +124,11 @@ const Contact = () => {
                                 <div className="relative z-0 w-full mb-5 group">
                                     <input
                                         type="tel"
-                                        pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
                                         name="phone"
                                         id="phone"
                                         className="block py-2.5 px-0 w-full text-sm text-zinc-50 bg-transparent border-0 border-b-2 border-zinc-700 appearance-none focus:outline-none focus:ring-0 focus:border-cyan-300 peer placeholder:text-zinc-400 "
                                         placeholder=" "
+                                        inputMode="tel"
                                     />
                                     <label
                                         htmlFor="phone"
@@ -182,9 +187,9 @@ const Contact = () => {
                                 <label
                                     htmlFor="message"
                                     className="absolute text-sm text-zinc-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0]
-                             peer-focus:left-0 peer-focus:text-cyan-300
-                             peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0
-                             peer-focus:scale-75 peer-focus:-translate-y-6"
+                    peer-focus:left-0 peer-focus:text-cyan-300
+                    peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0
+                    peer-focus:scale-75 peer-focus:-translate-y-6"
                                 >
                                     Message
                                 </label>

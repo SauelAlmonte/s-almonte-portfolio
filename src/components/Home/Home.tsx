@@ -6,6 +6,7 @@ import SkillsProjects from '@/components/Home/SkillsProjects/SkillsProjects';
 import ClientReview from '@/components/Home/ClientReview/ClientReview';
 import Blogs from '@/components/Home/Blogs/Blogs';
 import Contact from '@/components/Home/Contact/Contact';
+import ContactSuccessGate from '@/components/Home/Contact/ContactSuccessGate';
 
 const Home = () => {
     return (
@@ -17,6 +18,7 @@ const Home = () => {
             tabIndex={-1} // allows skip link focus
             className="w-full overflow-hidden focus:outline-none"
         >
+            <ContactSuccessGate />
             <Hero />
             <Services />
             <Resume />
