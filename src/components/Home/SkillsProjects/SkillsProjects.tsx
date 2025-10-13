@@ -1,104 +1,60 @@
-import React from "react";
-import SkillsProjectsCard from "@/components/Home/SkillsProjects/SkillsProjectsCard";
-import UnderConstruction from "@/components/UnderConstruction"; // adjust path as needed
+'use client';
 
-// JavaScript/TypeScript, with frameworks
-const chartDataJS = [
-    {id: "javascript", value: 95, fill: "#0ea5e9"},   // tailwind cyan-600
-    {id: "typescript", value: 95, fill: "#06b6d4"},   // cyan-500
-    {id: "react", value: 92, fill: "#22d3ee"},        // cyan-400
-    {id: "nextjs", value: 88, fill: "#67e8f9"},       // cyan-300
-];
-const chartConfigJS = {
-    javascript: {label: "JavaScript"},
-    typescript: {label: "TypeScript"},
-    react: {label: "React.js"},
-    nextjs: {label: "Next.js"},
-} as const;
+import React from 'react';
+import { motion } from 'framer-motion';
+import SkillsProjectsCard from '@/components/Home/SkillsProjects/SkillsProjectsCard';
+import UnderConstruction from '@/components/UnderConstruction';
+import SkillsProjectsHeading from '@/components/Home/SkillsProjects/SkillsProjectsHeading';
 
-// Python, with frameworks
-const chartDataPython = [
-    {id: "python", value: 93, fill: "#0ea5e9"},       // cyan-600
-    {id: "django", value: 85, fill: "#06b6d4"},       // cyan-500
-    {id: "flask", value: 75, fill: "#22d3ee"},        // cyan-400
-];
-const chartConfigPython = {
-    python: {label: "Python"},
-    django: {label: "Django"},
-    flask: {label: "Flask"},
-} as const;
+import {
+    buildContainer,
+    buildItem,
+    inViewTrigger,
+} from '@/_lib/motion-presets';
+import { useScrollReveal } from '@/_lib/useScrollReveal';
 
-// Java
-const chartDataJava = [
-    {id: "java", value: 90, fill: "#06b6d4"},         // cyan-500
-    {id: "spring", value: 78, fill: "#67e8f9"},       // cyan-300
-];
-const chartConfigJava = {
-    java: {label: "Java"},
-    spring: {label: "Spring"},
-} as const;
+import { SKILL_BLOCKS } from '@/constants/skills.constants';
 
-// C++
-const chartDataCpp = [
-    {id: "cpp", value: 88, fill: "#0ea5e9"},          // cyan-600
-    {id: "stl", value: 75, fill: "#06b6d4"},          // cyan-500
-];
-const chartConfigCpp = {
-    cpp: {label: "C++"},
-    stl: {label: "STL"},
-} as const;
+const SkillsProjects = () => {
+    const { ref: sectionRef, state: currentState } =
+        useScrollReveal(inViewTrigger);
+    const container = buildContainer(0.18, 0.28, 0.5);
+    const item = buildItem(16, 0.28);
 
-const SkillsProjects = () => (
-    <section
-		className="py-24 relative mt-10"
-	>
-        <h2
-			className="text-center text-2xl md:text-4xl xl:text-5xl font-bold text-cyan-50"
-		>
-            Tech Stack
-            <br/>
-            <span
-				className="text-cyan-300"
-			>
-				Skills
-			</span>{" "}
-            <span
-				className="text-3xl"
-			>
-				&
-			</span>{" "}
-            <span
-				  className="text-cyan-300"
-			>
-				Projects
-			</span>
-        </h2>
-        <div
-			className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8 mt-16 px-10 "
-		>
-            <SkillsProjectsCard
-                title="JavaScript/TypeScript & Frameworks"
-                chartData={chartDataJS}
-                chartConfig={chartConfigJS}
-            />
-            <SkillsProjectsCard
-                title="Python & Frameworks"
-                chartData={chartDataPython}
-                chartConfig={chartConfigPython}
-            />
-            <SkillsProjectsCard
-                title="Java & Frameworks"
-                chartData={chartDataJava}
-                chartConfig={chartConfigJava}
-            />
-            <SkillsProjectsCard
-                title="C++ & STL"
-                chartData={chartDataCpp}
-                chartConfig={chartConfigCpp}
-            />
-        </div>
-        <UnderConstruction/>
-    </section>
-);
+    return (
+        <section ref={sectionRef} className="py-24 relative mt-10 min-h-dvh">
+            <motion.div
+                variants={container}
+                initial="hidden"
+                animate={currentState}
+                className="mx-auto max-w-7xl px-10"
+            >
+                <motion.div variants={item}>
+                    <SkillsProjectsHeading
+                        id="skills-heading"
+                        delay={0}
+                        stagger={0.18}
+                    />
+                </motion.div>
+
+                <motion.div
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-16"
+                    variants={container}
+                >
+                    {SKILL_BLOCKS.map((b, i) => (
+                        <motion.div key={b.title} variants={item}>
+                            <SkillsProjectsCard
+                                title={b.title}
+                                chartData={b.chartData}
+                                chartConfig={b.chartConfig}
+                            />
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </motion.div>
+            <UnderConstruction />
+        </section>
+    );
+};
 
 export default SkillsProjects;
