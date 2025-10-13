@@ -40,7 +40,7 @@ const Contact = () => {
 
                 {/* Right Card (Form) */}
                 <div className="p-8">
-                    <div className="p-8 h-full flex flex-col rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md shadow-lg shadow-cyan-500/10 hover:shadow-cyan-400/20 transition duration-300 m-2 autofill-fix">
+                    <div className="p-8 h-full flex flex-col rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md shadow-lg shadow-cyan-500/10 hover:shadow-cyan-400/20 transition duration-300 m-2">
                         <form
                             className="max-w-md mx-auto w-full"
                             action="https://formsubmit.co/almontesauel@gmail.com"
