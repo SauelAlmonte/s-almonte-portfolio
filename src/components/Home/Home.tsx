@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import Hero from '@/components/Home/Hero/Hero';
 import Services from '@/components/Home/Services/Services';
 import Resume from '@/components/Home/Resume/Resume';
@@ -18,7 +18,9 @@ const Home = () => {
             tabIndex={-1} // allows skip link focus
             className="w-full overflow-hidden focus:outline-none"
         >
-            <ContactSuccessGate />
+            <Suspense fallback={null}>
+                <ContactSuccessGate />
+            </Suspense>
             <Hero />
             <Services />
             <Resume />
