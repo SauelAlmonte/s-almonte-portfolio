@@ -9,12 +9,13 @@ export default function ContactSuccessGate() {
     const router = useRouter();
     const open = search.get('sent') === '1';
 
-    function close() {
-        // remove ?sent=1 but keep the hash/route
+    // Name ends with "Action" to satisfy Next's rule
+    function closeAction() {
+        // remove ?sent=1 but keep the current path + hash
         const url = new URL(window.location.href);
         url.searchParams.delete('sent');
-        router.replace(url.pathname + url.search + url.hash);
+        router.replace(url.pathname + (url.search || '') + (url.hash || ''));
     }
 
-    return <ContactSuccessModal open={open} onClose={close} />;
+    return <ContactSuccessModal open={open} onCloseAction={closeAction} />;
 }

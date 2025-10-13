@@ -46,7 +46,7 @@ const Contact = () => {
                             action="https://formsubmit.co/almontesauel@gmail.com"
                             method="POST"
                             target="_self"
-                            accept-charset="UTF-8"
+                            acceptCharset="UTF-8"
                         >
                             {/* FormSubmit options */}
                             <input

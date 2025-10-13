@@ -1,13 +1,14 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 
 type Props = {
     open: boolean;
-    onClose: () => void;
+    onCloseAction: () => void; // ✅ name ends with Action
 };
 
-export default function ContactSuccessModal({ open, onClose }: Props) {
+export default function ContactSuccessModal({ open, onCloseAction }: Props) {
     if (!open) return null;
 
     return (
@@ -19,12 +20,12 @@ export default function ContactSuccessModal({ open, onClose }: Props) {
         >
             {/* Backdrop */}
             <button
+                type="button"
                 aria-label="Close"
-                onClick={onClose}
+                onClick={onCloseAction}
                 className="absolute inset-0 bg-black/60"
             />
 
-            {/* Card */}
             <div className="relative w-[92vw] max-w-lg rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md shadow-xl shadow-cyan-500/10 p-6 sm:p-8">
                 <div className="flex items-start gap-3">
                     <div className="mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full border border-cyan-400/30 bg-cyan-300/10">
@@ -52,17 +53,21 @@ export default function ContactSuccessModal({ open, onClose }: Props) {
 
                         <div className="mt-6 flex flex-col sm:flex-row gap-3">
                             <button
-                                onClick={onClose}
+                                type="button"
+                                onClick={onCloseAction}
                                 className="inline-flex items-center justify-center rounded-lg border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-cyan-50 hover:bg-cyan-500/20 transition"
                             >
                                 Close
                             </button>
-                            <a
+
+                            <Link
                                 href="/#contact"
+                                prefetch={false}
+                                onClick={onCloseAction}
                                 className="inline-flex items-center justify-center rounded-lg border border-zinc-600/40 px-4 py-2 text-zinc-200 hover:bg-white/5 transition"
                             >
                                 Send another message
-                            </a>
+                            </Link>
                         </div>
 
                         <p className="mt-6 text-xs text-zinc-400">
@@ -72,9 +77,9 @@ export default function ContactSuccessModal({ open, onClose }: Props) {
                     </div>
                 </div>
 
-                {/* X button */}
                 <button
-                    onClick={onClose}
+                    type="button"
+                    onClick={onCloseAction}
                     aria-label="Close"
                     className="absolute right-3 top-3 rounded-md p-2 text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
                 >
