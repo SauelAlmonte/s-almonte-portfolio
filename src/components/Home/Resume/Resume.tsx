@@ -13,7 +13,7 @@ import {
 } from '@/_lib/motion-presets';
 import { useScrollReveal } from '@/_lib/useScrollReveal';
 // import ResumeDeck from '@/components/Home/Resume/ResumeDeck';
-// import UnderConstruction from '@/components/UnderConstruction';
+import UnderConstruction from '@/components/UnderConstruction';
 
 const Resume = () => {
     // unified scroll trigger + a11y guard
@@ -86,7 +86,7 @@ const Resume = () => {
                 </motion.div>
             </div>
 
-            {/*<UnderConstruction />*/}
+            <UnderConstruction />
         </section>
     );
 };
