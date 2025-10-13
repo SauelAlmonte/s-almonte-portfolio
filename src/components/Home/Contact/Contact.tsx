@@ -1,3 +1,4 @@
+// No 'use client' needed—no hooks
 import React from 'react';
 import { BiMap } from 'react-icons/bi';
 import SocialIcons from '@/components/Home/Hero/SocialIcons';
@@ -8,7 +9,8 @@ const Contact = () => {
             <h2 className="text-center text-2xl md:text-3xl xl:text-4xl mt-4 pretty font-bold text-zinc-50 mb-4">
                 Let&#39;s <span className="text-cyan-300">Connect</span>
             </h2>
-            <div className=" max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center justify-center">
+
+            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center justify-center">
                 {/* Left Card */}
                 <div className="p-8">
                     <div className="p-8 h-full flex flex-col">
@@ -19,7 +21,7 @@ const Contact = () => {
                             and See If I&#39;m the{' '}
                             <span className="text-cyan-300">Right Fit</span>
                         </h2>
-                        <p className=" text-zinc-200 text-left text-base sm:text-left text-pretty mt-3 w-5/6 sm:w-full lg:w-5/6">
+                        <p className="text-zinc-200 text-left text-base text-pretty mt-3 w-5/6 sm:w-full lg:w-5/6">
                             Reach out to me today and let’s discuss how I can
                             help you achieve your goals.
                         </p>
@@ -28,28 +30,58 @@ const Contact = () => {
                                 <BiMap className="text-left w-9 h-9 text-cyan-300" />
                                 <p>Boston, MA</p>
                             </div>
-                            <div>
-                                <SocialIcons />
-                            </div>
+                            <SocialIcons />
                         </div>
                     </div>
                 </div>
+
                 {/* Right Card (Form) */}
                 <div className="p-8">
                     <div className="p-8 h-full flex flex-col rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md shadow-lg shadow-cyan-500/10 hover:shadow-cyan-400/20 transition duration-300 m-2">
-                        <form className="max-w-md mx-auto w-full">
+                        <form
+                            className="max-w-md mx-auto w-full"
+                            action="https://formsubmit.co/almontesauel@gmail.com"
+                            method="POST"
+                        >
+                            {/* FormSubmit options */}
+                            <input
+                                type="hidden"
+                                name="_subject"
+                                value="New contact from s-almonte.vercel.app"
+                            />
+                            <input
+                                type="hidden"
+                                name="_template"
+                                value="table"
+                            />
+                            <input
+                                type="hidden"
+                                name="_captcha"
+                                value="false"
+                            />
+                            {/* Optional redirect after success */}
+                            {/* <input type="hidden" name="_next" value="https://s-almonte.vercel.app/thanks" /> */}
+                            {/* Honeypot */}
+                            <input
+                                type="text"
+                                name="_honey"
+                                className="hidden"
+                                tabIndex={-1}
+                                autoComplete="off"
+                            />
+
                             <div className="grid md:grid-cols-2 md:gap-6">
                                 <div className="relative z-0 w-full mb-5 group">
                                     <input
                                         type="text"
-                                        name="floating_first_name"
-                                        id="floating_first_name"
+                                        name="firstName"
+                                        id="firstName"
                                         className="block py-2.5 px-0 w-full text-sm text-zinc-50 bg-transparent border-0 border-b-2 border-zinc-700 appearance-none focus:outline-none focus:ring-0 focus:border-cyan-300 peer placeholder:text-zinc-400"
                                         placeholder=" "
                                         required
                                     />
                                     <label
-                                        htmlFor="floating_first_name"
+                                        htmlFor="firstName"
                                         className="absolute text-sm text-zinc-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-cyan-300 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                                     >
                                         First name
@@ -58,33 +90,33 @@ const Contact = () => {
                                 <div className="relative z-0 w-full mb-5 group">
                                     <input
                                         type="text"
-                                        name="floating_last_name"
-                                        id="floating_last_name"
+                                        name="lastName"
+                                        id="lastName"
                                         className="block py-2.5 px-0 w-full text-sm text-zinc-50 bg-transparent border-0 border-b-2 border-zinc-700 appearance-none focus:outline-none focus:ring-0 focus:border-cyan-300 peer placeholder:text-zinc-400"
                                         placeholder=" "
                                         required
                                     />
                                     <label
-                                        htmlFor="floating_last_name"
+                                        htmlFor="lastName"
                                         className="absolute text-sm text-zinc-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-cyan-300 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                                     >
                                         Last name
                                     </label>
                                 </div>
                             </div>
+
                             <div className="grid md:grid-cols-2 md:gap-6">
                                 <div className="relative z-0 w-full mb-5 group">
                                     <input
                                         type="tel"
                                         pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-                                        name="floating_phone"
-                                        id="floating_phone"
+                                        name="phone"
+                                        id="phone"
                                         className="block py-2.5 px-0 w-full text-sm text-zinc-50 bg-transparent border-0 border-b-2 border-zinc-700 appearance-none focus:outline-none focus:ring-0 focus:border-cyan-300 peer placeholder:text-zinc-400 "
                                         placeholder=" "
-                                        required
                                     />
                                     <label
-                                        htmlFor="floating_phone"
+                                        htmlFor="phone"
                                         className="absolute text-sm text-zinc-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-cyan-300 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                                     >
                                         Phone number
@@ -93,43 +125,45 @@ const Contact = () => {
                                 <div className="relative z-0 w-full mb-5 group">
                                     <input
                                         type="text"
-                                        name="floating_company"
-                                        id="floating_company"
+                                        name="company"
+                                        id="company"
                                         className="block py-2.5 px-0 w-full text-sm text-zinc-50 bg-transparent border-0 border-b-2 border-zinc-700 appearance-none focus:outline-none focus:ring-0 focus:border-cyan-300 peer placeholder:text-zinc-400"
                                         placeholder=" "
-                                        required
                                     />
                                     <label
-                                        htmlFor="floating_company"
+                                        htmlFor="company"
                                         className="absolute text-sm text-zinc-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-cyan-300 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                                     >
                                         Company
                                     </label>
                                 </div>
                             </div>
+
+                            {/* IMPORTANT: name must be `email` so Reply-To works */}
                             <div className="relative z-0 w-full mb-5 group">
                                 <input
                                     type="email"
-                                    name="floating_email"
-                                    id="floating_email"
+                                    name="email"
+                                    id="email"
                                     className="block py-2.5 px-0 w-full text-sm text-zinc-50 bg-transparent border-0 border-b-2 border-zinc-700 appearance-none focus:outline-none focus:ring-0 focus:border-cyan-300 peer placeholder:text-zinc-400"
                                     placeholder=" "
                                     required
                                 />
                                 <label
-                                    htmlFor="floating_email"
+                                    htmlFor="email"
                                     className="absolute text-sm text-zinc-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-cyan-300 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                                 >
                                     Email address
                                 </label>
                             </div>
+
                             <div className="relative z-0 w-full mb-5 group">
                                 <textarea
                                     name="message"
                                     id="message"
                                     rows={5}
                                     className="block py-2.5 px-0 w-full text-sm text-zinc-50 bg-transparent border-0 border-b-2 border-zinc-700 appearance-none focus:outline-none focus:ring-0 focus:border-cyan-300 peer placeholder:text-transparent resize-y"
-                                    placeholder=" " // keep a space for the floating label trick
+                                    placeholder=" "
                                     required
                                     spellCheck={true}
                                     autoComplete="off"
@@ -138,9 +172,9 @@ const Contact = () => {
                                 <label
                                     htmlFor="message"
                                     className="absolute text-sm text-zinc-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0]
-                                               peer-focus:left-0 peer-focus:text-cyan-300
-                                               peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0
-                                               peer-focus:scale-75 peer-focus:-translate-y-6"
+                             peer-focus:left-0 peer-focus:text-cyan-300
+                             peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0
+                             peer-focus:scale-75 peer-focus:-translate-y-6"
                                 >
                                     Message
                                 </label>
@@ -159,4 +193,5 @@ const Contact = () => {
         </div>
     );
 };
+
 export default Contact;
