@@ -1,11 +1,11 @@
-import React from "react";
-import Hero from "@/components/Home/Hero/Hero";
-import Services from "@/components/Home/Services/Services"
-import Resume from "@/components/Home/Resume/Resume";
-import SkillsProjects from "@/components/Home/SkillsProjects/SkillsProjects";
-import ClientReview from "@/components/Home/ClientReview/ClientReview";
-import Blogs from "@/components/Home/Blogs/Blogs";
-import Contact from "@/components/Home/Contact/Contact";
+import React from 'react';
+import Hero from '@/components/Home/Hero/Hero';
+import Services from '@/components/Home/Services/Services';
+import Resume from '@/components/Home/Resume/Resume';
+import SkillsProjects from '@/components/Home/SkillsProjects/SkillsProjects';
+import ClientReview from '@/components/Home/ClientReview/ClientReview';
+import Blogs from '@/components/Home/Blogs/Blogs';
+import Contact from '@/components/Home/Contact/Contact';
 
 const Home = () => {
     return (
@@ -14,16 +14,16 @@ const Home = () => {
             id="main-content"
             role="main"
             aria-labelledby="hero-heading" // ties to the <h1 id="hero-heading"> in Hero
-            tabIndex={-1}                  // allows skip link focus
+            tabIndex={-1} // allows skip link focus
             className="w-full overflow-hidden focus:outline-none"
         >
             <Hero />
             <Services />
-            <Resume/>
-            <SkillsProjects/>
-            <ClientReview/>
-            <Blogs/>
-            <Contact/>
+            <Resume />
+            <SkillsProjects />
+            <ClientReview />
+            <Blogs />
+            <Contact />
         </main>
     );
 };
