@@ -1,8 +1,8 @@
 // components/Home/Hero/HeroTitle.tsx
-"use client";
+'use client';
 
-import React from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import React from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 
 type Props = {
     /** The id used by <section aria-labelledby "..."> for landmark naming */
@@ -16,11 +16,11 @@ type Props = {
 };
 
 export default function HeroTitle({
-                                      id = "hero-heading",
-                                      className,
-                                      delay = 0,
-                                      stagger = 0.12,
-                                  }: Props) {
+    id = 'hero-heading',
+    className,
+    delay = 0,
+    stagger = 0.12,
+}: Props) {
     // Respect user preference for reduced motion (WCAG 2: prefers-reduced-motion)
     const prefersReduced = useReducedMotion() === true;
 
@@ -32,32 +32,52 @@ export default function HeroTitle({
             tabIndex={-1}
             className={
                 className ??
-                "font-inter text-pretty text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl mt-4 text-center font-bold tracking-wide leading-[1.2] z-[100]"
+                'font-inter text-pretty text-2xl md:text-3xl lg:text-4xl xl:text-4xl 2xl:text-5xl mt-4 text-center font-bold tracking-wide leading-[1.2] z-[100]'
             }
         >
             {/* Line 1: fades/slides in unless user prefers reduced motion */}
             <motion.span
                 className="block"
-                initial={prefersReduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
+                initial={
+                    prefersReduced
+                        ? { opacity: 1, y: 0 }
+                        : { opacity: 0, y: 18 }
+                }
                 animate={{ opacity: 1, y: 0 }}
-                transition={prefersReduced ? undefined : { duration: 0.22, ease: "easeOut", delay }}
+                transition={
+                    prefersReduced
+                        ? undefined
+                        : { duration: 0.22, ease: 'easeOut', delay }
+                }
             >
                 {/* Use HTML entities you already chose to preserve punctuation/kerning */}
-                Creating Web&#44; AI&#44;
+                Creating{' '}
+                <span className="text-cyan-300 z-[100] text-pretty">Web</span>
+                &#44;{' '}
+                <span className="text-cyan-300 z-[100] text-pretty"> AI</span>
+                &#44; &#38;
             </motion.span>
 
             {/* Line 2: the cyan accent line, slightly delayed after line 1 */}
             <motion.span
                 className="block text-cyan-300 z-[100] text-pretty"
-                initial={prefersReduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
+                initial={
+                    prefersReduced
+                        ? { opacity: 1, y: 0 }
+                        : { opacity: 0, y: 18 }
+                }
                 animate={{ opacity: 1, y: 0 }}
                 transition={
                     prefersReduced
                         ? undefined
-                        : { duration: 0.22, ease: "easeOut", delay: delay + stagger }
+                        : {
+                              duration: 0.22,
+                              ease: 'easeOut',
+                              delay: delay + stagger,
+                          }
                 }
             >
-               and Cloud Solutions.
+                Cloud Solutions.
             </motion.span>
         </h1>
     );

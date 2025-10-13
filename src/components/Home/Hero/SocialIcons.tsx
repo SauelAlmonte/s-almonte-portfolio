@@ -1,11 +1,11 @@
 // components/Hero/SocialIcons.tsx
-"use client";
+'use client';
 
-import { motion, type Variants, useReducedMotion } from "framer-motion";
-import { FaGithub, FaLinkedin, FaYoutube } from "react-icons/fa";
-import { IoDocumentTextSharp } from "react-icons/io5";
-import type { IconType } from "react-icons";
-import { useId, useMemo } from "react";
+import { motion, type Variants, useReducedMotion } from 'framer-motion';
+import { FaGithub, FaLinkedin, FaYoutube } from 'react-icons/fa';
+import { IoDocumentTextSharp } from 'react-icons/io5';
+import type { IconType } from 'react-icons';
+import { useId, useMemo } from 'react';
 
 type SocialIconsProps = {
     /** Optional class overrides/extensions (Tailwind 4.1) */
@@ -42,19 +42,19 @@ const itemVariants: Variants = {
 
 // 44×44px minimum hit target, visible focus, border/glow preserved
 const linkBase =
-    "h-9 w-9 sm:h-11 sm:w-11  mt-1 " +
-    "flex items-center justify-center text-base sm:text-lg md:text-xl" +
-    "inline-flex items-center justify-center " +
-    "rounded-full border border-cyan-500 text-cyan-50 " +
-    "transition-colors drop-shadow-[0_0_15px_rgb(6_182_212/0.6)] " +
-    "focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70";
+    'h-9 w-9 sm:h-11 sm:w-11  mt-1 lg:h-12 lg:w-12 ' +
+    'flex items-center justify-center text-base sm:text-lg md:text-xl lg:text-2xl' +
+    'inline-flex items-center justify-center ' +
+    'rounded-full border border-cyan-500 text-cyan-50 ' +
+    'transition-colors drop-shadow-[0_0_15px_rgb(6_182_212/0.6)] ' +
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70';
 
 export default function SocialIcons({
-                                        className = "",
-                                        delay = 0,
-                                        stagger = 0.18,
-                                        reverse = false,
-                                    }: SocialIconsProps) {
+    className = '',
+    delay = 0,
+    stagger = 0.18,
+    reverse = false,
+}: SocialIconsProps) {
     // Normalize to a strict boolean (useReducedMotion can be boolean | null)
     const prefersReduced = useReducedMotion() === true;
 
@@ -64,10 +64,22 @@ export default function SocialIcons({
     // Define links once; labels are used for aria-label & tooltip text
     const baseLinks: LinkDef[] = useMemo(
         () => [
-            { href: "https://www.linkedin.com/in/sauel-almonte/", label: "LinkedIn", Icon: FaLinkedin },
-            { href: "https://github.com/SauelAlmonte", label: "GitHub", Icon: FaGithub },
-            { href: "https://youtube.com/", label: "YouTube", Icon: FaYoutube },
-            { href: "/resume/sauel_almonte_resume.pdf", label: "Resume", Icon: IoDocumentTextSharp },
+            {
+                href: 'https://www.linkedin.com/in/sauel-almonte/',
+                label: 'LinkedIn',
+                Icon: FaLinkedin,
+            },
+            {
+                href: 'https://github.com/SauelAlmonte',
+                label: 'GitHub',
+                Icon: FaGithub,
+            },
+            { href: 'https://youtube.com/', label: 'YouTube', Icon: FaYoutube },
+            {
+                href: '/resume/sauel_almonte_resume.pdf',
+                label: 'Resume',
+                Icon: IoDocumentTextSharp,
+            },
         ],
         []
     );
@@ -79,11 +91,11 @@ export default function SocialIcons({
         <motion.ul
             role="list"
             aria-label="Social links"
-            className={`flex items-center gap-3 pt-4 ${className}`}
+            className={`flex items-center gap-3 pt-2 ${className}`}
             variants={containerVariants}
             // When reduced motion is requested, skip animation init entirely
-            initial={prefersReduced ? false : "hidden"}
-            whileInView={prefersReduced ? undefined : "visible"}
+            initial={prefersReduced ? false : 'hidden'}
+            whileInView={prefersReduced ? undefined : 'visible'}
             viewport={{ once: true, amount: 0.3 }}
             // Stagger children (not deprecated; safe in modern Framer Motion)
             transition={{ delayChildren: delay, staggerChildren: stagger }}
@@ -104,8 +116,12 @@ export default function SocialIcons({
                             className={`${linkBase} group relative`}
                             variants={itemVariants}
                             // Motion interactions disabled when reduced motion is requested
-                            whileHover={prefersReduced ? undefined : { scale: 1.08 }}
-                            whileTap={prefersReduced ? undefined : { scale: 0.96 }}
+                            whileHover={
+                                prefersReduced ? undefined : { scale: 1.08 }
+                            }
+                            whileTap={
+                                prefersReduced ? undefined : { scale: 0.96 }
+                            }
                             title={label} // native tooltip fallback
                         >
                             {/* Icon itself is decorative once the link has a clear label */}

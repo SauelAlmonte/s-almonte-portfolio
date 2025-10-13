@@ -1,10 +1,10 @@
 // components/Home/Hero/HeroAvatar.tsx
-"use client";
+'use client';
 
-import React from "react";
-import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
-import type { Transition } from "framer-motion";
+import React from 'react';
+import Image from 'next/image';
+import { motion, useReducedMotion } from 'framer-motion';
+import type { Transition } from 'framer-motion';
 
 type Props = {
     /** Path or URL to the avatar image */
@@ -20,22 +20,29 @@ type Props = {
 };
 
 export default function HeroAvatar({
-                                       src,
-                                       alt,
-                                       size = 150,
-                                       className,
-                                       delay = 0,
-                                   }: Props) {
+    src,
+    alt,
+    size = 150,
+    className,
+    delay = 0,
+}: Props) {
     const reduced = useReducedMotion();
 
     // Spring transition config for entrance animation
-    const spring: Transition = { type: "spring", stiffness: 140, damping: 18, delay };
+    const spring: Transition = {
+        type: 'spring',
+        stiffness: 140,
+        damping: 18,
+        delay,
+    };
 
     return (
         // OUTER WRAPPER: controls avatar size and entrance animation
         <motion.div
             // Initial state (hidden, slightly rotated, scaled down, pushed down)
-            initial={reduced ? false : { opacity: 0, scale: 0.94, rotate: 2, y: 8 }}
+            initial={
+                reduced ? false : { opacity: 0, scale: 0.94, rotate: 2, y: 8 }
+            }
             // Animate to visible, upright, scaled normally
             animate={reduced ? {} : { opacity: 1, scale: 1, rotate: 0, y: 0 }}
             // Transition with spring physics (or none if reduced motion)
@@ -44,14 +51,13 @@ export default function HeroAvatar({
             whileHover={reduced ? {} : { scale: 1.02 }}
             // Responsive wrapper sizes (base = 125px, then scale up at breakpoints)
             className={`relative z-[1] 
-                w-[125px] h-[125px]
-                sm:w-36 sm:h-36
-                md:w-40 md:h-40
-                lg:w-44 lg:h-44
-                xl:w-48 xl:h-48
+                w-[200px] h-[200px]
+                md:w-56 md:h-56
+                lg:w-60 lg:h-60
+                xl:w-64 xl:h-64
                 2xl:w-52 2xl:h-52
                 [@media(min-width:2560px)]:w-56 [@media(min-width:2560px)]:h-56
-                ${className ?? ""}`}
+                ${className ?? ''}`}
         >
             {/* INNER WRAPPER: subtle idle animation (bobbing effect) */}
             <motion.div
@@ -59,7 +65,12 @@ export default function HeroAvatar({
                 transition={
                     reduced
                         ? {} // No animation if reduced motion is on
-                        : { duration: 5, repeat: Infinity, ease: "easeInOut", delay }
+                        : {
+                              duration: 5,
+                              repeat: Infinity,
+                              ease: 'easeInOut',
+                              delay,
+                          }
                 }
                 className="relative h-full w-full"
             >
@@ -69,19 +80,23 @@ export default function HeroAvatar({
                     className="pointer-events-none absolute inset-0 -z-10 rounded-full blur-2xl"
                     style={{
                         background:
-                            "radial-gradient(closest-side, rgba(34,211,238,0.7), rgba(34,211,238,0) 70%)",
-                        transform: "scale(1.25)", // enlarge glow around avatar
+                            'radial-gradient(closest-side, rgba(34,211,238,0.7), rgba(34,211,238,0) 70%)',
+                        transform: 'scale(1.25)', // enlarge glow around avatar
                     }}
-                    animate={reduced ? { opacity: 0.45 } : { opacity: [0.35, 0.65, 0.35] }}
+                    animate={
+                        reduced
+                            ? { opacity: 0.45 }
+                            : { opacity: [0.35, 0.65, 0.35] }
+                    }
                     transition={
                         reduced
                             ? {}
                             : {
-                                duration: 3.5,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                                delay: delay + 0.05,
-                            }
+                                  duration: 3.5,
+                                  repeat: Infinity,
+                                  ease: 'easeInOut',
+                                  delay: delay + 0.05,
+                              }
                     }
                 />
 

@@ -1,9 +1,9 @@
 // components/Home/Hero/HeroTagline.tsx
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
-import Typewriter from "typewriter-effect";
+import React, { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import Typewriter from 'typewriter-effect';
 
 type Props = {
     /** Optional class overrides/extensions (Tailwind 4.1, class-first) */
@@ -15,10 +15,14 @@ type Props = {
 };
 
 export default function HeroTagline({
-                                        className,
-                                        typedStrings = ["Full-Stack Developer", "AI Engineer", "Cloud Architect"],
-                                        delay = 0,
-                                    }: Props) {
+    className,
+    typedStrings = [
+        'Full-Stack Developer',
+        'AI Engineer',
+        'Cloud Solutions Architect',
+    ],
+    delay = 0,
+}: Props) {
     // Respect user preference for reduced motion (WCAG 2: prefers-reduced-motion)
     // Note: useReducedMotion() can be true/false/null; we normalize to boolean.
     const prefersReduced = useReducedMotion() === true;
@@ -30,13 +34,19 @@ export default function HeroTagline({
     return (
         // H2 is the visible tagline. We animate its entrance (fade/slide) unless reduced motion.
         <motion.h2
-            initial={prefersReduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+            initial={
+                prefersReduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }
+            }
             animate={{ opacity: 1, y: 0 }}
-            transition={prefersReduced ? undefined : { duration: 0.22, ease: "easeOut", delay }}
+            transition={
+                prefersReduced
+                    ? undefined
+                    : { duration: 0.22, ease: 'easeOut', delay }
+            }
             // Typography is responsive via Tailwind 4.1 utilities; no config file required.
             className={
                 className ??
-                "flex items-center text-pretty mt-2 px-2 text-[clamp(10px,3vw,16px)] sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl font-medium z-[100]"
+                'flex flex-col items-center text-pretty mt-2 px-2 text-lg md:text-xl lg:text-2xl xl:text-xl 2xl:text-2xl font-medium z-[100]'
             }
         >
             {/*
@@ -46,7 +56,8 @@ export default function HeroTagline({
                 This satisfies WCAG by preventing live, noisy updates in a heading.
             */}
             <span className="sr-only">
-                Hello! I’m Sauel Almonte — a passionate Full-Stack Developer, AI Engineer, and Cloud Architect.
+                Hello! I’m Sauel Almonte — a passionate: Full-Stack Developer,
+                AI Engineer, and Cloud Solutions Architect.
             </span>
 
             {/*
@@ -56,13 +67,20 @@ export default function HeroTagline({
             */}
             <motion.span
                 aria-hidden="true"
-                initial={prefersReduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                initial={
+                    prefersReduced
+                        ? { opacity: 1, y: 0 }
+                        : { opacity: 0, y: 10 }
+                }
                 animate={{ opacity: 1, y: 0 }}
-                transition={prefersReduced ? undefined : { duration: 0.22, ease: "easeOut", delay }}
+                transition={
+                    prefersReduced
+                        ? undefined
+                        : { duration: 0.22, ease: 'easeOut', delay }
+                }
             >
-                Hello&#33; I&#39;m Sauel Almonte &#8208; A Passionate
+                Hello&#33; I&#39;m Sauel Almonte &#8208; A Passionate&#58;
             </motion.span>
-
             {/*
                 Typewriter segment (visual only).
                 - aria-hidden="true" to prevent constants announcements of changing text.
@@ -73,10 +91,20 @@ export default function HeroTagline({
             <motion.span
                 className="text-cyan-300 font-bold z-[100] text-pretty"
                 aria-hidden="true"
-                initial={prefersReduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                initial={
+                    prefersReduced
+                        ? { opacity: 1, y: 0 }
+                        : { opacity: 0, y: 10 }
+                }
                 animate={{ opacity: 1, y: 0 }}
                 transition={
-                    prefersReduced ? undefined : { duration: 0.22, ease: "easeOut", delay: delay + 0.25 }
+                    prefersReduced
+                        ? undefined
+                        : {
+                              duration: 0.22,
+                              ease: 'easeOut',
+                              delay: delay + 0.25,
+                          }
                 }
                 onAnimationComplete={() => {
                     if (!prefersReduced) setStartTyping(true);
@@ -85,12 +113,12 @@ export default function HeroTagline({
                 {startTyping && (
                     <Typewriter
                         options={{
-                            strings: typedStrings,   // rotating values (visual only)
+                            strings: typedStrings, // rotating values (visual only)
                             autoStart: true,
                             loop: true,
                             delay: 75,
                             deleteSpeed: 50,
-                            wrapperClassName: "pl-2", // spacing before typed word
+                            wrapperClassName: 'pl-2', // spacing before typed word
                         }}
                     />
                 )}
