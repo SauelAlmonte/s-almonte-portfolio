@@ -1,89 +1,94 @@
-import React from "react";
-import ResumeCard from "@/components/Home/Resume/ResumeCard";
-import {FaCodepen, FaReact} from "react-icons/fa";
-import {BsDatabase} from "react-icons/bs";
-import {TbSchool} from "react-icons/tb";
-import {LuMonitorPlay} from "react-icons/lu";
-import UnderConstruction from "@/components/UnderConstruction";
+// components/Home/Resume/Resume.tsx
+'use client';
 
+import React from 'react';
+import { motion } from 'framer-motion';
+import ResumeCard from '@/components/Home/Resume/ResumeCard';
+import { EXPERIENCE, EDUCATION } from '@/constants/resume.constants';
+import ResumeHeading from '@/components/Home/Resume/ResumeHeading';
+import {
+    buildContainer,
+    buildItem,
+    inViewTrigger,
+} from '@/_lib/motion-presets';
+import { useScrollReveal } from '@/_lib/useScrollReveal';
+// import ResumeDeck from '@/components/Home/Resume/ResumeDeck';
+// import UnderConstruction from '@/components/UnderConstruction';
 
 const Resume = () => {
+    // unified scroll trigger + a11y guard
+    const { ref: sectionRef, state: currentState } =
+        useScrollReveal(inViewTrigger);
+
+    // variants (identical timing to Services)
+    const container = buildContainer(0.18, 0.28, 0.5);
+    const item = buildItem(16, 0.28);
+
     return (
-        <section
-            className="py-24 relative mt-10"
-        >
-            <div
-                className="mx-auto max-w-7xl grid grid-cols-1 gap-8 lg:grid-cols-2 px-10"
-            >
-                {/* Work Experience Section* */}
-                <div className="py-6">
-                    <h2
-                        className="text-3xl sm:text-4xl font-bold text-cyan-50"
-                    >
-                        Work <span className="text-cyan-300">Experience</span>
-                    </h2>
-                    <div
-                        className="mt-10"
-                    >
-                        <ResumeCard
-                            Icon={FaCodepen}
-                            title="Company Name"
-                            role="Full-Stack Developer"
-                            description="Lorem Ipsum "
-                            date="from &#8211; to"
+        <section ref={sectionRef} className="py-24 relative mt-10 min-h-dvh">
+            <div className="mx-auto max-w-7xl grid grid-cols-1 gap-8 lg:grid-cols-2 px-10">
+                {/* Wrap the whole content so headings + cards stagger in on scroll */}
+                <motion.div
+                    variants={container}
+                    initial="hidden"
+                    animate={currentState}
+                    className="contents"
+                >
+                    {/* Work Experience Section */}
+                    <motion.div variants={item} className="py-6">
+                        <ResumeHeading
+                            id="exp-heading"
+                            prefix="Work"
+                            accent="Experience"
+                            delay={0}
+                            stagger={0.18}
                         />
-                        <ResumeCard
-                            Icon={FaReact}
-                            title="Company Name"
-                            role="Front-End Developer"
-                            description="Lorem Ipsum "
-                            date="from &#8211; to"
+
+                        <motion.div className="mt-10" variants={container}>
+                            {EXPERIENCE.map((itemData, i) => (
+                                <motion.div key={`exp-${i}`} variants={item}>
+                                    <ResumeCard
+                                        Icon={itemData.Icon}
+                                        title={itemData.title}
+                                        role={itemData.role}
+                                        description={itemData.description}
+                                        date={itemData.date}
+                                    />
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    </motion.div>
+
+                    {/* Education */}
+                    <motion.div variants={item} className="py-6">
+                        <ResumeHeading
+                            id="edu-heading"
+                            prefix="My"
+                            accent="Education"
+                            delay={0}
+                            stagger={0.18}
                         />
-                        <ResumeCard
-                            Icon={BsDatabase}
-                            title="Company Name"
-                            role="Back-End Developer"
-                            description="Lorem Ipsum "
-                            date="from &#8211; to"
-                        />
-                    </div>
-                </div>
-                {/* Education */}
-                <div className="py-6">
-                    <h2
-                        className="text-3xl sm:text-4xl font-bold text-cyan-50"
-                    >
-                        My <span className="text-cyan-300">Education</span>
-                    </h2>
-                    <div
-                        className="mt-10"
-                    >
-                        <ResumeCard
-                            Icon={TbSchool}
-                            title="Bunker Hill Community College"
-                            role={"Computer Science A.S., \nMathematics Concentration, A.A."}
-                            description="Lorem Ipsum "
-                            date="from &#8211; to"
-                        />
-                        <ResumeCard
-                            Icon={LuMonitorPlay}
-                            title="Per Scholas"
-                            role="AWS Certification"
-                            description="Lorem Ipsum "
-                            date="from &#8211; to"
-                        />
-                        <ResumeCard
-                            Icon={LuMonitorPlay}
-                            title="MSIMBO Tech Academy"
-                            role="Full-Stack Developer Certification"
-                            description="Lorem Ipsum "
-                            date="from &#8211; to"
-                        />
-                    </div>
-                </div>
+
+                        <motion.div className="mt-10" variants={container}>
+                            {EDUCATION.map((itemData, i) => (
+                                <motion.div key={`edu-${i}`} variants={item}>
+                                    <ResumeCard
+                                        Icon={itemData.Icon}
+                                        title={itemData.title}
+                                        role={itemData.role}
+                                        description={itemData.description}
+                                        date={itemData.date}
+                                    />
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    </motion.div>
+                </motion.div>
             </div>
-            <UnderConstruction/>
+
+            {/*<UnderConstruction />*/}
         </section>
     );
-}
+};
+
 export default Resume;
