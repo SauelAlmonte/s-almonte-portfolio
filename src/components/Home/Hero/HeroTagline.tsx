@@ -46,7 +46,7 @@ export default function HeroTagline({
             // Typography is responsive via Tailwind 4.1 utilities; no config file required.
             className={
                 className ??
-                'flex flex-col items-center text-pretty mt-2 px-2 text-lg md:text-xl lg:text-2xl xl:text-xl 2xl:text-2xl font-medium z-[100]'
+                'flex flex-col items-center text-pretty mt-2 px-2 text-lg md:text-xl  2xl:text-2xl font-medium z-[100]'
             }
         >
             {/*

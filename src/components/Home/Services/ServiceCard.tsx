@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 type Props = Readonly<{
     icon: React.ReactNode;
@@ -8,39 +8,43 @@ type Props = Readonly<{
 }>;
 
 export default function ServiceCard({
-                                        icon,
-                                        name,
-                                        description,
-                                        className = "",
-                                    }: Props) {
+    icon,
+    name,
+    description,
+    className = '',
+}: Props) {
     return (
-        <section
+        <article
             className={[
-                "rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md",
-                "shadow-lg shadow-cyan-500/10 hover:shadow-cyan-400/20",
-                "transition duration-300 hover:border-cyan-300 hover:bg-cyan-300/10",
-                // let children stretch horizontally
-                "flex h-full max-w-sm flex-col items-center text-center sm:text-left sm:items-start",
-                "p-6",
+                // container
+                'h-full rounded-2xl border bg-white/5 backdrop-blur-sm',
+                'border-cyan-500/10 shadow-[0_0_0_1px_rgba(0,0,0,0.06)]',
+                // interaction
+                'transition-colors duration-300',
+                'hover:border-cyan-300/30 hover:bg-cyan-300/5',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60',
+                // layout
+                'flex flex-col items-center sm:items-start text-center sm:text-left',
+                'p-6 hover:shadow-cyan-400/25',
                 className,
-            ].join(" ")}
+            ].join(' ')}
         >
-            {/* icon (center it without affecting child stretch) */}
-                <div className="" aria-hidden="true">
-                    <div className="[&>svg]:h-10 [&>svg]:w-10 sm:[&>svg]:h-11 sm:[&>svg]:w-11 [&>svg]:fill-cyan-500">
-                        {icon}
-                    </div>
+            {/* Icon */}
+            <div aria-hidden="true" className="text-cyan-300">
+                <div className="[&>svg]:h-10 [&>svg]:w-10 sm:[&>svg]:h-11 sm:[&>svg]:w-11 [&>svg]:fill-current">
+                    {icon}
                 </div>
+            </div>
 
-                {/* title */}
-                <h2 className="mt-4 font-bold text-zinc-200 text-balance text-base sm:text-lg md:text-xl">
-                    {name}
-                </h2>
+            {/* Title */}
+            <h3 className="mt-4 text-lg md:text-xl lg:text-[22px] font-semibold tracking-tight text-zinc-100">
+                {name}
+            </h3>
 
-                {/* description – fills full card width now */}
-                <p className="mt-2 text-zinc-300 text-wrap text-sm sm:text-base font-normal leading-5.5 tracking-wide ">
-                    {description}
-                </p>
-        </section>
+            {/* Description */}
+            <p className="mt-2 text-sm sm:text-[15px] leading-relaxed text-zinc-300 max-w-[36ch] lg:max-w-[40ch]">
+                {description}
+            </p>
+        </article>
     );
 }

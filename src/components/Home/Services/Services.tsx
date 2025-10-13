@@ -1,37 +1,115 @@
-import React from "react";
-import ServicesHeading from "@/components/Home/Services/ServicesHeading";
-import MotionServiceCard from "@/components/Home/Services/MotionServiceCard";
-import ServiceIcon from "@/components/Home/Services/ServiceIcons";
-import {SERVICES} from "@/constants/services.constants";
-import UnderConstruction from "@/components/UnderConstruction";
+// components/Home/Services/Services.tsx
+'use client';
+
+import React, { useRef } from 'react';
+import {
+    motion,
+    useInView,
+    useReducedMotion,
+    stagger, // <-- NEW
+    type Variants,
+} from 'framer-motion';
+import ServicesHeading from '@/components/Home/Services/ServicesHeading';
+import MotionServiceCard from '@/components/Home/Services/MotionServiceCard';
+import ServiceIcon from '@/components/Home/Services/ServiceIcons';
+import { SERVICES } from '@/constants/services.constants';
+// import UnderConstruction from '@/components/UnderConstruction';
+
+/* === NEW: credibility metrics (simple data) === */
+// const METRICS = [
+//     { id: 'uptime', value: '~99.9%', label: 'uptime targets' },
+//     { id: 'mvp', value: '2–4wk', label: 'to MVP' },
+//     { id: 'a11y', value: 'A11y', label: 'WCAG-aware by default' },
+// ] as const;
 
 const Services = () => {
+    // === in-view trigger + a11y motion guard ===
+    const sectionRef = useRef<HTMLElement | null>(null);
+    const prefersReduced = useReducedMotion() === true;
+    const isInView = useInView(sectionRef, { amount: 0.5, once: true });
+
+    // === variants (use new stagger API) ===
+    const container = {
+        hidden: { opacity: 0, y: 20 },
+        show: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.5,
+                ease: 'easeOut',
+                // was: staggerChildren: 0.12,
+                delayChildren: stagger(0.18, { startDelay: 0.28 }), // ✅ modern API
+            },
+        },
+    } satisfies Variants;
+
+    const item = {
+        hidden: { opacity: 0, y: 16 },
+        show: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.28, ease: 'easeOut' },
+        },
+    } satisfies Variants;
+
+    const currentState = prefersReduced ? 'show' : isInView ? 'show' : 'hidden';
+
     return (
         <section
-            className="flex justify-center items-center py-24 relative mt-10"
+            ref={sectionRef}
+            className="min-h-dvh flex justify-center items-center py-24 relative mt-10"
         >
-            <div
-                className="mx-auto max-w-7xl p-8 "
-            >
-                <ServicesHeading delay={0} stagger={0.22}/>
-
-                <div
-                    className="mt-12 grid grid-cols-1 gap-8 sm:gap-6 md:grid-cols-2 xl:grid-cols-4 items-stretch"
+            <div className="mx-auto max-w-7xl p-8 ">
+                {/* === wrap heading in motion to participate in scroll trigger === */}
+                <motion.div
+                    variants={container}
+                    initial="hidden"
+                    animate={currentState}
                 >
-                    {SERVICES.map(({id, icon, name, description}, i) => (
-                        <MotionServiceCard
-                            key={id}
-                            index={i}
-                            delay={0}
-                            stagger={0.25}
-                            icon={<ServiceIcon name={icon}/>}
-                            name={name}
-                            description={description}
-                        />
-                    ))}
-                </div>
+                    <motion.div variants={item}>
+                        <ServicesHeading delay={0} stagger={0.22} />
+                    </motion.div>
+
+                    {/* === motion wrapper for grid + items (kept your classes/props) === */}
+                    <motion.div
+                        className="mt-12 grid grid-cols-1 gap-8 sm:gap-6 md:grid-cols-2 xl:grid-cols-4 items-stretch"
+                        variants={container}
+                    >
+                        {SERVICES.map(({ id, icon, name, description }, i) => (
+                            <motion.div key={id} variants={item}>
+                                <MotionServiceCard
+                                    index={i}
+                                    delay={0}
+                                    stagger={0.25}
+                                    icon={<ServiceIcon name={icon} />}
+                                    name={name}
+                                    description={description}
+                                />
+                            </motion.div>
+                        ))}
+                    </motion.div>
+
+                    {/* === NEW: Credibility row (staggered with same variants) === */}
+                    {/*<motion.ul*/}
+                    {/*    className="mt-8 grid grid-cols-3 gap-4 text-center text-cyan-100/80 text-xs md:text-sm"*/}
+                    {/*    variants={container}*/}
+                    {/*>*/}
+                    {/*    {METRICS.map(({ id, value, label }) => (*/}
+                    {/*        <motion.li*/}
+                    {/*            key={id}*/}
+                    {/*            variants={item}*/}
+                    {/*            className="leading-tight"*/}
+                    {/*        >*/}
+                    {/*            <span className="font-bold text-cyan-300">*/}
+                    {/*                {value}*/}
+                    {/*            </span>{' '}*/}
+                    {/*            {label}*/}
+                    {/*        </motion.li>*/}
+                    {/*    ))}*/}
+                    {/*</motion.ul>*/}
+                </motion.div>
             </div>
-            <UnderConstruction/>
+            {/*<UnderConstruction/>*/}
         </section>
     );
 };

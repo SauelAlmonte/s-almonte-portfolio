@@ -54,9 +54,9 @@ export default function HeroAvatar({
                 w-[200px] h-[200px]
                 md:w-56 md:h-56
                 lg:w-60 lg:h-60
-                xl:w-64 xl:h-64
-                2xl:w-52 2xl:h-52
-                [@media(min-width:2560px)]:w-56 [@media(min-width:2560px)]:h-56
+                // xl:w-60 xl:h-60
+                2xl:w-80 2xl:h-80
+                [@media(min-width:2560px)]:w-64 [@media(min-width:2560px)]:h-64
                 ${className ?? ''}`}
         >
             {/* INNER WRAPPER: subtle idle animation (bobbing effect) */}

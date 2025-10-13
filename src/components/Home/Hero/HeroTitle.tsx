@@ -32,7 +32,7 @@ export default function HeroTitle({
             tabIndex={-1}
             className={
                 className ??
-                'font-inter text-pretty text-2xl md:text-3xl lg:text-4xl xl:text-4xl 2xl:text-5xl mt-4 text-center font-bold tracking-wide leading-[1.2] z-[100]'
+                'font-inter text-pretty text-2xl md:text-3xl xl:text-4xl mt-4 text-center font-bold tracking-wide leading-[1.2] z-[100]'
             }
         >
             {/* Line 1: fades/slides in unless user prefers reduced motion */}
