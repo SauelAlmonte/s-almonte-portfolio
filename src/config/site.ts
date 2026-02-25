@@ -1,18 +1,61 @@
 export const siteConfig = {
-  name: "My Portfolio",
-  description: "Full-stack developer portfolio showcasing projects, skills, and experience.",
+  /* ── Identity ── */
+  name: "Sauel Almonte",
+  title: "Sauel Almonte — Full-Stack & AI Engineer",
+  description:
+    "Full-Stack Software Engineer based in Boston, MA specializing in scalable cloud applications, AI-powered automation, and modern web experiences. AWS Certified. Mentor. Builder.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  nav: [
-    { label: "Home", href: "#home" },
-    { label: "About", href: "#about" },
-    { label: "Skills & Projects", href: "#skills" },
-    { label: "Experience", href: "#experience" },
-    { label: "Contact", href: "#contact" },
-  ],
-  social: {
-    github: process.env.NEXT_PUBLIC_GITHUB_URL ?? "",
-    linkedin: process.env.NEXT_PUBLIC_LINKEDIN_URL ?? "",
-    twitter: process.env.NEXT_PUBLIC_TWITTER_URL ?? "",
-    youtube: process.env.NEXT_PUBLIC_YOUTUBE_URL ?? "",
+
+  /* ── Person metadata (used in JSON-LD & meta tags) ── */
+  person: {
+    name: "Sauel Almonte",
+    jobTitle: "Full-Stack Software Engineer",
+    location: "Boston, MA",
+    nationality: "Dominican-American",
+    languages: ["English", "Spanish"],
+    email: "almontesauel@gmail.com",
+    skills: [
+      "Next.js", "React", "TypeScript", "Node.js", "Python",
+      "AWS", "MongoDB", "PostgreSQL", "Docker", "AI Engineering",
+      "TailwindCSS", "GraphQL", "REST APIs", "Cloud Architecture",
+    ],
+    companies: ["Wayfair", "North Light AI"],
+    certifications: [
+      "AWS Certified Cloud Practitioner",
+      "Meta Front-End Developer Certificate",
+      "C++ Essentials 1 & 2 — CISCO Network Academy",
+    ],
   },
+
+  /* ── Nav ── */
+  nav: [
+    { label: "Home",             href: "#home"       },
+    { label: "About",            href: "#about"      },
+    { label: "Skills & Projects",href: "#skills"     },
+    { label: "Experience",       href: "#experience" },
+    { label: "Contact",          href: "#contact"    },
+  ],
+
+  /* ── Social ── */
+  social: {
+    github:   process.env.NEXT_PUBLIC_GITHUB_URL   ?? "https://github.com/SauelAlmonte",
+    linkedin: process.env.NEXT_PUBLIC_LINKEDIN_URL ?? "https://linkedin.com/in/sauel-almonte",
+    twitter:  process.env.NEXT_PUBLIC_TWITTER_URL  ?? "",
+    youtube:  process.env.NEXT_PUBLIC_YOUTUBE_URL  ?? "",
+  },
+
+  /* ── Keywords ── */
+  keywords: [
+    "Sauel Almonte",
+    "Full-Stack Engineer",
+    "Software Engineer Boston",
+    "AI Engineer",
+    "Cloud Developer",
+    "Next.js Developer",
+    "React Developer",
+    "AWS Certified",
+    "Portfolio",
+    "Web Developer Boston MA",
+    "Dominican American Engineer",
+  ],
 } as const;

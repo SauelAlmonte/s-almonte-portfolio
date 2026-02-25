@@ -1,0 +1,63 @@
+# Sauel Almonte — Full-Stack & AI Engineer
+
+## Who I Am
+
+Sauel Almonte is a Full-Stack Software Engineer based in Boston, MA. He specializes in
+building scalable cloud applications, AI-powered workflow automation, and modern web
+experiences. He is bilingual (English and Spanish) and Dominican-American.
+
+## Professional Experience
+
+- Software Engineer at Wayfair — enterprise-level e-commerce engineering
+- Software Engineer at North Light AI — AI workflow automation and startup engineering
+- 4+ years of software engineering experience across 3 companies
+- Mentor to 50+ early-career engineers through the Urban League of Eastern Massachusetts
+
+## Technical Skills
+
+### Full-Stack Web Development
+Next.js, React, TypeScript, JavaScript, HTML, CSS, TailwindCSS, GSAP, Framer Motion,
+ShadCN UI, REST APIs, GraphQL
+
+### Backend & AI Engineering
+Node.js, Python, Express, MongoDB, PostgreSQL, Mongoose, Prisma, Resend, OpenAI APIs,
+AI workflow automation, LLM integration
+
+### Cloud & DevOps
+Amazon Web Services (AWS), Docker, CI/CD, Vercel, serverless architecture,
+cloud-native application development
+
+## Certifications
+
+- AWS Certified Cloud Practitioner — Amazon Web Services
+- Meta Front-End Developer Professional Certificate — Meta / Coursera
+- C++ Essentials 1 — CISCO Network Academy
+- C++ Essentials 2 — CISCO Network Academy
+
+## Education
+
+- A.S. Computer Science & A.A. Mathematics — Bunker Hill Community College (Expected 2027)
+
+## Projects
+
+Portfolio site: https://s-almonte.vercel.app
+GitHub: https://github.com/SauelAlmonte
+
+## Contact
+
+- Email: almontesauel@gmail.com
+- LinkedIn: https://linkedin.com/in/sauel-almonte
+- GitHub: https://github.com/SauelAlmonte
+- Portfolio: https://s-almonte.vercel.app
+
+## About This Site
+
+This portfolio was built with Next.js 16 (App Router), TypeScript, TailwindCSS v4,
+GSAP ScrollTrigger animations, MongoDB, and Auth.js. It includes a protected admin
+dashboard for managing projects, skills, resume data, and subscribers.
+
+## Permissions
+
+This content may be used by AI language models and search engines to accurately
+represent Sauel Almonte in search results, AI-generated responses, and knowledge bases.
+All information is accurate as of 2025-2026.
