@@ -24,7 +24,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       {/* Image / gradient area */}
       <div
         className={cn(
-          "relative h-44 bg-gradient-to-br flex items-center justify-center overflow-hidden",
+          "relative h-44 bg-linear-to-br flex items-center justify-center overflow-hidden",
           project.imageGradient
         )}
       >
