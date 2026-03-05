@@ -27,6 +27,12 @@
 # cursor — local rules, not for repo
 .cursor/
 
+# IDE's
+.vscode/
+.idea/
+
+
+
 # debug
 npm-debug.log*
 yarn-debug.log*
