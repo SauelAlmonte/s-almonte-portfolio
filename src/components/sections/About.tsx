@@ -77,12 +77,12 @@ export function About() {
       gsap.set(photoCardRef.current, { opacity: 1, scale: 1, rotation: 0, y: 0 });
       gsap.set([badge1Ref.current, badge2Ref.current], { opacity: 1, scale: 1, y: 0 });
       /* Bio + download: always visible, no GSAP */
-      gsap.utils.toArray<HTMLElement>("[data-stat-card]").forEach((c) =>
-        gsap.set(c, { opacity: 1, scale: 1, rotation: 0, y: 0 })
-      );
-      gsap.utils.toArray<HTMLElement>("[data-edu-card]").forEach((c) =>
-        gsap.set(c, { opacity: 1, x: 0, scale: 1 })
-      );
+      gsap.utils.toArray<HTMLElement>("[data-stat-card]").forEach((c) => {
+        gsap.set(c, { opacity: 1, scale: 1, rotation: 0, y: 0 });
+      });
+      gsap.utils.toArray<HTMLElement>("[data-edu-card]").forEach((c) => {
+        gsap.set(c, { opacity: 1, x: 0, scale: 1 });
+      });
       ScrollTrigger.create({
         trigger: statsRef.current,
         start: "top 80%",
@@ -274,12 +274,12 @@ export function About() {
         gsap.set(photoCardRef.current, { opacity: 1, scale: 1, y: 0 });
         gsap.set([badge1Ref.current, badge2Ref.current], { opacity: 1, scale: 1 });
         /* Bio + download: always visible, no GSAP */
-        gsap.utils.toArray<HTMLElement>("[data-stat-card]").forEach((c) =>
-          gsap.set(c, { opacity: 1, y: 0 })
-        );
-        gsap.utils.toArray<HTMLElement>("[data-edu-card]").forEach((c) =>
-          gsap.set(c, { opacity: 1, y: 0 })
-        );
+        gsap.utils.toArray<HTMLElement>("[data-stat-card]").forEach((c) => {
+          gsap.set(c, { opacity: 1, y: 0 });
+        });
+        gsap.utils.toArray<HTMLElement>("[data-edu-card]").forEach((c) => {
+          gsap.set(c, { opacity: 1, y: 0 });
+        });
         ScrollTrigger.create({
           trigger: statsRef.current,
           start: "top 85%",
@@ -402,7 +402,7 @@ export function About() {
           <div ref={photoColRef} className="flex justify-center lg:justify-end lg:sticky lg:top-[15vh]">
             <div ref={photoCardRef} className="relative opacity-0">
               {/* Decorative rings */}
-              <div className="absolute -inset-4 rounded-full border border-primary/20 animate-pulse" />
+              <div className="absolute -inset-4 rounded-full border border-primary/20 motion-safe:animate-pulse" />
               <div className="absolute -inset-8 rounded-full border border-accent/10" />
 
               {/* Avatar */}
@@ -482,7 +482,7 @@ export function About() {
                 asChild
               >
                 <a href="/resume.pdf" download="sauel_almonte_resume.pdf" aria-label="Download resume PDF">
-                  <Download className="mr-2 h-4 w-4 group-hover:animate-bounce" />
+                  <Download className="mr-2 h-4 w-4 motion-safe:group-hover:animate-bounce" />
                   Download Resume
                 </a>
               </Button>
