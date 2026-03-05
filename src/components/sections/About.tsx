@@ -71,8 +71,33 @@ export function About() {
   useEffect(() => {
     const mm = gsap.matchMedia();
 
-    /* ─── DESKTOP (≥1024 px) ─── */
-    mm.add("(min-width: 1024px)", () => {
+    /* ─── DESKTOP + REDUCED MOTION: show content immediately, no animations ─── */
+    mm.add("(min-width: 1024px) and (prefers-reduced-motion: reduce)", () => {
+      gsap.set(headingRef.current, { clipPath: "inset(0% 0 0 0)", opacity: 1, y: 0 });
+      gsap.set(photoCardRef.current, { opacity: 1, scale: 1, rotation: 0, y: 0 });
+      gsap.set([badge1Ref.current, badge2Ref.current], { opacity: 1, scale: 1, y: 0 });
+      /* Bio + download: always visible, no GSAP */
+      gsap.utils.toArray<HTMLElement>("[data-stat-card]").forEach((c) => {
+        gsap.set(c, { opacity: 1 });
+      });
+      gsap.utils.toArray<HTMLElement>("[data-edu-card]").forEach((c) => {
+        gsap.set(c, { opacity: 1 });
+      });
+      ScrollTrigger.create({
+        trigger: statsRef.current,
+        start: "top 80%",
+        once: true,
+        onEnter: () => {
+          STATS.forEach((stat, i) => {
+            const el = statValueRefs.current[i];
+            if (el) el.textContent = stat.value.toString();
+          });
+        },
+      });
+    });
+
+    /* ─── DESKTOP (≥1024 px) + NO REDUCED MOTION ─── */
+    mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
 
       /* --- Background parallax blobs --- */
       gsap.to(blob1Ref.current, {
@@ -165,58 +190,19 @@ export function About() {
         },
       });
 
-      /* --- Bio paragraphs — clip-path wipe from bottom, staggered --- */
-      const paras = gsap.utils.toArray<HTMLElement>("[data-bio-para]");
-      paras.forEach((para, i) => {
-        gsap.fromTo(
-          para,
-          { clipPath: "inset(100% 0 0 0)", opacity: 0 },
-          {
-            clipPath: "inset(0% 0 0 0)",
-            opacity: 1,
-            duration: 0.85,
-            ease: "power3.out",
-            delay: i * 0.18,
-            scrollTrigger: {
-              trigger: para,
-              start: "top 82%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
-      });
+      /* --- Bio paragraphs + Download button: always visible (no GSAP) — content must be readable without scroll/animation --- */
 
-      /* --- Download button slide up --- */
-      gsap.fromTo(
-        "[data-download-btn]",
-        { opacity: 0, y: 24 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: "[data-download-btn]",
-            start: "top 88%",
-            toggleActions: "play none none none",
-          },
-        }
-      );
-
-      /* --- Stats: scale + rotation entrance + counter --- */
+      /* --- Stats: fade-in + counter --- */
       const statCards = gsap.utils.toArray<HTMLElement>("[data-stat-card]");
       statCards.forEach((card, i) => {
         gsap.fromTo(
           card,
-          { opacity: 0, scale: 0.7, rotation: i % 2 === 0 ? -8 : 8, y: 30 },
+          { opacity: 0 },
           {
             opacity: 1,
-            scale: 1,
-            rotation: 0,
-            y: 0,
-            duration: 0.7,
-            ease: "back.out(1.5)",
-            delay: i * 0.12,
+            duration: 0.6,
+            ease: "power2.out",
+            delay: i * 0.1,
             scrollTrigger: {
               trigger: statsRef.current,
               start: "top 80%",
@@ -251,19 +237,16 @@ export function About() {
         },
       });
 
-      /* --- Education cards: alternating L/R slide with stagger --- */
+      /* --- Education cards: fade-in --- */
       const eduCards = gsap.utils.toArray<HTMLElement>("[data-edu-card]");
       eduCards.forEach((card, i) => {
-        const fromX = i % 2 === 0 ? -70 : 70;
         gsap.fromTo(
           card,
-          { opacity: 0, x: fromX, scale: 0.92 },
+          { opacity: 0 },
           {
             opacity: 1,
-            x: 0,
-            scale: 1,
-            duration: 0.75,
-            ease: "power3.out",
+            duration: 0.6,
+            ease: "power2.out",
             delay: i * 0.1,
             scrollTrigger: {
               trigger: educationRef.current,
@@ -275,8 +258,37 @@ export function About() {
       });
     });
 
-    /* ─── MOBILE (< 1024 px) ─── */
+    /* ─── MOBILE / TABLET (< 1024 px) ─── */
     mm.add("(max-width: 1023px)", () => {
+      const prefersReducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (prefersReducedMotion) {
+        /* Show all content immediately, no animations */
+        gsap.set(headingRef.current, { clearProps: "clipPath,opacity,y" });
+        gsap.set(photoCardRef.current, { opacity: 1, scale: 1, y: 0 });
+        gsap.set([badge1Ref.current, badge2Ref.current], { opacity: 1, scale: 1 });
+        /* Bio + download: always visible, no GSAP */
+        gsap.utils.toArray<HTMLElement>("[data-stat-card]").forEach((c) => {
+          gsap.set(c, { opacity: 1 });
+        });
+        gsap.utils.toArray<HTMLElement>("[data-edu-card]").forEach((c) => {
+          gsap.set(c, { opacity: 1 });
+        });
+        ScrollTrigger.create({
+          trigger: statsRef.current,
+          start: "top 85%",
+          once: true,
+          onEnter: () => {
+            STATS.forEach((stat, i) => {
+              const el = statValueRefs.current[i];
+              if (el) el.textContent = stat.value.toString();
+            });
+          },
+        });
+        return () => {};
+      }
+
+      /* Run animations */
       const ctx = gsap.context(() => {
         /* Blob parallax (subtle on mobile) */
         gsap.to(blob1Ref.current, {
@@ -290,11 +302,8 @@ export function About() {
           },
         });
 
-        /* Heading */
-        gsap.fromTo(headingRef.current, { opacity: 0, y: 40 }, {
-          opacity: 1, y: 0, duration: 0.8, ease: "power3.out",
-          scrollTrigger: { trigger: headingRef.current, start: "top 88%" },
-        });
+        /* Heading — skip animation on mobile; .about-animate-initial keeps it visible */
+        gsap.set(headingRef.current, { clearProps: "clipPath,opacity" });
 
         /* Photo */
         gsap.fromTo(photoCardRef.current, { opacity: 0, scale: 0.85, y: 30 }, {
@@ -306,20 +315,13 @@ export function About() {
           scrollTrigger: { trigger: photoCardRef.current, start: "top 82%" },
         });
 
-        /* Bio paras */
-        const paras = gsap.utils.toArray<HTMLElement>("[data-bio-para]");
-        paras.forEach((para, i) => {
-          gsap.fromTo(para, { opacity: 0, y: 30 }, {
-            opacity: 1, y: 0, duration: 0.7, ease: "power3.out", delay: i * 0.12,
-            scrollTrigger: { trigger: para, start: "top 85%" },
-          });
-        });
+        /* Bio + download: always visible (no GSAP) */
 
         /* Stats */
         const statCards = gsap.utils.toArray<HTMLElement>("[data-stat-card]");
         statCards.forEach((card, i) => {
-          gsap.fromTo(card, { opacity: 0, y: 30 }, {
-            opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: i * 0.1,
+          gsap.fromTo(card, { opacity: 0 }, {
+            opacity: 1, duration: 0.6, ease: "power2.out", delay: i * 0.1,
             scrollTrigger: { trigger: statsRef.current, start: "top 85%" },
           });
         });
@@ -344,8 +346,8 @@ export function About() {
         /* Education */
         const eduCards = gsap.utils.toArray<HTMLElement>("[data-edu-card]");
         eduCards.forEach((card, i) => {
-          gsap.fromTo(card, { opacity: 0, y: 40 }, {
-            opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: i * 0.1,
+          gsap.fromTo(card, { opacity: 0 }, {
+            opacity: 1, duration: 0.6, ease: "power2.out", delay: i * 0.1,
             scrollTrigger: { trigger: educationRef.current, start: "top 85%" },
           });
         });
@@ -379,7 +381,7 @@ export function About() {
       <div className="max-w-6xl mx-auto space-y-24">
 
         {/* Heading */}
-        <div ref={headingRef} style={{ clipPath: "inset(100% 0 0 0)", opacity: 0 }}>
+        <div ref={headingRef} className="about-animate-initial">
           <SectionHeading
             label="About Me"
             title="Who I Am"
@@ -394,11 +396,11 @@ export function About() {
           <div ref={photoColRef} className="flex justify-center lg:justify-end lg:sticky lg:top-[15vh]">
             <div ref={photoCardRef} className="relative opacity-0">
               {/* Decorative rings */}
-              <div className="absolute -inset-4 rounded-full border border-primary/20 animate-pulse" />
+              <div className="absolute -inset-4 rounded-full border border-primary/20 motion-safe:animate-pulse" />
               <div className="absolute -inset-8 rounded-full border border-accent/10" />
 
               {/* Avatar */}
-              <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full bg-gradient-to-br from-primary/30 via-accent/20 to-secondary/30 flex items-center justify-center shadow-2xl ring-4 ring-primary/20">
+              <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full bg-linear-to-br from-primary/30 via-accent/20 to-secondary/30 flex items-center justify-center shadow-2xl ring-4 ring-primary/20">
                 <span className="text-6xl font-extrabold text-primary tracking-tight select-none">
                   SA
                 </span>
@@ -427,12 +429,16 @@ export function About() {
           </div>
 
           {/* Bio */}
-          <div ref={contentRef} className="space-y-6 lg:pt-4">
+          <div
+            ref={contentRef}
+            data-bio-block
+            className="space-y-6"
+            style={{ opacity: 1, visibility: "visible" }}
+          >
             <div className="space-y-5 text-muted-foreground leading-relaxed">
               <p
                 data-bio-para
                 className="text-base sm:text-lg"
-                style={{ clipPath: "inset(100% 0 0 0)", opacity: 0 }}
               >
                 I&apos;m a{" "}
                 <span className="text-foreground font-semibold">Full-Stack Software Engineer</span>{" "}
@@ -445,7 +451,6 @@ export function About() {
               <p
                 data-bio-para
                 className="text-base sm:text-lg"
-                style={{ clipPath: "inset(100% 0 0 0)", opacity: 0 }}
               >
                 Beyond coding, I&apos;m deeply committed to community. I&apos;ve{" "}
                 <span className="text-foreground font-semibold">mentored 50+ early-career engineers</span>{" "}
@@ -455,7 +460,6 @@ export function About() {
               <p
                 data-bio-para
                 className="text-base sm:text-lg"
-                style={{ clipPath: "inset(100% 0 0 0)", opacity: 0 }}
               >
                 I&apos;m currently pursuing my{" "}
                 <span className="text-foreground font-medium">A.S. in Computer Science</span> at
@@ -464,7 +468,7 @@ export function About() {
               </p>
             </div>
 
-            <div data-download-btn style={{ opacity: 0 }}>
+            <div data-download-btn>
               <Button
                 size="lg"
                 variant="outline"
@@ -472,7 +476,7 @@ export function About() {
                 asChild
               >
                 <a href="/resume.pdf" download="sauel_almonte_resume.pdf" aria-label="Download resume PDF">
-                  <Download className="mr-2 h-4 w-4 group-hover:animate-bounce" />
+                  <Download className="mr-2 h-4 w-4 motion-safe:group-hover:animate-bounce" />
                   Download Resume
                 </a>
               </Button>
@@ -481,15 +485,15 @@ export function About() {
         </div>
 
         {/* Stats */}
-        <div ref={statsRef} className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+        <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 min-w-0">
           {STATS.map((stat, i) => (
             <div
               key={stat.label}
               data-stat-card
-              className="relative group flex flex-col items-center justify-center p-6 rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+              className="relative group flex flex-col items-center justify-center p-4 sm:p-6 rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 min-w-0"
               style={{ opacity: 0 }}
             >
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <p className="text-3xl sm:text-4xl font-extrabold text-primary">
                 <span ref={(el) => { statValueRefs.current[i] = el; }}>0</span>
                 {stat.suffix}
@@ -502,7 +506,7 @@ export function About() {
         {/* Education & Certifications */}
         <div className="space-y-6">
           <h3 className="text-xl font-bold text-foreground">Education &amp; Certifications</h3>
-          <div ref={educationRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div ref={educationRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-w-0">
             {EDUCATION.map((edu) => {
               const inner = (
                 <>
@@ -529,7 +533,7 @@ export function About() {
                   target="_blank"
                   rel="noopener noreferrer"
                   data-edu-card
-                  className="group flex gap-4 p-5 rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-md transition-all duration-300"
+                  className="group flex gap-4 p-5 rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-md transition-all duration-300 min-w-0"
                   style={{ opacity: 0 }}
                 >
                   {inner}
@@ -538,7 +542,7 @@ export function About() {
                 <div
                   key={edu.degree}
                   data-edu-card
-                  className="group flex gap-4 p-5 rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-md transition-all duration-300"
+                  className="group flex gap-4 p-5 rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-md transition-all duration-300 min-w-0"
                   style={{ opacity: 0 }}
                 >
                   {inner}

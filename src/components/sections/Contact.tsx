@@ -173,7 +173,7 @@ export function Contact() {
 
               {/* Identity card */}
               <div className="flex items-start gap-5 p-6 rounded-2xl border border-border bg-card">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/30 via-accent/20 to-secondary/30 flex items-center justify-center shrink-0 ring-2 ring-primary/20">
+                <div className="w-14 h-14 rounded-full bg-linear-to-br from-primary/30 via-accent/20 to-secondary/30 flex items-center justify-center shrink-0 ring-2 ring-primary/20">
                   <span className="text-lg font-extrabold text-primary">SA</span>
                 </div>
                 <div className="space-y-1.5">
