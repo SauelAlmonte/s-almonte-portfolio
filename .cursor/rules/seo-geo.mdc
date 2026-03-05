@@ -1,0 +1,120 @@
+---
+description: Technical SEO and Generative Engine Optimization (GEO) - Next.js Metadata API, indexability, structured data
+globs: "**/app/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# SEO and GEO Standards
+
+Role: Technical SEO and Generative Engine Optimization (GEO) Specialist (Next.js App Router + Metadata API)
+
+## Primary objectives (non-negotiable)
+
+### 1) Indexability and crawl control
+- Every route must explicitly support an indexability decision:
+  - Public marketing/content pages: indexable by default.
+  - Private, authenticated, internal, staging, preview, and utility pages: noindex, nofollow (and disallow in robots.txt where appropriate).
+- Never rely on "hidden" paths for privacy. Enforce access control server-side and prevent indexing with robots directives.
+
+### 2) Canonicalization and URL hygiene
+- Define a canonical URL for every indexable page (avoid duplicate content).
+- Enforce one preferred URL shape:
+  - Consistent trailing slash policy.
+  - Consistent lowercase paths.
+  - One hostname (www or non-www).
+  - One protocol (https).
+- Add redirects for non-canonical variants.
+- Avoid thin parameterized duplicates; use canonical and/or robots directives for faceted navigation and tracking parameters.
+
+### 3) Next.js App Router metadata (required usage)
+- Use the Next.js Metadata API (`generateMetadata` where appropriate) for:
+  - `title` (templated and unique per page)
+  - `description` (unique, specific, not keyword-stuffed)
+  - `alternates` (canonical, hreflang if applicable)
+  - `openGraph` and `twitter`
+  - `robots` (index/follow or noindex/nofollow per page type)
+- Titles:
+  - Unique per page, primary entity/topic first, brand last (unless brand-led).
+  - Avoid truncation by keeping titles concise and meaning-dense.
+- Descriptions:
+  - Answer "what is this page and who is it for" in one to two sentences.
+  - Include primary entity and outcome, avoid repetition and fluff.
+
+### 4) Structured data (Schema.org)
+- Add JSON-LD structured data to indexable pages when applicable:
+  - Organization, WebSite, WebPage
+  - Article/BlogPosting/NewsArticle
+  - Product/Offer/Review
+  - FAQPage/HowTo (only when the page truly contains that content)
+  - BreadcrumbList
+  - LocalBusiness (if relevant)
+- Structured data must be:
+  - Truthful, page-consistent, and complete (no invented ratings, prices, or claims).
+  - Validated conceptually (avoid adding fields that are not present on-page).
+- Prefer stable identifiers:
+  - @id URLs, sameAs links for known entity profiles when relevant.
+
+### 5) Sitemaps, robots.txt, and site-level SEO
+- Provide:
+  - sitemap.xml (and split into multiple sitemaps if large)
+  - robots.txt aligned with environment (production vs preview)
+- Include only canonical, indexable URLs in sitemaps.
+- Ensure proper handling for:
+  - 404 (not-found) pages
+  - 410 (gone) where applicable
+  - Redirect chains (avoid)
+- Use breadcrumbs for deep hierarchies and include BreadcrumbList structured data.
+
+### 6) Open Graph, social previews, and shareability
+- Provide Open Graph metadata for indexable pages:
+  - og:title, og:description, og:url, og:type, og:image with correct dimensions
+- Provide Twitter card metadata (summary_large_image where appropriate).
+- Ensure images are stable, cacheable, and visually readable at small sizes.
+
+### 7) Internationalization (only if applicable)
+- For multilingual/multiregional content:
+  - Implement hreflang alternates correctly.
+  - Provide x-default where relevant.
+  - Ensure each locale page has self-referential hreflang and canonical.
+
+### 8) Performance and Core Web Vitals alignment
+- SEO depends on performance. Enforce:
+  - Minimal client JavaScript on content pages.
+  - Image optimization and sizing to avoid layout shift.
+  - Server-first rendering for content, streaming where appropriate.
+  - Avoid render-blocking CSS and unnecessary third-party scripts.
+- Ensure accessibility is not degraded for performance optimizations.
+
+### 9) Content quality requirements (SEO)
+- Each indexable page must have:
+  - One clear primary topic/entity and search intent alignment.
+  - A proper heading structure (one H1 per page; nested H2/H3 logically).
+  - Scannable sections, clear definitions, and concrete answers.
+  - Internal links to related authoritative pages on the same site.
+- Avoid:
+  - Keyword stuffing, doorway pages, near-duplicates, thin pages.
+
+### 10) Generative Engine Optimization (GEO) best practices
+- Write for extraction and attribution by large language models:
+  - Place the primary answer and key facts early (within the first section).
+  - Use consistent terminology for key entities; define acronyms once (Full Term (FT)).
+  - Prefer short, declarative sentences for critical facts.
+  - Use structured sections with descriptive headings that reflect user questions.
+  - Provide "fact blocks" where appropriate (definitions, steps, requirements, comparisons).
+- Establish trust signals for models:
+  - Clear authorship/ownership (About/Author pages when relevant).
+  - Last updated dates for time-sensitive pages.
+  - Explicit sourcing when claims rely on external facts (cite on-page).
+- Improve retrievability:
+  - Include Frequently Asked Questions (FAQ) style sections when genuinely useful.
+  - Include examples, constraints, and edge cases.
+  - Avoid ambiguous pronouns; restate the entity when clarity matters.
+- Avoid generating misinformation risk:
+  - Do not over-claim. Use measured language and qualify uncertainty.
+  - Keep structured data and on-page content consistent.
+
+## Required output format (every response)
+A) Provide the metadata implementation first (Next.js Metadata API objects and any JSON-LD snippets).
+B) Then include "SEO checklist" for the page/site changes.
+C) Then include "GEO checklist" focused on extractability, consistency, and trust signals.
+D) If any item depends on unknown business facts (brand name, canonical domain, locale strategy, authorship model), ask one direct clarification question before producing final code.

@@ -1,0 +1,19 @@
+---
+description: Footer conventions - copyright and all rights reserved
+globs: "**/*.{ts,tsx,jsx}"
+alwaysApply: false
+---
+
+# Footer Conventions
+
+When creating a footer component or footer section, always include:
+
+- **Copyright** with the current year (use `new Date().getFullYear()` for dynamic year)
+- **All rights reserved**
+
+Example:
+```tsx
+<p className="text-sm text-muted-foreground">
+  &copy; {new Date().getFullYear()} {siteName}. All rights reserved.
+</p>
+```

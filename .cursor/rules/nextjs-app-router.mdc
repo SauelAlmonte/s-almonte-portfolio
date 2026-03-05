@@ -1,0 +1,35 @@
+---
+description: Next.js App Router architecture and project structure (src/)
+globs: "src/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Next.js App Router Standards
+
+- Use Next.js 16.1.6 or later (keep dependencies current).
+- Assume Next.js App Router lives in `src/app`. Default to React Server Components; add `"use client"` only when interactivity is required.
+
+## Structure
+- `src/app/` — routing only (route groups + segments)
+- `src/components/` — shared UI
+- `src/lib/` — auth, validation, utilities, server-only logic
+- `src/styles/` — global styles, tokens
+- `src/types/` — shared TypeScript types
+- `src/hooks/` — shared React hooks
+- `src/config/` — runtime-safe config (no secrets in client)
+
+## Route Groups (do not affect URLs)
+- `src/app/(marketing)/`, `(app)/`, `(auth)/`, `(internal)/`
+- Private folders: `src/app/_lib`, `_components`, `_types` — never `page.tsx` inside underscore folders
+
+## Next.js Primitives
+- `next/link` for navigation, `next/image` for images when beneficial
+- Metadata API when applicable
+- Route files: `page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`, `route.ts`
+
+## Security
+- Do not rely on obscurity. Enforce authorization server-side.
+- Return 401/403 as appropriate. Validate and sanitize inputs on the server.
+- Auth: prefer `src/app/(auth)/sign-in`, `sign-up`, `reset-password`
+- API routes: `src/app/api/*/route.ts` with strict authorization
+- Avoid `dangerouslySetInnerHTML` unless sanitized
