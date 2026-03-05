@@ -4,19 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { Github, Linkedin, Mail, Youtube, ArrowDown, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/config/site";
 
 const ROLES = [
   "Full-Stack Engineer",
   "AI Engineer",
-  "Mentor & Builder",
+  "Mentor & Advocate",
   "Cloud Developer",
 ];
 
 const SOCIAL_LINKS = [
-  { label: "GitHub",   href: "https://github.com/SauelAlmonte",          icon: Github,   external: true  },
-  { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte",    icon: Linkedin, external: true  },
-  { label: "YouTube",  href: "https://youtube.com/@yourchannel",         icon: Youtube,  external: true  },
+  { label: "GitHub",   href: "https://github.com/SauelAlmonte",          icon: Github, external: true  },
+  { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte",    icon: Linkedin, external: true },
+  { label: "YouTube",  href: "https://youtube.com/@yourchannel",         icon: Youtube, external: true },
   { label: "Contact",  href: "#contact",                                  icon: Mail,     external: false },
 ];
 
@@ -24,13 +23,14 @@ export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const greetingRef = useRef<HTMLParagraphElement>(null);
   const nameRef = useRef<HTMLHeadingElement>(null);
+  const roleContainerRef = useRef<HTMLDivElement>(null);
   const roleRef = useRef<HTMLSpanElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const socialRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const [roleIndex, setRoleIndex] = useState(0);
+  const [, setRoleIndex] = useState(0);
   const [displayedRole, setDisplayedRole] = useState(ROLES[0]);
 
   /* GSAP entrance animation */
@@ -39,7 +39,7 @@ export function Hero() {
 
     tl.fromTo(greetingRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 })
       .fromTo(nameRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7 }, "-=0.3")
-      .fromTo(roleRef.current?.parentElement ?? null, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3")
+      .fromTo(roleContainerRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3")
       .fromTo(descRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2")
       .fromTo(ctaRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2")
       .fromTo(socialRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.2")
@@ -94,7 +94,7 @@ export function Hero() {
       </div>
 
       {/* Content */}
-      <div className="w-full max-w-4xl mx-auto text-center space-y-6">
+      <div className="w-full max-w-4xl mx-auto text-center space-y-4">
 
         {/* Greeting */}
         <p
@@ -102,7 +102,7 @@ export function Hero() {
           className="inline-flex items-center gap-2 text-sm font-medium tracking-widest uppercase text-muted-foreground opacity-0"
         >
           <span className="w-8 h-px bg-primary inline-block" />
-          Hi, I&apos;m Sauel
+          HI, I&apos;M SAUEL &#40;SOL&#41;
           <span className="w-8 h-px bg-primary inline-block" />
         </p>
 
@@ -116,7 +116,10 @@ export function Hero() {
         </h1>
 
         {/* Animated role */}
-        <div className="opacity-0 h-10 flex items-center justify-center">
+        <div
+          ref={roleContainerRef}
+          className="opacity-0 h-10 flex items-center justify-center mt-2!"
+        >
           <p className="text-lg sm:text-xl md:text-2xl font-medium text-foreground/70">
             <span className="text-accent font-semibold">
               <span ref={roleRef}>{displayedRole}</span>
@@ -128,10 +131,10 @@ export function Hero() {
         {/* Description */}
         <p
           ref={descRef}
-          className="opacity-0 max-w-2xl mx-auto text-base sm:text-lg text-muted-foreground leading-relaxed"
+          className="opacity-0 max-w-2xl mx-auto text-base sm:text-lg text-muted-foreground leading-relaxed mt-2!"
         >
           I build <span className="text-foreground font-medium">scalable web applications</span> and{" "}
-          <span className="text-foreground font-medium">AI-powered solutions</span> — from polished
+          <span className="text-foreground font-medium">AI-powered solutions</span>&#44; from polished
           frontends to cloud-deployed backends. Bilingual (EN/ES) and passionate about mentoring the
           next generation of engineers.
         </p>
@@ -206,7 +209,7 @@ export function Hero() {
           className="flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors group"
         >
           <span className="text-xs tracking-widest uppercase font-medium">Scroll</span>
-          <div className="w-px h-8 bg-gradient-to-b from-primary to-transparent group-hover:h-12 transition-all duration-300" />
+          <div className="w-px h-8 bg-linear-to-b from-primary to-transparent group-hover:h-12 transition-all duration-300" />
           <ArrowDown className="h-4 w-4 animate-bounce" />
         </button>
       </div>
