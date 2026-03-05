@@ -78,10 +78,10 @@ export function About() {
       gsap.set([badge1Ref.current, badge2Ref.current], { opacity: 1, scale: 1, y: 0 });
       /* Bio + download: always visible, no GSAP */
       gsap.utils.toArray<HTMLElement>("[data-stat-card]").forEach((c) => {
-        gsap.set(c, { opacity: 1, scale: 1, rotation: 0, y: 0 });
+        gsap.set(c, { opacity: 1 });
       });
       gsap.utils.toArray<HTMLElement>("[data-edu-card]").forEach((c) => {
-        gsap.set(c, { opacity: 1, x: 0, scale: 1 });
+        gsap.set(c, { opacity: 1 });
       });
       ScrollTrigger.create({
         trigger: statsRef.current,
@@ -192,20 +192,17 @@ export function About() {
 
       /* --- Bio paragraphs + Download button: always visible (no GSAP) — content must be readable without scroll/animation --- */
 
-      /* --- Stats: scale + rotation entrance + counter --- */
+      /* --- Stats: fade-in + counter --- */
       const statCards = gsap.utils.toArray<HTMLElement>("[data-stat-card]");
       statCards.forEach((card, i) => {
         gsap.fromTo(
           card,
-          { opacity: 0, scale: 0.7, rotation: i % 2 === 0 ? -8 : 8, y: 30 },
+          { opacity: 0 },
           {
             opacity: 1,
-            scale: 1,
-            rotation: 0,
-            y: 0,
-            duration: 0.7,
-            ease: "back.out(1.5)",
-            delay: i * 0.12,
+            duration: 0.6,
+            ease: "power2.out",
+            delay: i * 0.1,
             scrollTrigger: {
               trigger: statsRef.current,
               start: "top 80%",
@@ -240,19 +237,16 @@ export function About() {
         },
       });
 
-      /* --- Education cards: alternating L/R slide with stagger --- */
+      /* --- Education cards: fade-in --- */
       const eduCards = gsap.utils.toArray<HTMLElement>("[data-edu-card]");
       eduCards.forEach((card, i) => {
-        const fromX = i % 2 === 0 ? -70 : 70;
         gsap.fromTo(
           card,
-          { opacity: 0, x: fromX, scale: 0.92 },
+          { opacity: 0 },
           {
             opacity: 1,
-            x: 0,
-            scale: 1,
-            duration: 0.75,
-            ease: "power3.out",
+            duration: 0.6,
+            ease: "power2.out",
             delay: i * 0.1,
             scrollTrigger: {
               trigger: educationRef.current,
@@ -275,10 +269,10 @@ export function About() {
         gsap.set([badge1Ref.current, badge2Ref.current], { opacity: 1, scale: 1 });
         /* Bio + download: always visible, no GSAP */
         gsap.utils.toArray<HTMLElement>("[data-stat-card]").forEach((c) => {
-          gsap.set(c, { opacity: 1, y: 0 });
+          gsap.set(c, { opacity: 1 });
         });
         gsap.utils.toArray<HTMLElement>("[data-edu-card]").forEach((c) => {
-          gsap.set(c, { opacity: 1, y: 0 });
+          gsap.set(c, { opacity: 1 });
         });
         ScrollTrigger.create({
           trigger: statsRef.current,
@@ -326,8 +320,8 @@ export function About() {
         /* Stats */
         const statCards = gsap.utils.toArray<HTMLElement>("[data-stat-card]");
         statCards.forEach((card, i) => {
-          gsap.fromTo(card, { opacity: 0, y: 30 }, {
-            opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: i * 0.1,
+          gsap.fromTo(card, { opacity: 0 }, {
+            opacity: 1, duration: 0.6, ease: "power2.out", delay: i * 0.1,
             scrollTrigger: { trigger: statsRef.current, start: "top 85%" },
           });
         });
@@ -352,8 +346,8 @@ export function About() {
         /* Education */
         const eduCards = gsap.utils.toArray<HTMLElement>("[data-edu-card]");
         eduCards.forEach((card, i) => {
-          gsap.fromTo(card, { opacity: 0, y: 40 }, {
-            opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: i * 0.1,
+          gsap.fromTo(card, { opacity: 0 }, {
+            opacity: 1, duration: 0.6, ease: "power2.out", delay: i * 0.1,
             scrollTrigger: { trigger: educationRef.current, start: "top 85%" },
           });
         });
@@ -370,7 +364,7 @@ export function About() {
       ref={sectionRef}
       id="about"
       aria-label="About Me"
-      className="relative py-24 sm:py-32 px-4 sm:px-6 lg:px-8"
+      className="relative py-24 sm:py-32 px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
       {/* Parallax background blobs */}
       <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
@@ -384,7 +378,7 @@ export function About() {
         />
       </div>
 
-      <div className="max-w-6xl mx-auto space-y-24 min-w-0 overflow-x-hidden">
+      <div className="max-w-6xl mx-auto space-y-24">
 
         {/* Heading */}
         <div ref={headingRef} className="about-animate-initial">
@@ -438,7 +432,7 @@ export function About() {
           <div
             ref={contentRef}
             data-bio-block
-            className="space-y-6 lg:pt-4"
+            className="space-y-6"
             style={{ opacity: 1, visibility: "visible" }}
           >
             <div className="space-y-5 text-muted-foreground leading-relaxed">
