@@ -76,7 +76,7 @@ export function About() {
       gsap.set(headingRef.current, { clipPath: "inset(0% 0 0 0)", opacity: 1, y: 0 });
       gsap.set(photoCardRef.current, { opacity: 1, scale: 1, rotation: 0, y: 0 });
       gsap.set([badge1Ref.current, badge2Ref.current], { opacity: 1, scale: 1, y: 0 });
-      /* Bio + download: always visible, no GSAP */
+      gsap.set(gsap.utils.toArray<HTMLElement>("[data-bio-para], [data-download-btn]"), { opacity: 1 });
       gsap.utils.toArray<HTMLElement>("[data-stat-card]").forEach((c) => {
         gsap.set(c, { opacity: 1 });
       });
@@ -190,7 +190,21 @@ export function About() {
         },
       });
 
-      /* --- Bio paragraphs + Download button: always visible (no GSAP) — content must be readable without scroll/animation --- */
+      /* --- Bio paragraphs + Download button: Hero-style timeline (power3.out, y: 20, overlapping) --- */
+      const bioParas = gsap.utils.toArray<HTMLElement>("[data-bio-para]");
+      const downloadBtnEl = document.querySelector<HTMLElement>("[data-download-btn]");
+      const bioTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: contentRef.current,
+          start: "top 85%",
+          toggleActions: "play none none none",
+        },
+        defaults: { ease: "power3.out" },
+      });
+      if (bioParas[0]) bioTl.fromTo(bioParas[0], { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 });
+      if (bioParas[1]) bioTl.fromTo(bioParas[1], { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3");
+      if (bioParas[2]) bioTl.fromTo(bioParas[2], { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3");
+      if (downloadBtnEl) bioTl.fromTo(downloadBtnEl, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2");
 
       /* --- Stats: fade-in + counter --- */
       const statCards = gsap.utils.toArray<HTMLElement>("[data-stat-card]");
@@ -267,7 +281,7 @@ export function About() {
         gsap.set(headingRef.current, { clearProps: "clipPath,opacity,y" });
         gsap.set(photoCardRef.current, { opacity: 1, scale: 1, y: 0 });
         gsap.set([badge1Ref.current, badge2Ref.current], { opacity: 1, scale: 1 });
-        /* Bio + download: always visible, no GSAP */
+        gsap.set(gsap.utils.toArray<HTMLElement>("[data-bio-para], [data-download-btn]"), { opacity: 1 });
         gsap.utils.toArray<HTMLElement>("[data-stat-card]").forEach((c) => {
           gsap.set(c, { opacity: 1 });
         });
@@ -315,7 +329,17 @@ export function About() {
           scrollTrigger: { trigger: photoCardRef.current, start: "top 82%" },
         });
 
-        /* Bio + download: always visible (no GSAP) */
+        /* Bio paragraphs + Download: Hero-style timeline */
+        const bioParas = gsap.utils.toArray<HTMLElement>("[data-bio-para]");
+        const downloadBtnEl = document.querySelector<HTMLElement>("[data-download-btn]");
+        const bioTl = gsap.timeline({
+          scrollTrigger: { trigger: contentRef.current, start: "top 85%" },
+          defaults: { ease: "power3.out" },
+        });
+        if (bioParas[0]) bioTl.fromTo(bioParas[0], { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 });
+        if (bioParas[1]) bioTl.fromTo(bioParas[1], { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3");
+        if (bioParas[2]) bioTl.fromTo(bioParas[2], { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3");
+        if (downloadBtnEl) bioTl.fromTo(downloadBtnEl, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2");
 
         /* Stats */
         const statCards = gsap.utils.toArray<HTMLElement>("[data-stat-card]");
@@ -433,12 +457,11 @@ export function About() {
             ref={contentRef}
             data-bio-block
             className="space-y-6"
-            style={{ opacity: 1, visibility: "visible" }}
           >
             <div className="space-y-5 text-muted-foreground leading-relaxed">
               <p
                 data-bio-para
-                className="text-base sm:text-lg"
+                className="text-base sm:text-lg opacity-0"
               >
                 I&apos;m a{" "}
                 <span className="text-foreground font-semibold">Full-Stack Software Engineer</span>{" "}
@@ -450,7 +473,7 @@ export function About() {
               </p>
               <p
                 data-bio-para
-                className="text-base sm:text-lg"
+                className="text-base sm:text-lg opacity-0"
               >
                 Beyond coding, I&apos;m deeply committed to community. I&apos;ve{" "}
                 <span className="text-foreground font-semibold">mentored 50+ early-career engineers</span>{" "}
@@ -459,7 +482,7 @@ export function About() {
               </p>
               <p
                 data-bio-para
-                className="text-base sm:text-lg"
+                className="text-base sm:text-lg opacity-0"
               >
                 I&apos;m currently pursuing my{" "}
                 <span className="text-foreground font-medium">A.S. in Computer Science</span> at
@@ -468,7 +491,7 @@ export function About() {
               </p>
             </div>
 
-            <div data-download-btn>
+            <div data-download-btn className="opacity-0">
               <Button
                 size="lg"
                 variant="outline"
