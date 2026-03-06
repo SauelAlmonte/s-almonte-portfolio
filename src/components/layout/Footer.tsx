@@ -15,7 +15,7 @@ export function Footer() {
         <div className="flex items-center gap-4">
           <p className="hidden sm:block text-xs text-muted-foreground">
             Built with{" "}
-            <span className="text-primary font-medium">Next.js</span>
+            <span className="text-[#2b7a78] dark:text-primary font-medium">Next.js</span>
             {" & "}
             <span className="text-accent font-medium">passion</span>
           </p>
