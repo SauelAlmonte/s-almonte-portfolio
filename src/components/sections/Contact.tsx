@@ -172,15 +172,15 @@ export function Contact() {
               </div>
 
               {/* Identity card */}
-              <div className="flex items-start gap-5 p-6 rounded-2xl border border-border bg-card">
-                <div className="w-14 h-14 rounded-full bg-linear-to-br from-primary/30 via-accent/20 to-secondary/30 flex items-center justify-center shrink-0 ring-2 ring-primary/20">
-                  <span className="text-lg font-extrabold text-primary">SA</span>
+              <div className="flex items-start gap-5 p-6 rounded-2xl border border-border bg-card shadow-sm shadow-foreground/10">
+                <div className="w-14 h-14 rounded-full bg-linear-to-br from-primary/30 via-accent/20 to-secondary/30 flex items-center justify-center shrink-0 ring-2 ring-primary/20 shadow-sm shadow-foreground/10">
+                  <span className="text-lg font-extrabold text-[#2b7a78] dark:text-primary">SA</span>
                 </div>
                 <div className="space-y-1.5">
                   <p className="font-extrabold text-foreground text-lg leading-tight">Sauel Almonte</p>
                   <p className="text-sm text-muted-foreground">Full-Stack Engineer & AI Builder</p>
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                    <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
+                    <MapPin className="h-3.5 w-3.5 text-[#2b7a78] dark:text-primary shrink-0" />
                     <span>Boston, MA</span>
                   </div>
                 </div>
@@ -199,7 +199,7 @@ export function Contact() {
                       target={href.startsWith("mailto") ? undefined : "_blank"}
                       rel="noopener noreferrer"
                       aria-label={label}
-                      className="w-11 h-11 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/10 transition-all duration-200 hover:scale-110"
+                      className="w-11 h-11 rounded-full border border-foreground/25 dark:border-border bg-card shadow-sm shadow-foreground/10 flex items-center justify-center text-[#2b7a78] dark:text-muted-foreground hover:text-[#2b7a78] dark:hover:text-primary hover:border-[#2b7a78] dark:hover:border-primary hover:bg-[#2b7a78]/10 dark:hover:bg-primary/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-110"
                     >
                       <Icon className="h-5 w-5" />
                     </a>
@@ -222,7 +222,7 @@ export function Contact() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-sm font-semibold">
-                              Full Name <span className="text-primary">*</span>
+                              Full Name <span className="text-[#2b7a78] dark:text-primary">*</span>
                             </FormLabel>
                             <FormControl>
                               <Input placeholder="Jane Doe" {...field} className="rounded-xl border-border focus-visible:ring-primary bg-background" />
@@ -237,7 +237,7 @@ export function Contact() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-sm font-semibold">
-                              Email Address <span className="text-primary">*</span>
+                              Email Address <span className="text-[#2b7a78] dark:text-primary">*</span>
                             </FormLabel>
                             <FormControl>
                               <Input type="email" placeholder="jane@example.com" {...field} className="rounded-xl border-border focus-visible:ring-primary bg-background" />
@@ -272,7 +272,7 @@ export function Contact() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-sm font-semibold">
-                              Subject <span className="text-primary">*</span>
+                              Subject <span className="text-[#2b7a78] dark:text-primary">*</span>
                             </FormLabel>
                             <FormControl>
                               <Input placeholder="What's this about?" {...field} className="rounded-xl border-border focus-visible:ring-primary bg-background" />
@@ -290,7 +290,7 @@ export function Contact() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-sm font-semibold">
-                            Message <span className="text-primary">*</span>
+                            Message <span className="text-[#2b7a78] dark:text-primary">*</span>
                           </FormLabel>
                           <FormControl>
                             <Textarea

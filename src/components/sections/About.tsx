@@ -401,7 +401,7 @@ export function About() {
 
               {/* Avatar */}
               <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full bg-linear-to-br from-primary/30 via-accent/20 to-secondary/30 flex items-center justify-center shadow-2xl ring-4 ring-primary/20">
-                <span className="text-6xl font-extrabold text-primary tracking-tight select-none">
+                <span className="text-6xl font-extrabold text-[#2b7a78] dark:text-primary tracking-tight select-none">
                   SA
                 </span>
               </div>
@@ -412,7 +412,7 @@ export function About() {
                 className="absolute -bottom-4 -right-4 bg-background border border-border rounded-2xl px-4 py-2 shadow-lg flex items-center gap-2"
                 style={{ opacity: 0, scale: 0 }}
               >
-                <MapPin className="h-4 w-4 text-primary" />
+                <MapPin className="h-4 w-4 text-[#2b7a78] dark:text-primary" />
                 <span className="text-sm font-medium text-foreground">Boston, MA</span>
               </div>
 
@@ -472,7 +472,7 @@ export function About() {
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded-full px-8 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold transition-all duration-200 hover:scale-105 group"
+                className="rounded-full px-8 border-[#2b7a78] dark:border-primary text-[#2b7a78] dark:text-primary hover:bg-[#2b7a78] dark:hover:bg-primary hover:text-primary-foreground font-semibold shadow-sm shadow-foreground/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-105 group"
                 asChild
               >
                 <a href="/resume.pdf" download="sauel_almonte_resume.pdf" aria-label="Download resume PDF">
@@ -490,11 +490,11 @@ export function About() {
             <div
               key={stat.label}
               data-stat-card
-              className="relative group flex flex-col items-center justify-center p-4 sm:p-6 rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 min-w-0"
+              className="relative group flex flex-col items-center justify-center p-4 sm:p-6 rounded-2xl border border-border bg-card shadow-sm shadow-foreground/10 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 min-w-0"
               style={{ opacity: 0 }}
             >
               <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <p className="text-3xl sm:text-4xl font-extrabold text-primary">
+              <p className="text-3xl sm:text-4xl font-extrabold text-[#2b7a78] dark:text-primary">
                 <span ref={(el) => { statValueRefs.current[i] = el; }}>0</span>
                 {stat.suffix}
               </p>
@@ -510,18 +510,18 @@ export function About() {
             {EDUCATION.map((edu) => {
               const inner = (
                 <>
-                  <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <edu.icon className="h-5 w-5 text-primary" />
+                  <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 shadow-sm shadow-foreground/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <edu.icon className="h-5 w-5 text-[#2b7a78] dark:text-primary" />
                   </div>
                   <div className="space-y-1 min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-1">
                       <p className="font-semibold text-foreground text-sm leading-snug">{edu.institution}</p>
                       {edu.credentialUrl && (
-                        <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0 mt-0.5" />
+                        <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-[#2b7a78] dark:group-hover:text-primary transition-colors shrink-0 mt-0.5" />
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground leading-snug">{edu.degree}</p>
-                    <p className="text-xs text-primary font-medium">{edu.period}</p>
+                    <p className="text-xs text-[#2b7a78] dark:text-primary font-medium">{edu.period}</p>
                   </div>
                 </>
               );
@@ -533,7 +533,7 @@ export function About() {
                   target="_blank"
                   rel="noopener noreferrer"
                   data-edu-card
-                  className="group flex gap-4 p-5 rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-md transition-all duration-300 min-w-0"
+                  className="group flex gap-4 p-5 rounded-2xl border border-border bg-card shadow-sm shadow-foreground/10 hover:border-primary/40 hover:shadow-md transition-all duration-300 min-w-0"
                   style={{ opacity: 0 }}
                 >
                   {inner}
@@ -542,7 +542,7 @@ export function About() {
                 <div
                   key={edu.degree}
                   data-edu-card
-                  className="group flex gap-4 p-5 rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-md transition-all duration-300 min-w-0"
+                  className="group flex gap-4 p-5 rounded-2xl border border-border bg-card shadow-sm shadow-foreground/10 hover:border-primary/40 hover:shadow-md transition-all duration-300 min-w-0"
                   style={{ opacity: 0 }}
                 >
                   {inner}

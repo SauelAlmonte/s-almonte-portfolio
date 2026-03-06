@@ -1,5 +1,3 @@
-<div align="center">
-
 # Sauel Almonte — Portfolio
 
 ### Thank you for visiting my portfolio repository! 🙏
@@ -14,8 +12,6 @@
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-s--almonte.vercel.app-A8DADC?style=for-the-badge&logo=vercel&logoColor=black)](https://s-almonte.vercel.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-B39CD0?style=for-the-badge)](LICENSE)
-
-</div>
 
 ---
 
@@ -86,9 +82,8 @@ src/
 
 **Sauel Almonte** — Full-Stack Engineer & AI Builder — Boston, MA
 
-[![Email](https://img.shields.io/badge/Email-almontesauel%40gmail.com-A8DADC?style=flat-square&logo=gmail&logoColor=white)](mailto:almontesauel@gmail.com)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-sauel--almonte-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/sauel-almonte)
-[![GitHub](https://img.shields.io/badge/GitHub-SauelAlmonte-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/SauelAlmonte)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/sauel-almonte)
+[![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/SauelAlmonte)
 
 ---
 
@@ -101,8 +96,4 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 ---
 
-<div align="center">
-
 Made with ❤️ in Boston, MA
-
-</div>

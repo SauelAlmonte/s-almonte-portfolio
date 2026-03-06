@@ -23,10 +23,10 @@ export function SectionHeading({
         className
       )}
     >
-      <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-primary">
-        <span className="w-6 h-px bg-primary" />
+      <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-[#2b7a78] dark:text-primary">
+        <span className="w-6 h-px bg-[#2b7a78] dark:bg-primary" />
         {label}
-        <span className="w-6 h-px bg-primary" />
+        <span className="w-6 h-px bg-[#2b7a78] dark:bg-primary" />
       </p>
       <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
         {title}

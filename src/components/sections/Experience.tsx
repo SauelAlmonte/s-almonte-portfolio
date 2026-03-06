@@ -86,11 +86,11 @@ function UnderConstructionOverlay() {
         )}
       >
         <div className="flex items-center gap-3">
-          <HardHat className="h-6 w-6 text-primary" />
-          <span className="text-xs font-bold tracking-widest uppercase text-primary">
+          <HardHat className="h-6 w-6 text-[#2b7a78] dark:text-primary" />
+          <span className="text-xs font-bold tracking-widest uppercase text-[#2b7a78] dark:text-primary">
             Under Construction
           </span>
-          <HardHat className="h-6 w-6 text-primary" />
+          <HardHat className="h-6 w-6 text-[#2b7a78] dark:text-primary" />
         </div>
 
         <p className="text-5xl select-none">😔</p>
@@ -286,20 +286,20 @@ export function Experience() {
         {/* Top info bar */}
         <div className="flex items-center justify-between px-12 pt-10 pb-4 shrink-0">
           <div>
-            <p className="text-xs font-semibold tracking-widest uppercase text-primary flex items-center gap-2">
-              <span className="w-6 h-px bg-primary" />
+            <p className="text-xs font-semibold tracking-widest uppercase text-[#2b7a78] dark:text-primary flex items-center gap-2">
+              <span className="w-6 h-px bg-[#2b7a78] dark:bg-primary" />
               Experience
             </p>
             <h2 className="text-4xl xl:text-5xl font-extrabold tracking-tight text-foreground mt-1">
               Where I&apos;ve{" "}
-              <span className="text-primary">Worked</span>
+              <span className="text-[#2b7a78] dark:text-primary">Worked</span>
             </h2>
           </div>
 
           <div className="flex items-center gap-8">
             {/* Counter */}
             <div className="text-right">
-              <p className="text-5xl font-extrabold text-primary tabular-nums leading-none">
+              <p className="text-5xl font-extrabold text-[#2b7a78] dark:text-primary tabular-nums leading-none">
                 <span ref={counterRef}>01</span>
               </p>
               <p className="text-sm text-muted-foreground font-medium">
@@ -412,7 +412,7 @@ export function Experience() {
             {/* Final CTA card */}
             <div className="flex flex-col items-center justify-center w-[min(400px,60vw)] h-full min-h-[420px] rounded-3xl border border-dashed border-primary/40 bg-primary/5 p-10 gap-6">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <ArrowRight className="h-7 w-7 text-primary" />
+                <ArrowRight className="h-7 w-7 text-[#2b7a78] dark:text-primary" />
               </div>
               <div className="text-center space-y-2">
                 <p className="text-xl font-bold text-foreground">Want to see more?</p>

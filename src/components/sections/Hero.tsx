@@ -86,11 +86,11 @@ export function Hero() {
       aria-label="Hero"
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8"
     >
-      {/* Background blobs */}
+      {/* Background blobs — greenish primary tint to match section headings */}
       <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-[#A8DADC]/20 blur-[120px]" />
-        <div className="absolute top-1/2 -right-40 w-[450px] h-[450px] rounded-full bg-[#B39CD0]/20 blur-[120px]" />
-        <div className="absolute -bottom-20 left-1/3 w-[400px] h-[400px] rounded-full bg-[#FFC1CC]/15 blur-[100px]" />
+        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-primary/18 blur-[120px]" />
+        <div className="absolute top-1/2 -right-40 w-[450px] h-[450px] rounded-full bg-primary/12 blur-[120px]" />
+        <div className="absolute -bottom-20 left-1/3 w-[400px] h-[400px] rounded-full bg-primary/10 blur-[100px]" />
       </div>
 
       {/* Content */}
@@ -99,11 +99,11 @@ export function Hero() {
         {/* Greeting */}
         <p
           ref={greetingRef}
-          className="inline-flex items-center gap-2 text-sm font-medium tracking-widest uppercase text-muted-foreground opacity-0"
+          className="inline-flex items-center gap-2 text-sm font-medium tracking-widest uppercase text-[#2b7a78] dark:text-primary opacity-0"
         >
-          <span className="w-8 h-px bg-primary inline-block" />
+          <span className="w-8 h-px bg-[#2b7a78] dark:bg-primary inline-block" />
           HI, I&apos;M SAUEL &#40;SOL&#41;
-          <span className="w-8 h-px bg-primary inline-block" />
+          <span className="w-8 h-px bg-[#2b7a78] dark:bg-primary inline-block" />
         </p>
 
         {/* Name */}
@@ -112,7 +112,7 @@ export function Hero() {
           className="opacity-0 text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-none"
         >
           <span className="text-foreground">Sauel </span>
-          <span className="text-primary">Almonte</span>
+          <span className="text-[#2b7a78] dark:text-primary">Almonte</span>
         </h1>
 
         {/* Animated role */}
@@ -120,8 +120,8 @@ export function Hero() {
           ref={roleContainerRef}
           className="opacity-0 h-10 flex items-center justify-center mt-2!"
         >
-          <p className="text-lg sm:text-xl md:text-2xl font-medium text-foreground/70">
-            <span className="text-accent font-semibold">
+          <p className="text-lg sm:text-xl md:text-2xl font-medium text-muted-foreground">
+            <span className="text-[#50406a] dark:text-accent font-semibold">
               <span ref={roleRef}>{displayedRole}</span>
             </span>
             {" "}based in Boston, MA
@@ -146,7 +146,7 @@ export function Hero() {
         >
           <Button
             size="lg"
-            className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-8 rounded-full shadow-lg shadow-primary/25 transition-all duration-200 hover:shadow-primary/40 hover:scale-105"
+            className="w-full sm:w-auto bg-[#2b7a78] dark:bg-primary text-primary-foreground hover:bg-[#236663] dark:hover:bg-primary/90 font-semibold px-8 rounded-full shadow-lg shadow-[#2b7a78]/25 dark:shadow-primary/25 transition-all duration-200 hover:shadow-[#2b7a78]/40 dark:hover:shadow-primary/40 hover:scale-105"
             onClick={() => {
               document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
             }}
@@ -158,7 +158,7 @@ export function Hero() {
           <Button
             variant="outline"
             size="lg"
-            className="w-full sm:w-auto rounded-full px-8 border-border hover:border-primary hover:text-primary font-semibold transition-all duration-200 hover:scale-105"
+            className="w-full sm:w-auto rounded-full px-8 border-border hover:border-[#2b7a78] dark:hover:border-primary hover:text-[#2b7a78] dark:hover:text-primary font-semibold transition-all duration-200 hover:scale-105"
             onClick={() => {
               document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
             }}
@@ -180,7 +180,7 @@ export function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="p-2.5 rounded-full border border-border text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/10 transition-all duration-200 hover:scale-110"
+                className="p-2.5 rounded-full border border-foreground/25 dark:border-border shadow-sm shadow-foreground/10 text-[#2b7a78] dark:text-muted-foreground hover:text-[#2b7a78] dark:hover:text-primary hover:border-[#2b7a78] dark:hover:border-primary hover:bg-[#2b7a78]/10 dark:hover:bg-primary/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-110"
               >
                 <Icon className="h-5 w-5" />
               </a>
@@ -189,7 +189,7 @@ export function Hero() {
                 key={label}
                 onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
                 aria-label={label}
-                className="p-2.5 rounded-full border border-border text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/10 transition-all duration-200 hover:scale-110"
+                className="p-2.5 rounded-full border border-foreground/25 dark:border-border shadow-sm shadow-foreground/10 text-[#2b7a78] dark:text-muted-foreground hover:text-[#2b7a78] dark:hover:text-primary hover:border-[#2b7a78] dark:hover:border-primary hover:bg-[#2b7a78]/10 dark:hover:bg-primary/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-110"
               >
                 <Icon className="h-5 w-5" />
               </button>
@@ -206,10 +206,10 @@ export function Hero() {
         <button
           onClick={handleScrollDown}
           aria-label="Scroll to about section"
-          className="flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors group"
+          className="flex flex-col items-center gap-2 text-muted-foreground hover:text-[#2b7a78] dark:hover:text-primary transition-colors group"
         >
           <span className="text-xs tracking-widest uppercase font-medium">Scroll</span>
-          <div className="w-px h-8 bg-linear-to-b from-primary to-transparent group-hover:h-12 transition-all duration-300" />
+          <div className="w-px h-8 bg-linear-to-b from-[#2b7a78] to-transparent dark:from-primary group-hover:h-12 transition-all duration-300" />
           <ArrowDown className="h-4 w-4 animate-bounce" />
         </button>
       </div>

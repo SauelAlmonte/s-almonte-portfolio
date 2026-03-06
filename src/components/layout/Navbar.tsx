@@ -38,7 +38,7 @@ export function Navbar() {
     <>
       <a
         href="#home"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:font-medium"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#2b7a78] dark:focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:font-medium"
       >
         Skip to content
       </a>
@@ -64,10 +64,10 @@ export function Navbar() {
               className="group/logo flex items-center gap-2 focus:outline-none"
             >
               <span className="text-xl font-bold tracking-tight">
-                <span className="text-primary">S</span>
+                <span className="text-[#2b7a78] dark:text-primary">S</span>
                 <span className="text-foreground">A</span>
               </span>
-              <span className="hidden sm:block text-sm font-medium text-foreground/60 group-hover/logo:text-foreground transition-colors">
+              <span className="hidden sm:block text-sm font-medium text-muted-foreground group-hover/logo:text-foreground transition-colors">
                 Sauel Almonte
               </span>
             </button>
@@ -97,14 +97,14 @@ export function Navbar() {
                       "relative px-4 py-2 text-sm font-medium rounded-md transition-all duration-200",
                       "hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                       isActive
-                        ? "text-primary"
-                        : "text-foreground/70 hover:text-primary"
+                        ? "text-[#2b7a78] dark:text-primary"
+                        : "text-muted-foreground hover:text-[#2b7a78] dark:hover:text-primary"
                     )}
                     aria-current={isActive ? "page" : undefined}
                   >
                     {item.label}
                     {isActive && (
-                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-primary rounded-full" />
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[#2b7a78] dark:bg-primary rounded-full" />
                     )}
                   </button>
                 </li>
