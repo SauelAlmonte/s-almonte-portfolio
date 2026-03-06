@@ -22,6 +22,7 @@ interface SkillCard {
   title: string;
   subtitle: string;
   accent: string;
+  accentLight: string;
   accentClass: string;
   borderClass: string;
   barClass: string;
@@ -36,7 +37,8 @@ const SKILL_CARDS: SkillCard[] = [
     title: "Full-Stack Web Dev",
     subtitle: "Building end-to-end web experiences",
     accent: "#A8DADC",
-    accentClass: "text-[#3e9ea0] dark:text-[#A8DADC]",
+    accentLight: "#2b7a78",
+    accentClass: "text-[#2b7a78] dark:text-[#A8DADC]",
     borderClass:
       "border-[#A8DADC]/30 hover:border-[#A8DADC]/80 hover:shadow-[#A8DADC]/10",
     barClass: "bg-[#A8DADC]",
@@ -54,7 +56,8 @@ const SKILL_CARDS: SkillCard[] = [
     title: "Backend & AI Engineering",
     subtitle: "APIs, ML pipelines & AI automation",
     accent: "#B39CD0",
-    accentClass: "text-[#7b56a8] dark:text-[#B39CD0]",
+    accentLight: "#5a4a7a",
+    accentClass: "text-[#5a4a7a] dark:text-[#B39CD0]",
     borderClass:
       "border-[#B39CD0]/30 hover:border-[#B39CD0]/80 hover:shadow-[#B39CD0]/10",
     barClass: "bg-[#B39CD0]",
@@ -72,7 +75,8 @@ const SKILL_CARDS: SkillCard[] = [
     title: "Cloud & DevOps",
     subtitle: "Infrastructure built for scale",
     accent: "#FFC1CC",
-    accentClass: "text-[#c0536a] dark:text-[#FFC1CC]",
+    accentLight: "#b84a5f",
+    accentClass: "text-[#b84a5f] dark:text-[#FFC1CC]",
     borderClass:
       "border-[#FFC1CC]/30 hover:border-[#FFC1CC]/80 hover:shadow-[#FFC1CC]/10",
     barClass: "bg-[#FFC1CC]",
@@ -207,11 +211,22 @@ export function Skills() {
             >
               {/* Top: icon + arrow */}
               <div className="flex items-start justify-between">
-                <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center"
-                  style={{ background: `${card.accent}20` }}
-                >
-                  <card.icon className="h-6 w-6" style={{ color: card.accent }} />
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center relative overflow-hidden">
+                  <div
+                    className="absolute inset-0 rounded-2xl dark:hidden"
+                    style={{
+                      background: `color-mix(in srgb, ${card.accentLight} 18%, transparent)`,
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 rounded-2xl hidden dark:block"
+                    style={{
+                      background: `color-mix(in srgb, ${card.accent} 20%, transparent)`,
+                    }}
+                  />
+                  <card.icon
+                    className={cn("h-6 w-6 relative z-10", card.accentClass)}
+                  />
                 </div>
                 <ArrowUpRight
                   className={cn(

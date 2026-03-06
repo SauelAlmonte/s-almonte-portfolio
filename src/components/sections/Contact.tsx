@@ -172,8 +172,8 @@ export function Contact() {
               </div>
 
               {/* Identity card */}
-              <div className="flex items-start gap-5 p-6 rounded-2xl border border-border bg-card">
-                <div className="w-14 h-14 rounded-full bg-linear-to-br from-primary/30 via-accent/20 to-secondary/30 flex items-center justify-center shrink-0 ring-2 ring-primary/20">
+              <div className="flex items-start gap-5 p-6 rounded-2xl border border-border bg-card shadow-sm shadow-foreground/10">
+                <div className="w-14 h-14 rounded-full bg-linear-to-br from-primary/30 via-accent/20 to-secondary/30 flex items-center justify-center shrink-0 ring-2 ring-primary/20 shadow-sm shadow-foreground/10">
                   <span className="text-lg font-extrabold text-primary">SA</span>
                 </div>
                 <div className="space-y-1.5">
@@ -199,7 +199,7 @@ export function Contact() {
                       target={href.startsWith("mailto") ? undefined : "_blank"}
                       rel="noopener noreferrer"
                       aria-label={label}
-                      className="w-11 h-11 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/10 transition-all duration-200 hover:scale-110"
+                      className="w-11 h-11 rounded-full border border-foreground/25 dark:border-border bg-card shadow-sm shadow-foreground/10 flex items-center justify-center text-[#2b7a78] dark:text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-110"
                     >
                       <Icon className="h-5 w-5" />
                     </a>
