@@ -67,7 +67,7 @@ export function Navbar() {
                 <span className="text-primary">S</span>
                 <span className="text-foreground">A</span>
               </span>
-              <span className="hidden sm:block text-sm font-medium text-foreground/60 group-hover/logo:text-foreground transition-colors">
+              <span className="hidden sm:block text-sm font-medium text-muted-foreground group-hover/logo:text-foreground transition-colors">
                 Sauel Almonte
               </span>
             </button>
@@ -98,7 +98,7 @@ export function Navbar() {
                       "hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                       isActive
                         ? "text-primary"
-                        : "text-foreground/70 hover:text-primary"
+                        : "text-muted-foreground hover:text-primary"
                     )}
                     aria-current={isActive ? "page" : undefined}
                   >
