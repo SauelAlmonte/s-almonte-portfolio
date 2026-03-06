@@ -180,7 +180,7 @@ export function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="p-2.5 rounded-full border border-border text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/10 transition-all duration-200 hover:scale-110"
+                className="p-2.5 rounded-full border border-foreground/25 dark:border-border shadow-sm shadow-foreground/10 text-[#2b7a78] dark:text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-110"
               >
                 <Icon className="h-5 w-5" />
               </a>
@@ -189,7 +189,7 @@ export function Hero() {
                 key={label}
                 onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
                 aria-label={label}
-                className="p-2.5 rounded-full border border-border text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/10 transition-all duration-200 hover:scale-110"
+                className="p-2.5 rounded-full border border-foreground/25 dark:border-border shadow-sm shadow-foreground/10 text-[#2b7a78] dark:text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-110"
               >
                 <Icon className="h-5 w-5" />
               </button>
