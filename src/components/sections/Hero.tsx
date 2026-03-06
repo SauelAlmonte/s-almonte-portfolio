@@ -86,11 +86,11 @@ export function Hero() {
       aria-label="Hero"
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8"
     >
-      {/* Background blobs */}
+      {/* Background blobs — greenish primary tint to match section headings */}
       <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-[#A8DADC]/20 blur-[120px]" />
-        <div className="absolute top-1/2 -right-40 w-[450px] h-[450px] rounded-full bg-[#B39CD0]/20 blur-[120px]" />
-        <div className="absolute -bottom-20 left-1/3 w-[400px] h-[400px] rounded-full bg-[#FFC1CC]/15 blur-[100px]" />
+        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-primary/18 blur-[120px]" />
+        <div className="absolute top-1/2 -right-40 w-[450px] h-[450px] rounded-full bg-primary/12 blur-[120px]" />
+        <div className="absolute -bottom-20 left-1/3 w-[400px] h-[400px] rounded-full bg-primary/10 blur-[100px]" />
       </div>
 
       {/* Content */}
@@ -99,7 +99,7 @@ export function Hero() {
         {/* Greeting */}
         <p
           ref={greetingRef}
-          className="inline-flex items-center gap-2 text-sm font-medium tracking-widest uppercase text-muted-foreground opacity-0"
+          className="inline-flex items-center gap-2 text-sm font-medium tracking-widest uppercase text-primary opacity-0"
         >
           <span className="w-8 h-px bg-primary inline-block" />
           HI, I&apos;M SAUEL &#40;SOL&#41;
@@ -120,8 +120,8 @@ export function Hero() {
           ref={roleContainerRef}
           className="opacity-0 h-10 flex items-center justify-center mt-2!"
         >
-          <p className="text-lg sm:text-xl md:text-2xl font-medium text-foreground/70">
-            <span className="text-accent font-semibold">
+          <p className="text-lg sm:text-xl md:text-2xl font-medium text-muted-foreground">
+            <span className="text-primary font-semibold">
               <span ref={roleRef}>{displayedRole}</span>
             </span>
             {" "}based in Boston, MA
