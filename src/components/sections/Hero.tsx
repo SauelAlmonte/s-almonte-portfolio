@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { Github, Linkedin, Mail, Youtube, ArrowDown, ExternalLink } from "lucide-react";
+import { Github, Linkedin, Mail, Youtube, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const ROLES = [
@@ -94,7 +94,7 @@ export function Hero() {
       </div>
 
       {/* Content */}
-      <div className="w-full max-w-4xl mx-auto text-center space-y-4">
+      <div className="w-full max-w-4xl mx-auto text-center space-y-fl-y-snug">
 
         {/* Greeting */}
         <p
@@ -109,7 +109,7 @@ export function Hero() {
         {/* Name */}
         <h1
           ref={nameRef}
-          className="opacity-0 text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-none"
+          className="opacity-0 text-7xl font-extrabold tracking-tight leading-none lg:text-8xl"
         >
           <span className="text-foreground">Sauel </span>
           <span className="text-[#2b7a78] dark:text-primary">Almonte</span>
@@ -120,7 +120,7 @@ export function Hero() {
           ref={roleContainerRef}
           className="opacity-0 h-10 flex items-center justify-center mt-2!"
         >
-          <p className="text-lg sm:text-xl md:text-2xl font-medium text-muted-foreground">
+          <p className="text-2xl font-medium text-muted-foreground">
             <span className="text-[#50406a] dark:text-accent font-semibold">
               <span ref={roleRef}>{displayedRole}</span>
             </span>
@@ -131,7 +131,7 @@ export function Hero() {
         {/* Description */}
         <p
           ref={descRef}
-          className="opacity-0 max-w-2xl mx-auto text-base sm:text-lg text-muted-foreground leading-relaxed mt-2!"
+          className="opacity-0 max-w-2xl mx-auto text-lg text-muted-foreground leading-relaxed mt-2!"
         >
           I build <span className="text-foreground font-medium">scalable web applications</span> and{" "}
           <span className="text-foreground font-medium">AI-powered solutions</span>&#44; from polished
@@ -145,14 +145,16 @@ export function Hero() {
           className="opacity-0 flex flex-col sm:flex-row gap-4 items-center justify-center pt-2"
         >
           <Button
+            type="button"
             size="lg"
             className="w-full sm:w-auto bg-[#2b7a78] dark:bg-primary text-primary-foreground hover:bg-[#236663] dark:hover:bg-primary/90 font-semibold px-8 rounded-full shadow-lg shadow-[#2b7a78]/25 dark:shadow-primary/25 transition-all duration-200 hover:shadow-[#2b7a78]/40 dark:hover:shadow-primary/40 hover:scale-105"
+            aria-label="Scroll to Skills and Projects"
             onClick={() => {
-              document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
+              document.getElementById("skills")?.scrollIntoView({ behavior: "smooth" });
             }}
           >
             View My Work
-            <ExternalLink className="ml-2 h-4 w-4" />
+            <ArrowDown className="ml-2 h-4 w-4" aria-hidden />
           </Button>
 
           <Button

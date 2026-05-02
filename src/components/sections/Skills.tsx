@@ -1,15 +1,23 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight, Code2, BrainCircuit, Cloud } from "lucide-react";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { cn } from "@/lib/utils";
-import { type ProjectCategory } from "@/config/projects";
+import { CATEGORY_META, type ProjectCategory } from "@/config/projects";
+import { SKILL_SECTION_SUBTITLE } from "@/config/skills";
 
 gsap.registerPlugin(ScrollTrigger);
+
+export type SkillsSectionProps = {
+  skillsByCategory: Record<
+    ProjectCategory,
+    Array<{ name: string; proficiency: number }>
+  >;
+};
 
 interface Skill {
   name: string;
@@ -30,12 +38,11 @@ interface SkillCard {
   skills: Skill[];
 }
 
-const SKILL_CARDS: SkillCard[] = [
+/** Presentation only (icons + accents); skill rows come from CMS or defaults. */
+const SKILL_CARD_SHELL: Omit<SkillCard, "skills" | "title" | "subtitle">[] = [
   {
     category: "fullstack",
     icon: Code2,
-    title: "Full-Stack Web Dev",
-    subtitle: "Building end-to-end web experiences",
     accent: "#A8DADC",
     accentLight: "#2b7a78",
     accentClass: "text-[#2b7a78] dark:text-[#A8DADC]",
@@ -43,18 +50,10 @@ const SKILL_CARDS: SkillCard[] = [
       "border-[#A8DADC]/30 hover:border-[#A8DADC]/80 hover:shadow-[#A8DADC]/10",
     barClass: "bg-[#A8DADC]",
     glowClass: "group-hover:shadow-[0_8px_40px_rgba(168,218,220,0.2)]",
-    skills: [
-      { name: "Next.js / React", proficiency: 90 },
-      { name: "JavaScript / TypeScript", proficiency: 88 },
-      { name: "CSS / Tailwind CSS", proficiency: 85 },
-      { name: "HTML / Accessibility", proficiency: 82 },
-    ],
   },
   {
     category: "backend",
     icon: BrainCircuit,
-    title: "Backend & AI Engineering",
-    subtitle: "APIs, ML pipelines & AI automation",
     accent: "#B39CD0",
     accentLight: "#5a4a7a",
     accentClass: "text-[#5a4a7a] dark:text-[#B39CD0]",
@@ -62,18 +61,10 @@ const SKILL_CARDS: SkillCard[] = [
       "border-[#B39CD0]/30 hover:border-[#B39CD0]/80 hover:shadow-[#B39CD0]/10",
     barClass: "bg-[#B39CD0]",
     glowClass: "group-hover:shadow-[0_8px_40px_rgba(179,156,208,0.2)]",
-    skills: [
-      { name: "Python", proficiency: 82 },
-      { name: "Node.js / Express", proficiency: 78 },
-      { name: "GPT-4 / LangChain", proficiency: 75 },
-      { name: "Java / C++", proficiency: 65 },
-    ],
   },
   {
     category: "cloud",
     icon: Cloud,
-    title: "Cloud & DevOps",
-    subtitle: "Infrastructure built for scale",
     accent: "#FFC1CC",
     accentLight: "#b84a5f",
     accentClass: "text-[#b84a5f] dark:text-[#FFC1CC]",
@@ -81,16 +72,23 @@ const SKILL_CARDS: SkillCard[] = [
       "border-[#FFC1CC]/30 hover:border-[#FFC1CC]/80 hover:shadow-[#FFC1CC]/10",
     barClass: "bg-[#FFC1CC]",
     glowClass: "group-hover:shadow-[0_8px_40px_rgba(255,193,204,0.2)]",
-    skills: [
-      { name: "Docker / Containers", proficiency: 78 },
-      { name: "AWS", proficiency: 72 },
-      { name: "CI/CD Pipelines", proficiency: 70 },
-      { name: "PostgreSQL / MongoDB", proficiency: 80 },
-    ],
   },
 ];
 
-export function Skills() {
+function buildSkillCards(
+  skillsByCategory: SkillsSectionProps["skillsByCategory"]
+): SkillCard[] {
+  return SKILL_CARD_SHELL.map((shell) => ({
+    ...shell,
+    title: CATEGORY_META[shell.category].label,
+    subtitle: SKILL_SECTION_SUBTITLE[shell.category],
+    skills: skillsByCategory[shell.category] ?? [],
+  }));
+}
+
+export function Skills({ skillsByCategory }: SkillsSectionProps) {
+  const cards = useMemo(() => buildSkillCards(skillsByCategory), [skillsByCategory]);
+
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -99,7 +97,6 @@ export function Skills() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      /* Heading */
       gsap.fromTo(
         headingRef.current,
         { opacity: 0, y: 50 },
@@ -116,7 +113,6 @@ export function Skills() {
         }
       );
 
-      /* Cards stagger in */
       gsap.fromTo(
         cardRefs.current,
         { opacity: 0, y: 70, scale: 0.95 },
@@ -135,13 +131,13 @@ export function Skills() {
         }
       );
 
-      /* Skill bars animate width on scroll */
       cardRefs.current.forEach((card, cardIdx) => {
         if (!card) return;
         const bars = barRefs.current[cardIdx];
+        const cardSkills = cards[cardIdx]?.skills ?? [];
         bars.forEach((bar, barIdx) => {
           if (!bar) return;
-          const target = SKILL_CARDS[cardIdx].skills[barIdx].proficiency;
+          const target = cardSkills[barIdx]?.proficiency ?? 0;
           gsap.fromTo(
             bar,
             { width: "0%" },
@@ -162,23 +158,21 @@ export function Skills() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [cards]);
 
   return (
     <section
       ref={sectionRef}
       id="skills"
       aria-label="Skills and Projects"
-      className="relative py-24 sm:py-32 px-4 sm:px-6 lg:px-8 overflow-hidden"
+      className="relative py-fl-section px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
-      {/* Background accents */}
       <div aria-hidden="true" className="absolute inset-0 -z-10">
         <div className="absolute bottom-0 left-1/4 w-80 h-80 rounded-full bg-[#B39CD0]/10 blur-[100px]" />
         <div className="absolute top-1/3 right-0 w-64 h-64 rounded-full bg-[#FFC1CC]/10 blur-[80px]" />
       </div>
 
-      <div className="max-w-6xl mx-auto space-y-16">
-        {/* Heading */}
+      <div className="max-w-6xl mx-auto space-y-fl-y-lg">
         <div ref={headingRef} className="opacity-0">
           <SectionHeading
             label="Skills & Projects"
@@ -187,9 +181,8 @@ export function Skills() {
           />
         </div>
 
-        {/* Cards grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {SKILL_CARDS.map((card, cardIdx) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-6 xl:gap-8">
+          {cards.map((card, cardIdx) => (
             <div
               key={card.category}
               ref={(el) => { cardRefs.current[cardIdx] = el; }}
@@ -198,18 +191,19 @@ export function Skills() {
               aria-label={`Explore ${card.title} projects`}
               onClick={() => router.push(`/skills/${card.category}`)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ")
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
                   router.push(`/skills/${card.category}`);
+                }
               }}
               className={cn(
-                "group relative flex flex-col gap-6 p-7 rounded-3xl border bg-card",
+                "group relative flex cursor-pointer flex-col gap-5 rounded-3xl border bg-card p-5 sm:gap-6 sm:p-6 xl:p-7",
                 "transition-all duration-300 shadow-md",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 card.borderClass,
                 card.glowClass
               )}
             >
-              {/* Top: icon + arrow */}
               <div className="flex items-start justify-between">
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center relative overflow-hidden">
                   <div
@@ -237,27 +231,29 @@ export function Skills() {
                 />
               </div>
 
-              {/* Title + subtitle */}
               <div className="space-y-1">
-                <h3 className="text-xl font-extrabold text-foreground leading-tight">
+                <h3 className="text-xl font-extrabold leading-tight text-foreground">
                   {card.title}
                 </h3>
-                <p className="text-sm text-muted-foreground">{card.subtitle}</p>
+                <p className="text-sm leading-snug text-muted-foreground">{card.subtitle}</p>
               </div>
 
-              {/* Skill bars */}
-              <div className="space-y-4 flex-1">
+              <div className="flex-1 space-y-4">
                 {card.skills.map((skill, barIdx) => (
                   <div key={skill.name} className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-foreground/80">
+                    <div className="flex min-w-0 items-baseline justify-between gap-2 sm:gap-3">
+                      <span className="min-w-0 flex-1 break-words text-xs font-semibold text-foreground/80">
                         {skill.name}
                       </span>
-                      <span className={cn("text-xs font-bold", card.accentClass)}>
+                      <span
+                        className={cn(
+                          "shrink-0 text-xs font-bold tabular-nums",
+                          card.accentClass
+                        )}
+                      >
                         {skill.proficiency}%
                       </span>
                     </div>
-                    {/* Track */}
                     <div className="h-1.5 w-full rounded-full bg-border overflow-hidden">
                       <div
                         ref={(el) => { barRefs.current[cardIdx][barIdx] = el; }}
@@ -274,7 +270,6 @@ export function Skills() {
                 ))}
               </div>
 
-              {/* Footer CTA */}
               <div
                 className={cn(
                   "flex items-center gap-2 text-sm font-semibold pt-2 border-t border-border/50 transition-colors duration-200",
@@ -285,7 +280,6 @@ export function Skills() {
                 <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </div>
 
-              {/* Hover gradient overlay */}
               <div
                 className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                 style={{

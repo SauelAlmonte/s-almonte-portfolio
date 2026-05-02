@@ -20,7 +20,7 @@ export function ContactThankYou({ senderName }: ContactThankYouProps) {
   return (
     <Html>
       <Head />
-      <Preview>Thanks for reaching out, {firstName}! I'll be in touch soon.</Preview>
+      <Preview>Thanks for reaching out, {firstName}! I&apos;ll be in touch soon.</Preview>
       <Body style={main}>
         <Container style={container}>
           {/* Header */}

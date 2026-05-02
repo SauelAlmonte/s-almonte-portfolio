@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { Skill } from "@/lib/models/Skill";
 import { auth } from "@/auth";
+import { buildSkillPartialUpdate } from "@/lib/skills/admin-skill-write";
 
 export async function PUT(
   req: Request,
@@ -11,10 +12,33 @@ export async function PUT(
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const body = await req.json();
-  await connectToDatabase();
-  const skill = await Skill.findByIdAndUpdate(id, body, { new: true });
-  return NextResponse.json({ skill });
+
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+  }
+
+  const patch = buildSkillPartialUpdate(body);
+  if (Object.keys(patch).length === 0) {
+    return NextResponse.json({ error: "No valid fields to update." }, { status: 400 });
+  }
+
+  try {
+    await connectToDatabase();
+    const skill = await Skill.findByIdAndUpdate(id, { $set: patch }, { new: true, runValidators: true });
+    if (!skill) {
+      return NextResponse.json({ error: "Skill not found." }, { status: 404 });
+    }
+    return NextResponse.json({ skill });
+  } catch (err) {
+    console.error("[admin/skills PUT]", err);
+    return NextResponse.json(
+      { error: "Database unavailable. Check MONGODB_URI and Atlas network access." },
+      { status: 503 }
+    );
+  }
 }
 
 export async function DELETE(
@@ -25,7 +49,19 @@ export async function DELETE(
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  await connectToDatabase();
-  await Skill.findByIdAndDelete(id);
-  return NextResponse.json({ success: true });
+
+  try {
+    await connectToDatabase();
+    const removed = await Skill.findByIdAndDelete(id);
+    if (!removed) {
+      return NextResponse.json({ error: "Skill not found." }, { status: 404 });
+    }
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("[admin/skills DELETE]", err);
+    return NextResponse.json(
+      { error: "Database unavailable. Check MONGODB_URI and Atlas network access." },
+      { status: 503 }
+    );
+  }
 }

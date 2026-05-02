@@ -11,7 +11,6 @@ import {
   Github,
   Linkedin,
   Youtube,
-  Mail,
   Send,
   CheckCircle2,
   Loader2,
@@ -32,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SectionHeading } from "@/components/common/SectionHeading";
@@ -139,7 +139,7 @@ export function Contact() {
         ref={sectionRef}
         id="contact"
         aria-label="Contact"
-        className="relative py-24 sm:py-32 px-4 sm:px-6 lg:px-8 overflow-hidden"
+        className="relative py-fl-section px-4 sm:px-6 lg:px-8 overflow-hidden"
       >
         {/* Background blobs */}
         <div aria-hidden="true" className="absolute inset-0 -z-10">
@@ -147,19 +147,19 @@ export function Contact() {
           <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-[#B39CD0]/10 blur-[80px]" />
         </div>
 
-        <div className="max-w-6xl mx-auto space-y-16">
+        <div className="max-w-6xl mx-auto space-y-fl-y-lg">
           <SectionHeading
             label="Contact"
             title="Let's Work Together"
             subtitle="Have a project in mind, a question, or just want to say hello? I'd love to hear from you."
           />
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-fl-gap-cols items-start">
 
             {/* ── Left ── */}
             <div ref={leftRef} className="opacity-0 space-y-10">
               <div className="space-y-4">
-                <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
+                <p className="text-muted-foreground leading-relaxed text-lg">
                   Whether you&apos;re looking for a{" "}
                   <span className="text-foreground font-medium">full-stack engineer</span>,
                   want to collaborate on something meaningful, or just want to connect —
@@ -344,6 +344,9 @@ export function Contact() {
       <Dialog open={modalState === "consent"} onOpenChange={(open) => { if (!open) setModalState("idle"); }}>
         <DialogContent className="sm:max-w-md rounded-3xl border border-border bg-card p-8 shadow-2xl">
           <DialogTitle className="sr-only">Subscription consent</DialogTitle>
+          <DialogDescription className="sr-only">
+            Choose whether to subscribe to portfolio updates when sending a message through this form.
+          </DialogDescription>
 
           <div className="flex justify-center mb-5">
             <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center">
@@ -396,6 +399,9 @@ export function Contact() {
       <Dialog open={modalState === "success"} onOpenChange={(open) => { if (!open) setModalState("idle"); }}>
         <DialogContent className="sm:max-w-md rounded-3xl border border-border bg-card p-8 text-center shadow-2xl">
           <DialogTitle className="sr-only">Message sent successfully</DialogTitle>
+          <DialogDescription className="sr-only">
+            Your contact message was submitted successfully.
+          </DialogDescription>
 
           <div className="flex justify-center mb-6">
             <div className="w-20 h-20 rounded-full bg-primary/15 flex items-center justify-center">
@@ -404,7 +410,7 @@ export function Contact() {
           </div>
 
           <div className="space-y-3 mb-8">
-            <h2 className="text-2xl font-extrabold text-foreground">Message Sent! 🎉</h2>
+            <h2 className="text-2xl font-extrabold text-foreground">Message sent</h2>
             <p className="text-muted-foreground leading-relaxed text-sm">
               Your message has been successfully submitted. I&apos;ll review it and get back to
               you as soon as possible.

@@ -52,6 +52,57 @@
   --color-lavender: var(--portfolio-lavender);
   --color-slate: var(--portfolio-slate);
   --color-light: var(--portfolio-light);
+
+  /*
+   * Fluid type: clamp between compact phones (~20rem) and wide desktops (~80rem).
+   * All text-* utilities use these tokens; no component edits required.
+   */
+  --text-xs: clamp(0.6875rem, 0.64rem + 0.22vw, 0.75rem);
+  --text-xs--line-height: 1.45;
+  --text-sm: clamp(0.8125rem, 0.76rem + 0.28vw, 0.875rem);
+  --text-sm--line-height: 1.45;
+  --text-base: clamp(0.9375rem, 0.86rem + 0.42vw, 1rem);
+  --text-base--line-height: 1.55;
+  --text-lg: clamp(1rem, 0.92rem + 0.45vw, 1.125rem);
+  --text-lg--line-height: 1.55;
+  --text-xl: clamp(1.0625rem, 0.94rem + 0.65vw, 1.25rem);
+  --text-xl--line-height: 1.45;
+  --text-2xl: clamp(1.1875rem, 1rem + 0.95vw, 1.5rem);
+  --text-2xl--line-height: 1.35;
+  --text-3xl: clamp(1.375rem, 1.08rem + 1.5vw, 1.875rem);
+  --text-3xl--line-height: 1.25;
+  --text-4xl: clamp(1.5625rem, 1.12rem + 2.1vw, 2.25rem);
+  --text-4xl--line-height: 1.2;
+  --text-5xl: clamp(1.875rem, 1.2rem + 3.25vw, 3rem);
+  --text-5xl--line-height: 1.1;
+  --text-6xl: clamp(2.25rem, 1.35rem + 4.5vw, 3.75rem);
+  --text-6xl--line-height: 1.05;
+  --text-7xl: clamp(2.625rem, 1.35rem + 6.4vw, 4.5rem);
+  --text-7xl--line-height: 1.05;
+  --text-8xl: clamp(3rem, 1.25rem + 8.75vw, 6rem);
+  --text-8xl--line-height: 1.05;
+  --text-9xl: clamp(3.375rem, 1rem + 11.8vw, 8rem);
+  --text-9xl--line-height: 1.05;
+
+  /*
+   * Fluid spacing (same viewport basis as type) for tight UI regions — modal gaps,
+   * CTA padding, etc. Use gap-fl-*, p-fl-*, min-h-fl-* utilities on the landing page.
+   */
+  --spacing-fl-dialog: clamp(0.875rem, 0.75rem + 0.6vw, 1.25rem);
+  --spacing-fl-stack: clamp(0.625rem, 0.5rem + 0.5vw, 0.875rem);
+  --spacing-fl-cta-x: clamp(0.875rem, 0.65rem + 1vw, 1rem);
+  --spacing-fl-cta-y: clamp(0.625rem, 0.45rem + 0.75vw, 0.875rem);
+  --spacing-fl-row-min: clamp(2.75rem, 6vw, 3.25rem);
+  --spacing-fl-icon-gap: clamp(0.625rem, 0.5rem + 0.35vw, 0.75rem);
+  --spacing-fl-icon: clamp(1rem, 0.9rem + 0.35vw, 1.125rem);
+
+  /* Section rhythm (same viewport basis as type) — landing page vertical padding & stacks */
+  --spacing-fl-section: clamp(6rem, 4.5rem + 4vw, 8rem);
+  --spacing-fl-y-xl: clamp(5rem, 3.75rem + 3vw, 6rem);
+  --spacing-fl-y-lg: clamp(3.5rem, 2.75rem + 2vw, 4rem);
+  --spacing-fl-y-tight: clamp(3rem, 2.5rem + 1.25vw, 4rem);
+  --spacing-fl-y-snug: clamp(0.875rem, 0.7rem + 0.65vw, 1.25rem);
+  --spacing-fl-gap-cols: clamp(2.75rem, 2rem + 2.5vw, 4rem);
 }
 
 :root {
@@ -195,14 +246,17 @@
     scroll-behavior: smooth;
   }
   a,
-  button,
-  [role="button"],
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
   label[for],
-  select,
+  select:not(:disabled),
   summary,
-  [type="button"],
-  [type="submit"],
-  [type="reset"] {
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled),
+  input[type="file"]:not(:disabled) {
     cursor: pointer;
   }
 }

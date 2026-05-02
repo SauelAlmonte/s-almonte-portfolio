@@ -7,6 +7,7 @@ const ExperienceSchema = new Schema({
   location: { type: String },
   description: { type: String },
   bullets: { type: [String], default: [] },
+  tech: { type: [String], default: [] },
   order: { type: Number, default: 0 },
 });
 
@@ -16,12 +17,14 @@ const EducationSchema = new Schema({
   field: { type: String },
   year: { type: String },
   description: { type: String },
+  credentialUrl: { type: String },
 });
 
 const CertificationSchema = new Schema({
   name: { type: String, required: true },
   issuer: { type: String, required: true },
   year: { type: String },
+  description: { type: String },
   credentialUrl: { type: String },
 });
 
@@ -31,7 +34,10 @@ const ResumeDataSchema = new Schema(
     experience: { type: [ExperienceSchema], default: [] },
     education: { type: [EducationSchema], default: [] },
     certifications: { type: [CertificationSchema], default: [] },
+    /** Primary / “Software” resume PDF path or URL. */
     resumeFileUrl: { type: String },
+    /** IT resume PDF path or URL (landing modal second option). */
+    resumeItFileUrl: { type: String },
   },
   { timestamps: true }
 );
