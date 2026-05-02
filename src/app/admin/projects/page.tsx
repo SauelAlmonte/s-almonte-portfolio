@@ -317,21 +317,34 @@ export default function AdminProjectsPage() {
       discoveryChipRef.current?.clearDraft();
       setForm((f) => ({ ...f, techStack, tags }));
       const body = { ...form, techStack, tags };
-      if (editing) {
-        await fetch(`/api/admin/projects/${editing._id}`, {
-          method: "PUT", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-          credentials: "include",
-        });
-      } else {
-        await fetch("/api/admin/projects", {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-          credentials: "include",
-        });
+      const url = editing
+        ? `/api/admin/projects/${editing._id}`
+        : "/api/admin/projects";
+      const method = editing ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        credentials: "include",
+      });
+      const text = await res.text();
+      let data: { error?: string } = {};
+      if (text.trim()) {
+        try {
+          data = JSON.parse(text) as { error?: string };
+        } catch {
+          setLoadError("Could not save project. Invalid server response.");
+          return;
+        }
+      }
+      if (!res.ok) {
+        setLoadError(typeof data.error === "string" ? data.error : `Save failed (${res.status}).`);
+        return;
       }
       await fetchProjects();
       setOpen(false);
+    } catch {
+      setLoadError("Could not save project. Check your connection and try again.");
     } finally {
       setSaving(false);
     }
@@ -380,13 +393,35 @@ export default function AdminProjectsPage() {
 
 
   const toggleFeatured = async (p: Project) => {
-    await fetch(`/api/admin/projects/${p._id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ featured: !p.featured }),
-      credentials: "include",
-    });
-    fetchProjects();
+    try {
+      const res = await fetch(`/api/admin/projects/${p._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ featured: !p.featured }),
+        credentials: "include",
+      });
+      const text = await res.text();
+      let data: { error?: string } = {};
+      if (text.trim()) {
+        try {
+          data = JSON.parse(text) as { error?: string };
+        } catch {
+          setLoadError("Could not update featured state. Invalid server response.");
+          return;
+        }
+      }
+      if (!res.ok) {
+        setLoadError(
+          typeof data.error === "string"
+            ? data.error
+            : `Could not update featured state (${res.status}).`
+        );
+        return;
+      }
+      await fetchProjects();
+    } catch {
+      setLoadError("Could not update featured state. Check your connection and try again.");
+    }
   };
 
   return (

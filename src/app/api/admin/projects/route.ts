@@ -33,7 +33,15 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  await connectToDatabase();
-  const project = await Project.create(doc);
-  return NextResponse.json({ project }, { status: 201 });
+  try {
+    await connectToDatabase();
+    const project = await Project.create(doc);
+    return NextResponse.json({ project }, { status: 201 });
+  } catch (err) {
+    console.error("[admin/projects POST]", err);
+    return NextResponse.json(
+      { error: "Database unavailable. Check MONGODB_URI and Atlas network access." },
+      { status: 503 }
+    );
+  }
 }
