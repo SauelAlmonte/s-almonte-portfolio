@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { Project } from "@/lib/models/Project";
 import { auth } from "@/auth";
+import { buildProjectPartialUpdate } from "@/lib/projects/admin-project-write";
 
 export async function PUT(
   req: Request,
@@ -12,9 +13,31 @@ export async function PUT(
 
   const { id } = await params;
   const body = await req.json();
-  await connectToDatabase();
-  const project = await Project.findByIdAndUpdate(id, body, { new: true });
-  return NextResponse.json({ project });
+
+  const patch = buildProjectPartialUpdate(body);
+  if (Object.keys(patch).length === 0) {
+    return NextResponse.json({ error: "No valid fields to update." }, { status: 400 });
+  }
+
+  try {
+    await connectToDatabase();
+
+    const project = await Project.findByIdAndUpdate(
+      id,
+      { $set: patch },
+      { new: true, runValidators: true }
+    );
+    if (!project) {
+      return NextResponse.json({ error: "Project not found." }, { status: 404 });
+    }
+    return NextResponse.json({ project });
+  } catch (err) {
+    console.error("[admin/projects PUT]", err);
+    return NextResponse.json(
+      { error: "Database unavailable. Check MONGODB_URI and Atlas network access." },
+      { status: 503 }
+    );
+  }
 }
 
 export async function DELETE(
@@ -25,7 +48,15 @@ export async function DELETE(
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  await connectToDatabase();
-  await Project.findByIdAndDelete(id);
-  return NextResponse.json({ success: true });
+  try {
+    await connectToDatabase();
+    await Project.findByIdAndDelete(id);
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("[admin/projects DELETE]", err);
+    return NextResponse.json(
+      { error: "Database unavailable. Check MONGODB_URI and Atlas network access." },
+      { status: 503 }
+    );
+  }
 }

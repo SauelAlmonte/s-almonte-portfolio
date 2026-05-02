@@ -1,3 +1,6 @@
+/* Dev fix: prod AUTH_* in .env.local should not steal OAuth redirects from localhost */
+import "@/lib/auth/normalize-dev-auth-urls";
+
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 

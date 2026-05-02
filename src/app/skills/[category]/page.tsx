@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { PROJECTS, CATEGORY_META, type ProjectCategory } from "@/config/projects";
+import { CATEGORY_META, type ProjectCategory } from "@/config/projects";
+import { loadPublishedProjectsByCategory } from "@/lib/projects/load-published-projects";
 import { ProjectsPageClient } from "./ProjectsPageClient";
+
+/** Always read latest projects from Mongo when available (admin edits reflect here). */
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ category: string }>;
@@ -31,7 +35,7 @@ export default async function CategoryPage({ params }: PageProps) {
   }
 
   const cat = category as ProjectCategory;
-  const projects = PROJECTS.filter((p) => p.category === cat);
+  const projects = await loadPublishedProjectsByCategory(cat);
   const meta = CATEGORY_META[cat];
 
   return <ProjectsPageClient category={cat} projects={projects} meta={meta} />;

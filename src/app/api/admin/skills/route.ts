@@ -7,9 +7,17 @@ export async function GET() {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  await connectToDatabase();
-  const skills = await Skill.find().sort({ category: 1, order: 1 }).lean();
-  return NextResponse.json({ skills });
+  try {
+    await connectToDatabase();
+    const skills = await Skill.find().sort({ category: 1, order: 1 }).lean();
+    return NextResponse.json({ skills });
+  } catch (err) {
+    console.error("[admin/skills GET]", err);
+    return NextResponse.json(
+      { error: "Database unavailable. Check MONGODB_URI and Atlas network access." },
+      { status: 503 }
+    );
+  }
 }
 
 export async function POST(req: Request) {

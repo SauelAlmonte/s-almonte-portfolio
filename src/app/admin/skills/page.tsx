@@ -33,6 +33,7 @@ const EMPTY_FORM = { name: "", category: "fullstack", proficiency: 75, order: 0 
 export default function AdminSkillsPage() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Skill | null>(null);
@@ -40,10 +41,22 @@ export default function AdminSkillsPage() {
 
   const fetchSkills = async () => {
     setLoading(true);
-    const res = await fetch("/api/admin/skills");
-    const data = await res.json();
-    setSkills(data.skills ?? []);
-    setLoading(false);
+    setLoadError(null);
+    try {
+      const res = await fetch("/api/admin/skills", { credentials: "include" });
+      const data = await res.json();
+      if (!res.ok) {
+        setLoadError(typeof data?.error === "string" ? data.error : `Request failed (${res.status})`);
+        setSkills([]);
+        return;
+      }
+      setSkills(data.skills ?? []);
+    } catch {
+      setLoadError("Could not load skills. Check your connection and MongoDB settings.");
+      setSkills([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchSkills(); }, []);
@@ -62,11 +75,13 @@ export default function AdminSkillsPage() {
         await fetch(`/api/admin/skills/${editing._id}`, {
           method: "PUT", headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form),
+          credentials: "include",
         });
       } else {
         await fetch("/api/admin/skills", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form),
+          credentials: "include",
         });
       }
       await fetchSkills();
@@ -78,7 +93,7 @@ export default function AdminSkillsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this skill?")) return;
-    await fetch(`/api/admin/skills/${id}`, { method: "DELETE" });
+    await fetch(`/api/admin/skills/${id}`, { method: "DELETE", credentials: "include" });
     setSkills((s) => s.filter((x) => x._id !== id));
   };
 
@@ -98,6 +113,12 @@ export default function AdminSkillsPage() {
           <Plus className="h-4 w-4" /> Add Skill
         </Button>
       </div>
+
+      {loadError && (
+        <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-xl" role="alert">
+          {loadError}
+        </p>
+      )}
 
       {loading ? (
         <div className="flex items-center justify-center py-20 text-muted-foreground gap-3">

@@ -22,13 +22,27 @@ if (!global.mongoose) {
   global.mongoose = cached;
 }
 
+const connectOptions = {
+  bufferCommands: false,
+  /* Fail fast instead of hanging indefinitely when Atlas/network blocks or URI is wrong */
+  serverSelectionTimeoutMS: 10_000,
+  connectTimeoutMS: 10_000,
+  socketTimeoutMS: 45_000,
+} as const;
+
 export async function connectToDatabase(): Promise<typeof mongoose> {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, { bufferCommands: false });
+    cached.promise = mongoose.connect(MONGODB_URI, connectOptions);
   }
 
-  cached.conn = await cached.promise;
-  return cached.conn;
+  try {
+    cached.conn = await cached.promise;
+    return cached.conn;
+  } catch (error) {
+    cached.promise = null;
+    cached.conn = null;
+    throw error;
+  }
 }
