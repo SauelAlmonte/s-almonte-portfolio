@@ -9,12 +9,20 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await connectToDatabase();
-  const subscribers = await Subscriber.find()
-    .sort({ createdAt: -1 })
-    .lean();
+  try {
+    await connectToDatabase();
+    const subscribers = await Subscriber.find()
+      .sort({ createdAt: -1 })
+      .lean();
 
-  return NextResponse.json({ subscribers });
+    return NextResponse.json({ subscribers });
+  } catch (err) {
+    console.error("[admin/subscribers GET]", err);
+    return NextResponse.json(
+      { error: "Database unavailable. Check MONGODB_URI and Atlas network access." },
+      { status: 503 }
+    );
+  }
 }
 
 export async function DELETE(req: Request) {

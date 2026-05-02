@@ -33,7 +33,7 @@ export default function SubscribersPage() {
   const fetchSubscribers = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/subscribers");
+      const res = await fetch("/api/admin/subscribers", { credentials: "include" });
       const data = await res.json();
       setSubscribers(data.subscribers || []);
       setFiltered(data.subscribers || []);
@@ -67,6 +67,7 @@ export default function SubscribersPage() {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
+        credentials: "include",
       });
       setSubscribers((prev) => prev.filter((s) => s._id !== id));
     } catch (err) {

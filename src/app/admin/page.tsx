@@ -18,12 +18,53 @@ const QUICK_ACTIONS = [
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [statsError, setStatsError] = useState<string | null>(null);
+  const [statsHint, setStatsHint] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/admin/stats")
-      .then((r) => r.json())
-      .then(setStats)
-      .catch(console.error);
+    let cancelled = false;
+
+    void (async () => {
+      setStatsError(null);
+      setStatsHint(null);
+      try {
+        const res = await fetch("/api/admin/stats", { credentials: "include" });
+        const text = await res.text();
+        if (cancelled) return;
+
+        if (!text.trim()) {
+          setStatsError(res.ok ? "Empty response from server." : `Request failed (${res.status}).`);
+          return;
+        }
+
+        let data: { total?: number; active?: number; error?: string; hint?: string };
+        try {
+          data = JSON.parse(text) as {
+            total?: number;
+            active?: number;
+            error?: string;
+            hint?: string;
+          };
+        } catch {
+          setStatsError("Could not parse server response.");
+          return;
+        }
+
+        if (!res.ok) {
+          setStatsError(typeof data.error === "string" ? data.error : `Request failed (${res.status}).`);
+          setStatsHint(typeof data.hint === "string" ? data.hint : null);
+          return;
+        }
+
+        setStats({ total: data.total ?? 0, active: data.active ?? 0 });
+      } catch {
+        if (!cancelled) setStatsError("Could not load subscriber stats.");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -35,6 +76,17 @@ export default function AdminDashboard() {
           Welcome back, Sauel. Here&apos;s an overview of your portfolio.
         </p>
       </div>
+
+      {statsError && (
+        <div className="space-y-2" role="alert">
+          <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-xl">{statsError}</p>
+          {statsHint ? (
+            <p className="text-sm text-muted-foreground bg-muted/50 px-4 py-3 rounded-xl leading-relaxed">
+              {statsHint}
+            </p>
+          ) : null}
+        </div>
+      )}
 
       {/* Stats grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

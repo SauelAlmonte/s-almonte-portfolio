@@ -28,6 +28,17 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           project.imageGradient
         )}
       >
+        {project.imageBase64 && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element -- CMS-uploaded arbitrary data */}
+            <img
+              src={project.imageBase64}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/35" aria-hidden />
+          </>
+        )}
         {project.comingSoon && (
           <div className="absolute inset-0 bg-background/40 backdrop-blur-sm flex items-center justify-center gap-2">
             <Clock className="h-5 w-5 text-muted-foreground" />
@@ -69,17 +80,38 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           </p>
         </div>
 
-        {/* Tech tags */}
-        <div className="flex flex-wrap gap-1.5">
-          {project.techStack.map((tag) => (
-            <span
-              key={tag}
-              className={cn("px-2.5 py-0.5 rounded-full text-xs font-semibold", meta.tagClass)}
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
+        {/* Tech stack (same order as admin form: stack first, then discovery tags) */}
+        {project.techStack.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {project.techStack.map((tag) => (
+              <span
+                key={tag}
+                className={cn(
+                  "px-2.5 py-0.5 rounded-full text-xs font-semibold",
+                  meta.tagClass
+                )}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {(project.tags?.length ?? 0) > 0 && (
+          <ul
+            aria-label="Project topics"
+            className="flex flex-wrap gap-1.5 list-none m-0 p-0"
+          >
+            {(project.tags ?? []).map((tag) => (
+              <li
+                key={tag}
+                className="px-2.5 py-0.5 rounded-full text-xs font-medium border border-primary/35 bg-primary/10 text-primary"
+              >
+                {tag}
+              </li>
+            ))}
+          </ul>
+        )}
 
         {/* Actions */}
         {!project.comingSoon && (

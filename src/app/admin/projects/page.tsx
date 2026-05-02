@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import {
-  Plus, Pencil, Trash2, X, ImagePlus, Star, StarOff, RefreshCw, ExternalLink, Github,
+  Plus, Pencil, Trash2, X, ImagePlus, Star, StarOff, RefreshCw, ExternalLink, Github, Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,23 +13,25 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  Tabs, TabsContent, TabsList, TabsTrigger,
+} from "@/components/ui/tabs";
+import { CATEGORY_META, type ProjectCategory } from "@/config/projects";
+import { cn } from "@/lib/utils";
 
-const CATEGORY_LABELS: Record<string, string> = {
-  fullstack: "Full-Stack",
-  backend: "Backend & AI",
-  cloud: "Cloud",
-};
+const PROJECT_CATEGORIES: ProjectCategory[] = ["fullstack", "backend", "cloud"];
 
-const CATEGORY_COLORS: Record<string, string> = {
-  fullstack: "bg-[#A8DADC]/20 text-[#2C9C9F] border-[#A8DADC]/30",
-  backend: "bg-[#FFC1CC]/20 text-rose-500 border-[#FFC1CC]/30",
-  cloud: "bg-[#B39CD0]/20 text-[#7B5EA7] border-[#B39CD0]/30",
+const CATEGORY_BORDER_ACTIVE: Record<ProjectCategory, string> = {
+  fullstack: "data-[state=active]:border-[#A8DADC]/50 data-[state=active]:shadow-[inset_0_0_0_1px_rgba(168,218,220,0.35)]",
+  backend: "data-[state=active]:border-[#B39CD0]/45 data-[state=active]:shadow-[inset_0_0_0_1px_rgba(179,156,208,0.35)]",
+  cloud: "data-[state=active]:border-[#FFC1CC]/50 data-[state=active]:shadow-[inset_0_0_0_1px_rgba(255,193,204,0.35)]",
 };
 
 interface Project {
   _id: string;
+  slug?: string;
   title: string;
   description: string;
   category: string;
@@ -37,8 +39,10 @@ interface Project {
   tags: string[];
   liveUrl?: string;
   repoUrl?: string;
+  imageGradient?: string;
   imageBase64?: string;
   featured: boolean;
+  comingSoon?: boolean;
   order: number;
 }
 
@@ -52,7 +56,7 @@ const EMPTY_FORM = {
   repoUrl: "",
   imageBase64: "",
   featured: false,
-  order: 0,
+  comingSoon: false,
 };
 
 function compressImage(file: File): Promise<string> {
@@ -75,34 +79,82 @@ function compressImage(file: File): Promise<string> {
   });
 }
 
-function TagInput({
-  label, values, onChange, placeholder,
-}: {
-  label: string;
-  values: string[];
-  onChange: (v: string[]) => void;
-  placeholder?: string;
-}) {
+/** Split chip input on commas, semicolons, en dash, or em dash (matches placeholder typography). */
+function splitChipInput(raw: string): string[] {
+  return raw
+    .split(/[,;]|[\u2013\u2014]/g)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/** Merge textarea-style draft into persisted chip list (used when Save is clicked). */
+function mergeIncomingChips(existing: string[], rawDraft: string): string[] {
+  const additions = splitChipInput(rawDraft);
+  if (!additions.length) return existing;
+  const out = [...existing];
+  for (const a of additions) {
+    if (!out.includes(a)) out.push(a);
+  }
+  return out;
+}
+
+export type ChipInputHandle = {
+  /** Uncommitted text currently in the field */
+  getDraft: () => string;
+  clearDraft: () => void;
+};
+
+const TagInput = forwardRef<
+  ChipInputHandle,
+  {
+    label: string;
+    values: string[];
+    onChange: (v: string[]) => void;
+    placeholder?: string;
+    hint?: string;
+  }
+>(function TagInput({ label, values, onChange, placeholder, hint }, ref) {
   const [input, setInput] = useState("");
 
-  const add = () => {
-    const val = input.trim();
-    if (val && !values.includes(val)) onChange([...values, val]);
+  const commitDraft = useCallback(() => {
+    const segments = splitChipInput(input);
+    if (!segments.length) return;
+    const merged = [...values];
+    for (const s of segments) {
+      if (!merged.includes(s)) merged.push(s);
+    }
+    onChange(merged);
     setInput("");
-  };
+  }, [input, values, onChange]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      getDraft: () => input,
+      clearDraft: () => setInput(""),
+    }),
+    [input]
+  );
 
   return (
     <div className="space-y-2">
       <Label className="text-sm font-semibold">{label}</Label>
+      {hint ? <p className="text-xs text-muted-foreground -mt-0.5">{hint}</p> : null}
       <div className="flex gap-2">
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); add(); } }}
-          placeholder={placeholder ?? "Type and press Enter"}
+          onBlur={() => commitDraft()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              commitDraft();
+            }
+          }}
+          placeholder={placeholder ?? "Type and press Enter, or comma-separate"}
           className="rounded-xl bg-card text-sm"
         />
-        <Button type="button" variant="outline" size="sm" onClick={add} className="rounded-xl shrink-0">
+        <Button type="button" variant="outline" size="sm" onClick={() => commitDraft()} className="rounded-xl shrink-0">
           Add
         </Button>
       </div>
@@ -111,7 +163,7 @@ function TagInput({
           {values.map((v) => (
             <span key={v} className="flex items-center gap-1 text-xs bg-muted px-2.5 py-1 rounded-full">
               {v}
-              <button type="button" onClick={() => onChange(values.filter((x) => x !== v))}>
+              <button type="button" aria-label={`Remove ${v}`} onClick={() => onChange(values.filter((x) => x !== v))}>
                 <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
               </button>
             </span>
@@ -120,7 +172,9 @@ function TagInput({
       )}
     </div>
   );
-}
+});
+
+TagInput.displayName = "TagInput";
 
 export default function AdminProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -130,30 +184,119 @@ export default function AdminProjectsPage() {
   const [editing, setEditing] = useState<Project | null>(null);
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const fileRef = useRef<HTMLInputElement>(null);
+  const techChipRef = useRef<ChipInputHandle | null>(null);
+  const discoveryChipRef = useRef<ChipInputHandle | null>(null);
+
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [seedMessage, setSeedMessage] = useState<string | null>(null);
+  const [seeding, setSeeding] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<ProjectCategory>("fullstack");
+  const [deleteConfirmProject, setDeleteConfirmProject] = useState<Project | null>(null);
+  const [deleteConfirmationInput, setDeleteConfirmationInput] = useState("");
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false);
+
+  const countsByCategory = useMemo(
+    () =>
+      PROJECT_CATEGORIES.reduce(
+        (acc, key) => {
+          acc[key] = projects.filter((p) => p.category === key).length;
+          return acc;
+        },
+        {} as Record<ProjectCategory, number>
+      ),
+    [projects]
+  );
 
   const fetchProjects = async () => {
     setLoading(true);
-    const res = await fetch("/api/admin/projects");
-    const data = await res.json();
-    setProjects(data.projects ?? []);
-    setLoading(false);
+    setLoadError(null);
+    setSeedMessage(null);
+    try {
+      const res = await fetch("/api/admin/projects", { credentials: "include" });
+      const text = await res.text();
+      let data: { projects?: Project[]; error?: string } = {};
+      if (text.trim()) {
+        try {
+          data = JSON.parse(text) as { projects?: Project[]; error?: string };
+        } catch {
+          setLoadError("Server returned invalid data (not JSON). Try restarting the dev server.");
+          setProjects([]);
+          return;
+        }
+      }
+      if (!res.ok) {
+        setLoadError(typeof data?.error === "string" ? data.error : `Request failed (${res.status})`);
+        setProjects([]);
+        return;
+      }
+      const list = data.projects ?? [];
+      setProjects(
+        list.map((p) => ({
+          ...p,
+          tags: p.tags ?? [],
+          techStack: p.techStack ?? [],
+        }))
+      );
+    } catch {
+      setLoadError("Could not load projects. Check your connection and MongoDB settings.");
+      setProjects([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchProjects(); }, []);
 
-  const openAdd = () => {
+  const seedFromPortfolioConfig = async () => {
+    setSeeding(true);
+    setLoadError(null);
+    setSeedMessage(null);
+    try {
+      const res = await fetch("/api/admin/projects/seed", {
+        method: "POST",
+        credentials: "include",
+      });
+      const text = await res.text();
+      let data: { message?: string; error?: string } = {};
+      if (text.trim()) {
+        try {
+          data = JSON.parse(text) as { message?: string; error?: string };
+        } catch {
+          throw new Error("Invalid response from server");
+        }
+      }
+      if (!res.ok) {
+        throw new Error(typeof data.error === "string" ? data.error : "Import failed");
+      }
+      setSeedMessage(typeof data.message === "string" ? data.message : "Import complete.");
+      await fetchProjects();
+    } catch (e) {
+      setLoadError(e instanceof Error ? e.message : "Import failed.");
+    } finally {
+      setSeeding(false);
+    }
+  };
+
+  const openAddForCategory = (cat: ProjectCategory) => {
+    setActiveCategory(cat);
     setEditing(null);
-    setForm({ ...EMPTY_FORM });
+    setForm({ ...EMPTY_FORM, category: cat });
     setOpen(true);
+  };
+
+  const openAdd = () => {
+    openAddForCategory(activeCategory);
   };
 
   const openEdit = (p: Project) => {
     setEditing(p);
     setForm({
       title: p.title, description: p.description, category: p.category,
-      techStack: p.techStack, tags: p.tags,
-      liveUrl: p.liveUrl ?? "", repoUrl: p.repoUrl ?? "",
-      imageBase64: p.imageBase64 ?? "", featured: p.featured, order: p.order,
+      techStack: p.techStack, tags: p.tags ?? [],
+      liveUrl: p.liveUrl ?? "",
+      repoUrl: p.repoUrl ?? "",
+      imageBase64: p.imageBase64 ?? "", featured: p.featured,
+      comingSoon: p.comingSoon ?? false,
     });
     setOpen(true);
   };
@@ -168,15 +311,23 @@ export default function AdminProjectsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const techStack = mergeIncomingChips(form.techStack, techChipRef.current?.getDraft() ?? "");
+      const tags = mergeIncomingChips(form.tags, discoveryChipRef.current?.getDraft() ?? "");
+      techChipRef.current?.clearDraft();
+      discoveryChipRef.current?.clearDraft();
+      setForm((f) => ({ ...f, techStack, tags }));
+      const body = { ...form, techStack, tags };
       if (editing) {
         await fetch(`/api/admin/projects/${editing._id}`, {
           method: "PUT", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify(body),
+          credentials: "include",
         });
       } else {
         await fetch("/api/admin/projects", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify(body),
+          credentials: "include",
         });
       }
       await fetchProjects();
@@ -186,16 +337,54 @@ export default function AdminProjectsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this project?")) return;
-    await fetch(`/api/admin/projects/${id}`, { method: "DELETE" });
-    setProjects((p) => p.filter((x) => x._id !== id));
+  const confirmDeletePhraseMatches =
+    deleteConfirmationInput.trim().toLowerCase() === "delete";
+
+  const resetDeleteConfirmation = () => {
+    setDeleteConfirmProject(null);
+    setDeleteConfirmationInput("");
+    setDeleteSubmitting(false);
   };
+
+  const openDeleteConfirmation = (p: Project) => {
+    setDeleteConfirmProject(p);
+    setDeleteConfirmationInput("");
+    setDeleteSubmitting(false);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!deleteConfirmProject || !confirmDeletePhraseMatches || deleteSubmitting) return;
+    setDeleteSubmitting(true);
+    try {
+      const id = deleteConfirmProject._id;
+      let res: Response;
+      try {
+        res = await fetch(`/api/admin/projects/${id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+      } catch {
+        setLoadError("Could not delete this project. Check your connection and try again.");
+        return;
+      }
+      if (!res.ok) {
+        setLoadError(`Could not delete this project (${res.status}).`);
+        return;
+      }
+      setProjects((prev) => prev.filter((x) => x._id !== id));
+      resetDeleteConfirmation();
+    } finally {
+      setDeleteSubmitting(false);
+    }
+  };
+
 
   const toggleFeatured = async (p: Project) => {
     await fetch(`/api/admin/projects/${p._id}`, {
-      method: "PUT", headers: { "Content-Type": "application/json" },
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ featured: !p.featured }),
+      credentials: "include",
     });
     fetchProjects();
   };
@@ -206,7 +395,15 @@ export default function AdminProjectsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-foreground">Projects</h1>
-          <p className="text-sm text-muted-foreground mt-1">{projects.length} total</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {projects.length} total
+            {!loading && projects.length > 0 ? (
+              <>
+                {" "}
+                · {countsByCategory[activeCategory]} in {CATEGORY_META[activeCategory].label}
+              </>
+            ) : null}
+          </p>
         </div>
         <Button onClick={openAdd} className="gap-2 rounded-xl">
           <Plus className="h-4 w-4" /> Add Project
@@ -214,88 +411,243 @@ export default function AdminProjectsPage() {
       </div>
 
       {/* Projects grid */}
+      {loadError && (
+        <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-xl" role="alert">
+          {loadError}
+        </p>
+      )}
+      {seedMessage && (
+        <p className="text-sm text-muted-foreground bg-muted/50 px-4 py-3 rounded-xl">{seedMessage}</p>
+      )}
+
       {loading ? (
         <div className="flex items-center justify-center py-20 text-muted-foreground gap-3">
           <RefreshCw className="h-5 w-5 animate-spin" />
           <span className="text-sm">Loading…</span>
         </div>
       ) : projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground border border-dashed border-border rounded-xl">
-          <Plus className="h-10 w-10 opacity-30" />
-          <p className="text-sm">No projects yet. Add your first one.</p>
+        <div className="flex flex-col items-center justify-center py-14 gap-4 text-center border border-dashed border-border rounded-xl px-6">
+          <div className="space-y-1 max-w-md">
+            <p className="text-sm font-semibold text-foreground">No projects in the database yet</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Public `/skills/[category]` pages load from MongoDB when it has rows; otherwise they use
+              <code className="mx-1 text-xs bg-muted px-1 py-0.5 rounded">config/projects.ts</code>.
+              Import those defaults once so Admin and the site share the same data.
+            </p>
+          </div>
+          <Button
+            type="button"
+            onClick={() => seedFromPortfolioConfig()}
+            disabled={seeding}
+            variant="outline"
+            className="rounded-xl gap-2"
+          >
+            {seeding ? (
+              <><RefreshCw className="h-4 w-4 animate-spin" /> Importing…</>
+            ) : (
+              <><Download className="h-4 w-4" /> Import from portfolio config</>
+            )}
+          </Button>
+          <Button type="button" onClick={openAdd} variant="default" className="rounded-xl gap-2">
+            <Plus className="h-4 w-4" /> Add project manually instead
+          </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {projects.map((p) => (
-            <div key={p._id} className="rounded-xl border border-border bg-card overflow-hidden group">
-              {/* Thumbnail */}
-              <div className="relative h-40 bg-muted flex items-center justify-center overflow-hidden">
-                {p.imageBase64 ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.imageBase64} alt={p.title} className="w-full h-full object-cover" />
+        <Tabs
+          value={activeCategory}
+          onValueChange={(v) => setActiveCategory(v as ProjectCategory)}
+          className="w-full"
+        >
+          <TabsList
+            variant="default"
+            className="flex h-auto min-h-11 w-full max-w-full flex-wrap justify-start gap-1 rounded-xl p-1 md:flex-nowrap"
+            aria-label="Project categories"
+          >
+            {PROJECT_CATEGORIES.map((cat) => {
+              const meta = CATEGORY_META[cat];
+              const n = countsByCategory[cat];
+              return (
+                <TabsTrigger
+                  key={cat}
+                  value={cat}
+                  id={`projects-tab-${cat}`}
+                  className={cn(
+                    "grow basis-[min(100%,11rem)] justify-center gap-2 rounded-lg px-3 py-2.5 text-center text-xs font-semibold whitespace-normal md:text-sm lg:flex-none",
+                    CATEGORY_BORDER_ACTIVE[cat]
+                  )}
+                >
+                  <span>{meta.label}</span>
+                  <span
+                    className="tabular-nums text-[0.65rem] font-semibold opacity-75 md:text-xs"
+                    aria-hidden
+                  >
+                    ({n})
+                  </span>
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+
+          {PROJECT_CATEGORIES.map((cat) => {
+            const list = projects
+              .filter((p) => p.category === cat)
+              .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+            return (
+              <TabsContent
+                key={cat}
+                value={cat}
+                className="mt-6 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                aria-labelledby={`projects-tab-${cat}`}
+              >
+                {list.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border py-14 px-4 text-center">
+                    <p className="text-sm font-medium text-foreground">
+                      No projects in {CATEGORY_META[cat].label} yet.
+                    </p>
+                    <p className="text-xs text-muted-foreground max-w-sm">
+                      Add a project below or import defaults from portfolio config—they are assigned to categories automatically.
+                    </p>
+                    <Button type="button" onClick={() => openAddForCategory(cat)} className="rounded-xl gap-2">
+                      <Plus className="h-4 w-4" />
+                      Add to {CATEGORY_META[cat].label}
+                    </Button>
+                  </div>
                 ) : (
-                  <ImagePlus className="h-8 w-8 text-muted-foreground/30" />
-                )}
-                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => toggleFeatured(p)} className="p-1.5 bg-background/80 backdrop-blur-sm rounded-lg hover:bg-background transition-colors">
-                    {p.featured ? <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" /> : <StarOff className="h-3.5 w-3.5 text-muted-foreground" />}
-                  </button>
-                  <button onClick={() => openEdit(p)} className="p-1.5 bg-background/80 backdrop-blur-sm rounded-lg hover:bg-background transition-colors">
-                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-                  </button>
-                  <button onClick={() => handleDelete(p._id)} className="p-1.5 bg-background/80 backdrop-blur-sm rounded-lg hover:bg-destructive/10 transition-colors">
-                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                  </button>
-                </div>
-              </div>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {list.map((p) => (
+                      <article
+                        key={p._id}
+                        className="group overflow-hidden rounded-xl border border-border bg-card"
+                      >
+                        {/* Thumbnail */}
+                        <div className="relative flex h-40 items-center justify-center overflow-hidden bg-muted">
+                          {p.imageBase64 ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={p.imageBase64}
+                              alt=""
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <ImagePlus className="h-8 w-8 text-muted-foreground/30" aria-hidden />
+                          )}
+                          <div className="absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                            <button
+                              type="button"
+                              onClick={() => toggleFeatured(p)}
+                              className="rounded-lg bg-background/80 p-1.5 backdrop-blur-sm transition-colors hover:bg-background"
+                              aria-label={p.featured ? "Remove featured" : "Mark featured"}
+                            >
+                              {p.featured ? (
+                                <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" />
+                              ) : (
+                                <StarOff className="h-3.5 w-3.5 text-muted-foreground" />
+                              )}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => openEdit(p)}
+                              className="rounded-lg bg-background/80 p-1.5 backdrop-blur-sm transition-colors hover:bg-background"
+                              aria-label={`Edit ${p.title}`}
+                            >
+                              <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => openDeleteConfirmation(p)}
+                              className="rounded-lg bg-background/80 p-1.5 backdrop-blur-sm transition-colors hover:bg-destructive/10"
+                              aria-label={`Delete ${p.title}`}
+                            >
+                              <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                            </button>
+                          </div>
+                        </div>
 
-              {/* Content */}
-              <div className="p-4 space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold text-foreground text-sm leading-tight">{p.title}</h3>
-                  <Badge variant="outline" className={`text-xs shrink-0 ${CATEGORY_COLORS[p.category]}`}>
-                    {CATEGORY_LABELS[p.category]}
-                  </Badge>
-                </div>
-                <p className="text-xs text-muted-foreground line-clamp-2">{p.description}</p>
+                        <div className="space-y-3 p-4">
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="text-sm leading-tight font-semibold text-foreground">
+                              {p.title}
+                            </h3>
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                "shrink-0 text-xs border",
+                                CATEGORY_META[p.category as ProjectCategory]?.tagClass
+                              )}
+                            >
+                              {CATEGORY_META[p.category as ProjectCategory]?.label ?? p.category}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground line-clamp-2">{p.description}</p>
 
-                {/* Tags */}
-                {p.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {p.tags.slice(0, 4).map((t) => (
-                      <span key={t} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{t}</span>
+                          {p.techStack.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {p.techStack.slice(0, 3).map((t) => (
+                                <span
+                                  key={t}
+                                  className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                              {p.techStack.length > 3 && (
+                                <span className="text-xs text-muted-foreground">
+                                  +{p.techStack.length - 3} more
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {p.tags && p.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {p.tags.slice(0, 4).map((t) => (
+                                <span
+                                  key={t}
+                                  className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary"
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                              {p.tags.length > 4 && (
+                                <span className="text-xs text-muted-foreground">
+                                  +{p.tags.length - 4}
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          <div className="flex gap-2 pt-1">
+                            {p.liveUrl && (
+                              <a
+                                href={p.liveUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-primary"
+                              >
+                                <ExternalLink className="h-3 w-3" aria-hidden /> Live
+                              </a>
+                            )}
+                            {p.repoUrl && (
+                              <a
+                                href={p.repoUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-primary"
+                              >
+                                <Github className="h-3 w-3" aria-hidden /> Repo
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </article>
                     ))}
-                    {p.tags.length > 4 && <span className="text-xs text-muted-foreground">+{p.tags.length - 4}</span>}
                   </div>
                 )}
-
-                {/* Tech stack */}
-                {p.techStack.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {p.techStack.slice(0, 3).map((t) => (
-                      <span key={t} className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">{t}</span>
-                    ))}
-                    {p.techStack.length > 3 && <span className="text-xs text-muted-foreground">+{p.techStack.length - 3} more</span>}
-                  </div>
-                )}
-
-                {/* Links */}
-                <div className="flex gap-2 pt-1">
-                  {p.liveUrl && (
-                    <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors">
-                      <ExternalLink className="h-3 w-3" /> Live
-                    </a>
-                  )}
-                  {p.repoUrl && (
-                    <a href={p.repoUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors">
-                      <Github className="h-3 w-3" /> Repo
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              </TabsContent>
+            );
+          })}
+        </Tabs>
       )}
 
       {/* Add/Edit Dialog */}
@@ -315,7 +667,7 @@ export default function AdminProjectsPage() {
               >
                 {form.imageBase64 ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={form.imageBase64} alt="preview" className="w-full h-full object-cover" />
+                  <img src={form.imageBase64} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <ImagePlus className="h-8 w-8" />
@@ -346,23 +698,18 @@ export default function AdminProjectsPage() {
                 <Textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} className="rounded-xl bg-card resize-none" rows={3} />
               </div>
 
-              <div className="space-y-2">
+              <div className="col-span-2 space-y-2">
                 <Label className="text-sm font-semibold">Category *</Label>
                 <Select value={form.category} onValueChange={(v) => setForm((f) => ({ ...f, category: v }))}>
-                  <SelectTrigger className="rounded-xl bg-card">
+                  <SelectTrigger className="w-full min-w-0 rounded-xl bg-card">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="fullstack">Full-Stack</SelectItem>
-                    <SelectItem value="backend">Backend & AI</SelectItem>
-                    <SelectItem value="cloud">Cloud</SelectItem>
+                    <SelectItem value="fullstack">{CATEGORY_META.fullstack.label}</SelectItem>
+                    <SelectItem value="backend">{CATEGORY_META.backend.label}</SelectItem>
+                    <SelectItem value="cloud">{CATEGORY_META.cloud.label}</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold">Order</Label>
-                <Input type="number" value={form.order} onChange={(e) => setForm((f) => ({ ...f, order: +e.target.value }))} className="rounded-xl bg-card" />
               </div>
 
               <div className="space-y-2">
@@ -377,18 +724,32 @@ export default function AdminProjectsPage() {
             </div>
 
             <TagInput
+              ref={techChipRef}
               label="Tech Stack"
               values={form.techStack}
               onChange={(v) => setForm((f) => ({ ...f, techStack: v }))}
-              placeholder="e.g. Next.js, TypeScript…"
+              placeholder="Next.js, TypeScript — commas ok, then Add"
             />
 
             <TagInput
+              ref={discoveryChipRef}
               label="Discovery Tags (attract visitors & SEO)"
+              hint="Shown as topic pills on admin cards and public /skills/[category] project cards."
               values={form.tags}
               onChange={(v) => setForm((f) => ({ ...f, tags: v }))}
-              placeholder="e.g. AI, SaaS, Real-time…"
+              placeholder="AI, SaaS — commas ok, then Add"
             />
+
+            <div className="flex items-center gap-3 pt-1 flex-wrap">
+              <input
+                type="checkbox"
+                id="comingSoon"
+                checked={form.comingSoon}
+                onChange={(e) => setForm((f) => ({ ...f, comingSoon: e.target.checked }))}
+                className="h-4 w-4 accent-primary"
+              />
+              <Label htmlFor="comingSoon" className="text-sm cursor-pointer">Coming soon (card overlay on site)</Label>
+            </div>
 
             <div className="flex items-center gap-3 pt-1">
               <input
@@ -406,6 +767,78 @@ export default function AdminProjectsPage() {
             <Button variant="outline" onClick={() => setOpen(false)} className="rounded-xl">Cancel</Button>
             <Button onClick={handleSave} disabled={saving || !form.title || !form.description} className="rounded-xl">
               {saving ? "Saving…" : editing ? "Save Changes" : "Add Project"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={deleteConfirmProject !== null}
+        onOpenChange={(next) => {
+          if (!next && !deleteSubmitting) resetDeleteConfirmation();
+        }}
+      >
+        <DialogContent
+          className="rounded-xl max-w-[calc(100%-2rem)] sm:max-w-md"
+          showCloseButton={!deleteSubmitting}
+          onPointerDownOutside={(e) => deleteSubmitting && e.preventDefault()}
+          onEscapeKeyDown={(e) => deleteSubmitting && e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle>Delete project?</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <DialogDescription id="delete-project-dialog-desc" asChild>
+              <div className="space-y-1 text-sm leading-relaxed text-muted-foreground">
+                <p>
+                  Are you sure you want to delete{" "}
+                  <span className="font-semibold text-foreground">{deleteConfirmProject?.title}</span>
+                  ?
+                </p>
+                <p className="font-medium text-destructive">This action cannot be undone.</p>
+              </div>
+            </DialogDescription>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirm-delete-project-input" className="cursor-default text-sm font-semibold text-foreground">
+                Type{" "}
+                <span className="font-mono font-semibold text-destructive">delete</span>{" "}
+                to confirm
+              </Label>
+              <Input
+                id="confirm-delete-project-input"
+                value={deleteConfirmationInput}
+                onChange={(e) => setDeleteConfirmationInput(e.target.value)}
+                autoComplete="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                aria-describedby="delete-project-dialog-desc"
+                aria-invalid={deleteConfirmationInput.length > 0 && !confirmDeletePhraseMatches}
+                className="rounded-xl bg-card font-mono text-sm"
+                disabled={deleteSubmitting}
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-xl"
+              onClick={resetDeleteConfirmation}
+              disabled={deleteSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              className="rounded-xl"
+              onClick={handleDeleteConfirmed}
+              disabled={!confirmDeletePhraseMatches || deleteSubmitting}
+            >
+              {deleteSubmitting ? "Deleting…" : "Confirm"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,7 +1,8 @@
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
-export default auth((req) => {
+/** Next.js 16+: `middleware` renamed to `proxy` (same matcher + auth behavior). */
+export const proxy = auth((req) => {
   const isLoggedIn = !!req.auth;
   const isLoginPage = req.nextUrl.pathname === "/admin/login";
 

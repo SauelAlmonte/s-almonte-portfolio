@@ -5,9 +5,13 @@ export interface ProjectData {
   title: string;
   description: string;
   techStack: string[];
+  /** Discovery / SEO-oriented labels shown on skill category cards when present */
+  tags?: string[];
   liveUrl?: string;
   repoUrl?: string;
   imageGradient: string;
+  /** When set (e.g. admin upload), renders over the gradient area instead of initials only */
+  imageBase64?: string;
   featured: boolean;
   comingSoon?: boolean;
   category: ProjectCategory;

@@ -14,9 +14,17 @@ export async function GET() {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  await connectToDatabase();
-  const resume = await getOrCreateResume();
-  return NextResponse.json({ resume });
+  try {
+    await connectToDatabase();
+    const resume = await getOrCreateResume();
+    return NextResponse.json({ resume });
+  } catch (err) {
+    console.error("[admin/resume GET]", err);
+    return NextResponse.json(
+      { error: "Database unavailable. Check MONGODB_URI and Atlas network access." },
+      { status: 503 }
+    );
+  }
 }
 
 export async function PATCH(req: Request) {

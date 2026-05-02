@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { Project } from "@/lib/models/Project";
 import { auth } from "@/auth";
+import { buildProjectPartialUpdate } from "@/lib/projects/admin-project-write";
 
 export async function PUT(
   req: Request,
@@ -13,7 +14,20 @@ export async function PUT(
   const { id } = await params;
   const body = await req.json();
   await connectToDatabase();
-  const project = await Project.findByIdAndUpdate(id, body, { new: true });
+
+  const patch = buildProjectPartialUpdate(body);
+  if (Object.keys(patch).length === 0) {
+    return NextResponse.json({ error: "No valid fields to update." }, { status: 400 });
+  }
+
+  const project = await Project.findByIdAndUpdate(
+    id,
+    { $set: patch },
+    { new: true, runValidators: true }
+  );
+  if (!project) {
+    return NextResponse.json({ error: "Project not found." }, { status: 404 });
+  }
   return NextResponse.json({ project });
 }
 

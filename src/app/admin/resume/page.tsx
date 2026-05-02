@@ -52,11 +52,20 @@ const patch = (action: string, data?: object, id?: string) =>
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action, data, id }),
+    credentials: "include",
   });
+
+const emptyResumeDoc: ResumeDoc = {
+  summary: "",
+  experience: [],
+  education: [],
+  certifications: [],
+};
 
 export default function AdminResumePage() {
   const [resume, setResume] = useState<ResumeDoc | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [savingSection, setSavingSection] = useState<string | null>(null);
 
   /* Summary state */
@@ -71,13 +80,31 @@ export default function AdminResumePage() {
 
   const fetchResume = async () => {
     setLoading(true);
-    const res = await fetch("/api/admin/resume");
-    const data = await res.json();
-    const r: ResumeDoc = data.resume;
-    setResume(r);
-    setSummary(r.summary ?? "");
-    setFileUrl(r.resumeFileUrl ?? "");
-    setLoading(false);
+    setLoadError(null);
+    try {
+      const res = await fetch("/api/admin/resume", { credentials: "include" });
+      const data = await res.json();
+      if (!res.ok) {
+        const msg =
+          typeof data?.error === "string" ? data.error : `Request failed (${res.status})`;
+        setLoadError(msg);
+        setResume(emptyResumeDoc);
+        setSummary("");
+        setFileUrl("");
+        return;
+      }
+      const r: ResumeDoc = data.resume ?? emptyResumeDoc;
+      setResume(r);
+      setSummary(r.summary ?? "");
+      setFileUrl(r.resumeFileUrl ?? "");
+    } catch {
+      setLoadError("Could not load resume. Check your connection and MongoDB settings.");
+      setResume(emptyResumeDoc);
+      setSummary("");
+      setFileUrl("");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchResume(); }, []);
@@ -159,6 +186,12 @@ export default function AdminResumePage() {
         <h1 className="text-2xl font-extrabold text-foreground">Resume</h1>
         <p className="text-sm text-muted-foreground mt-1">Manage your resume content</p>
       </div>
+
+      {loadError && (
+        <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-xl" role="alert">
+          {loadError}
+        </p>
+      )}
 
       <Tabs defaultValue="summary">
         <TabsList className="rounded-xl">

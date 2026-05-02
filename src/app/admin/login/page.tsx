@@ -52,7 +52,13 @@ function LoginForm() {
 
         {/* Google Sign In */}
         <Button
-          onClick={() => signIn("google", { callbackUrl: "/admin" })}
+          onClick={() => {
+            const origin =
+              typeof window !== "undefined" ? window.location.origin : "";
+            void signIn("google", {
+              callbackUrl: origin ? `${origin}/admin` : "/admin",
+            });
+          }}
           size="lg"
           className="w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25 transition-all duration-200 gap-3"
         >
