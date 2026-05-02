@@ -493,9 +493,41 @@ export default function AdminProjectsPage() {
           onValueChange={(v) => setActiveCategory(v as ProjectCategory)}
           className="w-full"
         >
+          <div className="space-y-2 md:hidden">
+            <Label htmlFor="projects-category-select" className="text-sm font-semibold">
+              Category
+            </Label>
+            <Select
+              value={activeCategory}
+              onValueChange={(v) => setActiveCategory(v as ProjectCategory)}
+            >
+              <SelectTrigger
+                id="projects-category-select"
+                className="h-auto min-h-11 w-full rounded-xl bg-card py-2.5"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="z-100 rounded-xl" position="popper">
+                {PROJECT_CATEGORIES.map((cat) => {
+                  const meta = CATEGORY_META[cat];
+                  const n = countsByCategory[cat];
+                  return (
+                    <SelectItem key={cat} value={cat} className="rounded-lg">
+                      <span className="font-medium">{meta.label}</span>
+                      <span className="text-muted-foreground tabular-nums">({n})</span>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+
           <TabsList
             variant="default"
-            className="flex h-auto min-h-11 w-full max-w-full flex-wrap justify-start gap-1 rounded-xl p-1 md:flex-nowrap"
+            className={cn(
+              "hidden w-full max-w-full justify-start gap-1 rounded-xl p-1 md:flex",
+              "group-data-[orientation=horizontal]/tabs:h-auto min-h-11 md:group-data-[orientation=horizontal]/tabs:h-11",
+            )}
             aria-label="Project categories"
           >
             {PROJECT_CATEGORIES.map((cat) => {
@@ -507,13 +539,14 @@ export default function AdminProjectsPage() {
                   value={cat}
                   id={`projects-tab-${cat}`}
                   className={cn(
-                    "grow basis-[min(100%,11rem)] justify-center gap-2 rounded-lg px-3 py-2.5 text-center text-xs font-semibold whitespace-normal md:text-sm lg:flex-none",
+                    "grow basis-[min(100%,11rem)] justify-center gap-2 rounded-lg px-3 py-2.5 text-center text-sm font-semibold whitespace-normal lg:flex-none",
+                    "group-data-[orientation=horizontal]/tabs:h-[calc(100%-1px)]",
                     CATEGORY_BORDER_ACTIVE[cat]
                   )}
                 >
                   <span>{meta.label}</span>
                   <span
-                    className="tabular-nums text-[0.65rem] font-semibold opacity-75 md:text-xs"
+                    className="tabular-nums text-xs font-semibold opacity-75"
                     aria-hidden
                   >
                     ({n})
@@ -533,7 +566,7 @@ export default function AdminProjectsPage() {
                 key={cat}
                 value={cat}
                 className="mt-6 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-                aria-labelledby={`projects-tab-${cat}`}
+                aria-label={`${CATEGORY_META[cat].label}, ${countsByCategory[cat]} projects`}
               >
                 {list.length === 0 ? (
                   <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border py-14 px-4 text-center">
@@ -690,6 +723,9 @@ export default function AdminProjectsPage() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing ? "Edit Project" : "Add Project"}</DialogTitle>
+            <DialogDescription className="sr-only">
+              Fill in project details, optional thumbnail, and save to the database.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
@@ -836,7 +872,7 @@ export default function AdminProjectsPage() {
             </DialogDescription>
 
             <div className="space-y-2">
-              <Label htmlFor="confirm-delete-project-input" className="cursor-default text-sm font-semibold text-foreground">
+              <Label htmlFor="confirm-delete-project-input" className="text-sm font-semibold text-foreground">
                 Type{" "}
                 <span className="font-mono font-semibold text-destructive">delete</span>{" "}
                 to confirm

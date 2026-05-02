@@ -17,19 +17,17 @@ const NAV_ITEMS = [
   { label: "Subscribers", href: "/admin/subscribers", icon: Users },
 ];
 
-function AdminShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const { data: session } = useSession();
-  const [mobileOpen, setMobileOpen] = useState(false);
+type AdminSidebarProps = {
+  mobile?: boolean;
+  pathname: string;
+  userName: string | null | undefined;
+  onNavClick: () => void;
+  onLogout: () => void;
+};
 
-  if (pathname === "/admin/login") return <>{children}</>;
-
-  const handleLogout = () =>
-    signOut({ callbackUrl: "/" });
-
-  const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (
+function AdminSidebar({ mobile = false, pathname, userName, onNavClick, onLogout }: AdminSidebarProps) {
+  return (
     <div className={cn("flex flex-col h-full", mobile ? "p-4" : "p-6")}>
-      {/* Brand */}
       <div className="flex items-center gap-3 mb-8">
         <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
           <span className="text-sm font-extrabold text-primary">SA</span>
@@ -37,12 +35,11 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         <div>
           <p className="text-sm font-bold text-foreground leading-tight">Portfolio Admin</p>
           <p className="text-xs text-muted-foreground truncate max-w-[120px]">
-            {session?.user?.name ?? "Sauel Almonte"}
+            {userName ?? "Sauel Almonte"}
           </p>
         </div>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 space-y-1">
         {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
           const active = pathname === href;
@@ -50,7 +47,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             <Link
               key={href}
               href={href}
-              onClick={() => setMobileOpen(false)}
+              onClick={onNavClick}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
                 active
@@ -65,7 +62,6 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         })}
       </nav>
 
-      {/* Bottom */}
       <div className="space-y-2 pt-4 border-t border-border">
         <Link
           href="/"
@@ -76,8 +72,9 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           View Portfolio
         </Link>
         <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200"
+          type="button"
+          onClick={onLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200 cursor-pointer"
         >
           <LogOut className="h-4 w-4 shrink-0" />
           Sign Out
@@ -85,12 +82,28 @@ function AdminShell({ children }: { children: React.ReactNode }) {
       </div>
     </div>
   );
+}
+
+function AdminShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const { data: session } = useSession();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  if (pathname === "/admin/login") return <>{children}</>;
+
+  const handleLogout = () =>
+    signOut({ callbackUrl: "/" });
 
   return (
     <div className="min-h-screen bg-background flex">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-60 shrink-0 border-r border-border bg-card">
-        <Sidebar />
+        <AdminSidebar
+          pathname={pathname}
+          userName={session?.user?.name}
+          onNavClick={() => {}}
+          onLogout={handleLogout}
+        />
       </aside>
 
       {/* Mobile sidebar overlay */}
@@ -101,7 +114,13 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             onClick={() => setMobileOpen(false)}
           />
           <div className="absolute left-0 top-0 bottom-0 w-64 bg-card border-r border-border">
-            <Sidebar mobile />
+            <AdminSidebar
+              mobile
+              pathname={pathname}
+              userName={session?.user?.name}
+              onNavClick={() => setMobileOpen(false)}
+              onLogout={handleLogout}
+            />
           </div>
         </div>
       )}

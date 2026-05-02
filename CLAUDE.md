@@ -62,6 +62,8 @@ TailwindCSS v4 + ShadCN UI. The three accent colors map to content categories:
 
 Use `cn()` from `src/lib/utils.ts` (re-exports `clsx` + `tailwind-merge`) for conditional class composition.
 
+**Interactive cursor:** Anything that behaves as clickable (links, CTAs, buttons, checkboxes, radios, selects, disclosure controls, tabs, labeled inputs, custom `div`/`span` handlers) must show a **pointer** cursor on hover: use Tailwind `cursor-pointer` where needed and keep `src/app/globals.css` `@layer base` selectors aligned; avoid `cursor-default` on clickable elements (disabled controls may use `cursor-not-allowed` or rely on opacity/pointer-events). See `.cursor/rules/interactive-pointer.mdc`.
+
 ## Required Environment Variables
 
 See [.env.example](.env.example) for a full template.
