@@ -182,7 +182,7 @@ export default function AdminSkillsPage() {
   }));
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="admin-page-shell admin-page-shell--lg">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-foreground">Skills</h1>
@@ -202,21 +202,21 @@ export default function AdminSkillsPage() {
       </div>
 
       {loadError && (
-        <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-xl" role="alert">
+        <p className="admin-alert rounded-xl text-sm text-destructive bg-destructive/10" role="alert">
           {loadError}
         </p>
       )}
       {seedMessage && (
-        <p className="text-sm text-muted-foreground bg-muted/50 px-4 py-3 rounded-xl">{seedMessage}</p>
+        <p className="admin-alert rounded-xl text-sm text-muted-foreground bg-muted/50">{seedMessage}</p>
       )}
 
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-muted-foreground gap-3">
+        <div className="flex items-center justify-center gap-3 py-[length:var(--spacing-fl-admin-loading-y)] text-muted-foreground">
           <RefreshCw className="h-5 w-5 animate-spin" />
           <span className="text-sm">Loading…</span>
         </div>
       ) : skills.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-14 gap-4 text-center border border-dashed border-border rounded-xl px-6">
+        <div className="flex flex-col items-center justify-center gap-4 py-[length:var(--spacing-fl-admin-empty-y)] px-[length:var(--spacing-fl-admin-card-pad)] text-center border border-dashed border-border rounded-xl">
           <div className="space-y-1 max-w-md">
             <p className="text-sm font-semibold text-foreground">No skills in the database yet</p>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -261,34 +261,51 @@ export default function AdminSkillsPage() {
               Sync from config
             </Button>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="admin-skills-grid">
             {grouped.map(({ value, label, badgeClass, skills: catSkills }) => (
-              <div key={value} className="rounded-xl border border-border bg-card overflow-hidden">
-                <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-2">
-                  <Badge variant="outline" className={badgeClass}>{label}</Badge>
-                  <span className="text-xs text-muted-foreground shrink-0">{catSkills.length} skills</span>
+              <div
+                key={value}
+                className="rounded-xl border border-border bg-card overflow-hidden min-w-0 flex flex-col"
+              >
+                <div className="border-b border-border flex flex-wrap items-center justify-between gap-2 px-[length:var(--spacing-fl-admin-skill-card-pad-x)] py-[length:var(--spacing-fl-admin-skill-card-pad-y)]">
+                  <Badge variant="outline" className={cn(badgeClass, "max-w-full whitespace-normal text-left leading-snug")}>
+                    {label}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground shrink-0 tabular-nums">{catSkills.length} skills</span>
                 </div>
-                <div className="p-3 space-y-2">
+                <div className="space-y-2 flex-1 min-w-0 px-[length:var(--spacing-fl-admin-skill-card-pad-x)] py-[length:var(--spacing-fl-admin-skill-card-pad-y)]">
                   {catSkills.length === 0 ? (
                     <p className="text-xs text-muted-foreground text-center py-4">No skills in this category</p>
                   ) : (
                     catSkills.map((s) => (
                       <div
                         key={s._id}
-                        className="group flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted focus-within:bg-muted transition-colors"
+                        className="group flex items-start gap-3 p-2.5 rounded-lg hover:bg-muted focus-within:bg-muted transition-colors min-w-0"
                       >
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1 gap-2">
-                            <span className="text-sm font-medium text-foreground truncate">{s.name}</span>
-                            <span className="text-xs text-muted-foreground shrink-0">{s.proficiency}%</span>
+                          <div className="flex flex-col gap-0.5 sm:flex-row sm:items-start sm:justify-between sm:gap-x-3 mb-1">
+                            <span className="text-sm font-medium text-foreground min-w-0 wrap-break-word leading-snug">
+                              {s.name}
+                            </span>
+                            <span
+                              className={cn(
+                                "text-xs font-bold tabular-nums shrink-0 sm:text-right",
+                                CATEGORY_META[value].skillAccentClass
+                              )}
+                            >
+                              {s.proficiency}%
+                            </span>
                           </div>
                           <div className="h-1.5 bg-muted-foreground/20 rounded-full overflow-hidden">
                             <div
-                              className="h-full rounded-full bg-primary transition-all duration-300"
+                              className={cn(
+                                "h-full rounded-full transition-all duration-300",
+                                CATEGORY_META[value].dotClass
+                              )}
                               style={{ width: `${s.proficiency}%` }}
                               role="progressbar"
                               aria-valuenow={s.proficiency}
-                              aria-valuemin={1}
+                              aria-valuemin={0}
                               aria-valuemax={100}
                               aria-label={`${s.name} proficiency`}
                             />
@@ -318,7 +335,10 @@ export default function AdminSkillsPage() {
                   <button
                     type="button"
                     onClick={() => { setForm({ ...EMPTY_FORM, category: value }); setEditing(null); setOpen(true); }}
-                    className="w-full flex items-center justify-center gap-2 py-2 text-xs text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-colors border border-dashed border-border mt-2 cursor-pointer"
+                    className={cn(
+                      "w-full flex flex-wrap items-center justify-center gap-x-2 gap-y-1 px-1 py-2 text-xs text-muted-foreground text-center rounded-lg transition-colors border border-dashed border-border mt-2 cursor-pointer wrap-break-word",
+                      CATEGORY_META[value].skillSubtleHoverClass
+                    )}
                   >
                     <Plus className="h-3 w-3" /> Add to {label}
                   </button>
@@ -330,7 +350,7 @@ export default function AdminSkillsPage() {
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-md rounded-xl">
+        <DialogContent className="max-w-md gap-fl-dialog rounded-xl">
           <DialogHeader>
             <DialogTitle>{editing ? "Edit Skill" : "Add Skill"}</DialogTitle>
             <DialogDescription>
@@ -373,7 +393,15 @@ export default function AdminSkillsPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-2">
                 <Label htmlFor="admin-skill-proficiency-slider" className="text-sm font-semibold">Proficiency</Label>
-                <span id="admin-skill-proficiency-val" className="text-sm font-bold text-primary tabular-nums">{form.proficiency}%</span>
+                <span
+                  id="admin-skill-proficiency-val"
+                  className={cn(
+                    "text-sm font-bold tabular-nums",
+                    CATEGORY_META[form.category].skillAccentClass
+                  )}
+                >
+                  {form.proficiency}%
+                </span>
               </div>
               <Slider
                 id="admin-skill-proficiency-slider"
@@ -381,6 +409,8 @@ export default function AdminSkillsPage() {
                 onValueChange={([v]) => setForm((f) => ({ ...f, proficiency: v }))}
                 min={1} max={100} step={1}
                 className="w-full"
+                rangeClassName={CATEGORY_META[form.category].dotClass}
+                thumbClassName={CATEGORY_META[form.category].skillSliderThumbClass}
                 aria-valuetext={`${form.proficiency}%`}
               />
               <div className="flex justify-between text-xs text-muted-foreground">

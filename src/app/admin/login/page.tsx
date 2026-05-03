@@ -18,16 +18,16 @@ function LoginForm() {
   }, [error, router]);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-[length:var(--spacing-fl-admin-main-x)]">
       {/* Background blobs */}
       <div aria-hidden="true" className="fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#A8DADC]/10 blur-[120px]" />
         <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-[#B39CD0]/10 blur-[100px]" />
       </div>
 
-      <div className="w-full max-w-sm space-y-8">
+      <div className="w-full flex flex-col gap-[length:var(--spacing-fl-admin-stack)] max-w-[length:var(--spacing-fl-admin-login-max)]">
         {/* Header */}
-        <div className="text-center space-y-3">
+        <div className="text-center flex flex-col gap-[length:var(--spacing-fl-admin-stack-tight)]">
           <div className="flex justify-center">
             <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
               <Lock className="h-6 w-6 text-primary" />
@@ -43,7 +43,7 @@ function LoginForm() {
 
         {/* Error */}
         {error && (
-          <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-xl text-center">
+          <p className="admin-alert rounded-xl text-sm text-destructive bg-destructive/10 text-center">
             {error === "AccessDenied"
               ? "Access denied. Only the portfolio owner can sign in."
               : "Something went wrong. Please try again."}

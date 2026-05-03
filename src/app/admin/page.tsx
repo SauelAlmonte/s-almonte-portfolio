@@ -68,20 +68,22 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="space-y-8 max-w-5xl">
+    <div className="admin-page-shell admin-page-shell--lg">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-extrabold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Welcome back, Sauel. Here&apos;s an overview of your portfolio.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-x-4">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-extrabold text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Welcome back, Sauel. Here&apos;s an overview of your portfolio.
+          </p>
+        </div>
       </div>
 
       {statsError && (
-        <div className="space-y-2" role="alert">
-          <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-xl">{statsError}</p>
+        <div className="flex flex-col gap-[length:var(--spacing-fl-admin-stack-tight)]" role="alert">
+          <p className="admin-alert rounded-xl text-sm text-destructive bg-destructive/10">{statsError}</p>
           {statsHint ? (
-            <p className="text-sm text-muted-foreground bg-muted/50 px-4 py-3 rounded-xl leading-relaxed">
+            <p className="admin-alert rounded-xl text-sm text-muted-foreground bg-muted/50 leading-relaxed">
               {statsHint}
             </p>
           ) : null}
@@ -89,7 +91,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Stats grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-[length:var(--spacing-fl-admin-grid-gap)] sm:grid-cols-2 lg:grid-cols-4">
         {/* Total subscribers */}
         <Card className="border-border">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -126,19 +128,21 @@ export default function AdminDashboard() {
 
       {/* Quick links */}
       <div>
-        <h2 className="text-base font-bold text-foreground mb-3">Quick Actions</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <h2 className="text-base font-bold text-foreground mb-[length:var(--spacing-fl-admin-stack-tight)]">
+          Quick Actions
+        </h2>
+        <div className="grid grid-cols-1 gap-[length:var(--spacing-fl-admin-grid-gap)] sm:grid-cols-2">
           {QUICK_ACTIONS.map(({ label, href, icon: Icon, desc }) => (
             <a
               key={href}
               href={href}
-              className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition-all duration-200 group"
+              className="flex items-center gap-[length:var(--spacing-fl-admin-grid-gap)] p-[length:var(--spacing-fl-admin-card-pad)] rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition-all duration-200 group min-w-0"
             >
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
                 <Icon className="h-5 w-5 text-primary" />
               </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">{label}</p>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground wrap-break-word">{label}</p>
                 <p className="text-xs text-muted-foreground">{desc}</p>
               </div>
             </a>

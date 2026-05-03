@@ -28,6 +28,12 @@ export const CATEGORY_META: Record<
     borderClass: string;
     tagClass: string;
     dotClass: string;
+    /** Proficiency % / accent text — matches homepage Skills cards and admin lists */
+    skillAccentClass: string;
+    /** Admin “Add to …” row hover tint */
+    skillSubtleHoverClass: string;
+    /** Slider thumb ring color (admin skill dialog) */
+    skillSliderThumbClass: string;
   }
 > = {
   fullstack: {
@@ -40,6 +46,9 @@ export const CATEGORY_META: Record<
     borderClass: "border-[#A8DADC]/40 hover:border-[#A8DADC]",
     tagClass: "bg-[#A8DADC]/15 text-[#3e9ea0] dark:text-[#A8DADC]",
     dotClass: "bg-[#A8DADC]",
+    skillAccentClass: "text-[#2b7a78] dark:text-[#A8DADC]",
+    skillSubtleHoverClass: "hover:text-[#A8DADC] hover:bg-[#A8DADC]/10",
+    skillSliderThumbClass: "border-[#A8DADC]",
   },
   backend: {
     label: "Backend & AI Engineering",
@@ -51,6 +60,9 @@ export const CATEGORY_META: Record<
     borderClass: "border-[#B39CD0]/40 hover:border-[#B39CD0]",
     tagClass: "bg-[#B39CD0]/15 text-[#7b56a8] dark:text-[#B39CD0]",
     dotClass: "bg-[#B39CD0]",
+    skillAccentClass: "text-[#5a4a7a] dark:text-[#B39CD0]",
+    skillSubtleHoverClass: "hover:text-[#B39CD0] hover:bg-[#B39CD0]/10",
+    skillSliderThumbClass: "border-[#B39CD0]",
   },
   cloud: {
     label: "Cloud & DevOps",
@@ -62,6 +74,9 @@ export const CATEGORY_META: Record<
     borderClass: "border-[#FFC1CC]/40 hover:border-[#FFC1CC]",
     tagClass: "bg-[#FFC1CC]/15 text-[#c0536a] dark:text-[#FFC1CC]",
     dotClass: "bg-[#FFC1CC]",
+    skillAccentClass: "text-[#b84a5f] dark:text-[#FFC1CC]",
+    skillSubtleHoverClass: "hover:text-[#FFC1CC] hover:bg-[#FFC1CC]/10",
+    skillSliderThumbClass: "border-[#FFC1CC]",
   },
 };
 

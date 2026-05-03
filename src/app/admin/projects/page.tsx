@@ -1,6 +1,15 @@
 "use client";
 
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Plus, Pencil, Trash2, X, ImagePlus, Star, StarOff, RefreshCw, ExternalLink, Github, Download,
 } from "lucide-react";
@@ -177,6 +186,7 @@ const TagInput = forwardRef<
 TagInput.displayName = "TagInput";
 
 export default function AdminProjectsPage() {
+  const deleteDialogInstructionsId = useId();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -425,10 +435,10 @@ export default function AdminProjectsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="admin-page-shell admin-page-shell--md">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+        <div className="min-w-0 flex flex-col gap-1">
           <h1 className="text-2xl font-extrabold text-foreground">Projects</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {projects.length} total
@@ -440,28 +450,28 @@ export default function AdminProjectsPage() {
             ) : null}
           </p>
         </div>
-        <Button onClick={openAdd} className="gap-2 rounded-xl">
+        <Button onClick={openAdd} className="gap-2 rounded-xl shrink-0 cursor-pointer">
           <Plus className="h-4 w-4" /> Add Project
         </Button>
       </div>
 
       {/* Projects grid */}
       {loadError && (
-        <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-xl" role="alert">
+        <p className="admin-alert rounded-xl text-sm text-destructive bg-destructive/10" role="alert">
           {loadError}
         </p>
       )}
       {seedMessage && (
-        <p className="text-sm text-muted-foreground bg-muted/50 px-4 py-3 rounded-xl">{seedMessage}</p>
+        <p className="admin-alert rounded-xl text-sm text-muted-foreground bg-muted/50">{seedMessage}</p>
       )}
 
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-muted-foreground gap-3">
+        <div className="flex items-center justify-center gap-3 py-[length:var(--spacing-fl-admin-loading-y)] text-muted-foreground">
           <RefreshCw className="h-5 w-5 animate-spin" />
           <span className="text-sm">Loading…</span>
         </div>
       ) : projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-14 gap-4 text-center border border-dashed border-border rounded-xl px-6">
+        <div className="flex flex-col items-center justify-center gap-4 py-[length:var(--spacing-fl-admin-empty-y)] px-[length:var(--spacing-fl-admin-card-pad)] text-center border border-dashed border-border rounded-xl">
           <div className="space-y-1 max-w-md">
             <p className="text-sm font-semibold text-foreground">No projects in the database yet</p>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -565,11 +575,11 @@ export default function AdminProjectsPage() {
               <TabsContent
                 key={cat}
                 value={cat}
-                className="mt-6 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                className="mt-[length:var(--spacing-fl-admin-stack-tight)] rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
                 aria-label={`${CATEGORY_META[cat].label}, ${countsByCategory[cat]} projects`}
               >
                 {list.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border py-14 px-4 text-center">
+                  <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border py-[length:var(--spacing-fl-admin-empty-y)] px-[length:var(--spacing-fl-admin-card-pad)] text-center">
                     <p className="text-sm font-medium text-foreground">
                       No projects in {CATEGORY_META[cat].label} yet.
                     </p>
@@ -582,11 +592,11 @@ export default function AdminProjectsPage() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <div className="admin-projects-grid">
                     {list.map((p) => (
                       <article
                         key={p._id}
-                        className="group overflow-hidden rounded-xl border border-border bg-card"
+                        className="group min-w-0 overflow-hidden rounded-xl border border-border bg-card"
                       >
                         {/* Thumbnail */}
                         <div className="relative flex h-40 items-center justify-center overflow-hidden bg-muted">
@@ -632,9 +642,9 @@ export default function AdminProjectsPage() {
                           </div>
                         </div>
 
-                        <div className="space-y-3 p-4">
+                        <div className="flex flex-col gap-[length:var(--spacing-fl-admin-stack-tight)] p-[length:var(--spacing-fl-admin-card-pad)]">
                           <div className="flex items-start justify-between gap-2">
-                            <h3 className="text-sm leading-tight font-semibold text-foreground">
+                            <h3 className="text-sm leading-tight font-semibold text-foreground wrap-break-word min-w-0">
                               {p.title}
                             </h3>
                             <Badge
@@ -720,7 +730,7 @@ export default function AdminProjectsPage() {
 
       {/* Add/Edit Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto gap-fl-dialog">
           <DialogHeader>
             <DialogTitle>{editing ? "Edit Project" : "Add Project"}</DialogTitle>
             <DialogDescription className="sr-only">
@@ -852,6 +862,7 @@ export default function AdminProjectsPage() {
         <DialogContent
           className="rounded-xl max-w-[calc(100%-2rem)] sm:max-w-md"
           showCloseButton={!deleteSubmitting}
+          aria-describedby={undefined}
           onPointerDownOutside={(e) => deleteSubmitting && e.preventDefault()}
           onEscapeKeyDown={(e) => deleteSubmitting && e.preventDefault()}
         >
@@ -860,16 +871,17 @@ export default function AdminProjectsPage() {
           </DialogHeader>
 
           <div className="space-y-4">
-            <DialogDescription id="delete-project-dialog-desc" asChild>
-              <div className="space-y-1 text-sm leading-relaxed text-muted-foreground">
-                <p>
-                  Are you sure you want to delete{" "}
-                  <span className="font-semibold text-foreground">{deleteConfirmProject?.title}</span>
-                  ?
-                </p>
-                <p className="font-medium text-destructive">This action cannot be undone.</p>
-              </div>
-            </DialogDescription>
+            <div
+              id={deleteDialogInstructionsId}
+              className="space-y-1 text-sm leading-relaxed text-muted-foreground"
+            >
+              <p>
+                Are you sure you want to delete{" "}
+                <span className="font-semibold text-foreground">{deleteConfirmProject?.title}</span>
+                ?
+              </p>
+              <p className="font-medium text-destructive">This action cannot be undone.</p>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="confirm-delete-project-input" className="text-sm font-semibold text-foreground">
@@ -884,7 +896,7 @@ export default function AdminProjectsPage() {
                 autoComplete="off"
                 autoCapitalize="off"
                 spellCheck={false}
-                aria-describedby="delete-project-dialog-desc"
+                aria-describedby={deleteDialogInstructionsId}
                 aria-invalid={deleteConfirmationInput.length > 0 && !confirmDeletePhraseMatches}
                 className="rounded-xl bg-card font-mono text-sm"
                 disabled={deleteSubmitting}

@@ -27,7 +27,12 @@ type AdminSidebarProps = {
 
 function AdminSidebar({ mobile = false, pathname, userName, onNavClick, onLogout }: AdminSidebarProps) {
   return (
-    <div className={cn("flex flex-col h-full", mobile ? "p-4" : "p-6")}>
+    <div
+      className={cn(
+        "flex flex-col h-full",
+        mobile ? "p-[length:var(--spacing-fl-admin-main-x)]" : "p-[length:var(--spacing-fl-admin-sidebar-pad)]",
+      )}
+    >
       <div className="flex items-center gap-3 mb-8">
         <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
           <span className="text-sm font-extrabold text-primary">SA</span>
@@ -128,7 +133,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header className="h-14 border-b border-border bg-card/50 backdrop-blur-md flex items-center justify-between px-4 sm:px-6 shrink-0">
+        <header className="h-14 border-b border-border bg-card/50 backdrop-blur-md flex items-center justify-between px-[length:var(--spacing-fl-admin-main-x)] shrink-0">
           <Button
             variant="ghost"
             size="icon"
@@ -141,7 +146,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           <ThemeToggle />
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
+        <main className="flex-1 overflow-auto px-[length:var(--spacing-fl-admin-main-x)] py-[length:var(--spacing-fl-admin-main-y)]">
           {children}
         </main>
       </div>

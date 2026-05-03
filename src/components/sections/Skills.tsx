@@ -39,41 +39,43 @@ interface SkillCard {
 }
 
 /** Presentation only (icons + accents); skill rows come from CMS or defaults. */
-const SKILL_CARD_SHELL: Omit<SkillCard, "skills" | "title" | "subtitle">[] = [
-  {
-    category: "fullstack",
-    icon: Code2,
-    accent: "#A8DADC",
-    accentLight: "#2b7a78",
-    accentClass: "text-[#2b7a78] dark:text-[#A8DADC]",
-    borderClass:
-      "border-[#A8DADC]/30 hover:border-[#A8DADC]/80 hover:shadow-[#A8DADC]/10",
-    barClass: "bg-[#A8DADC]",
-    glowClass: "group-hover:shadow-[0_8px_40px_rgba(168,218,220,0.2)]",
-  },
-  {
-    category: "backend",
-    icon: BrainCircuit,
-    accent: "#B39CD0",
-    accentLight: "#5a4a7a",
-    accentClass: "text-[#5a4a7a] dark:text-[#B39CD0]",
-    borderClass:
-      "border-[#B39CD0]/30 hover:border-[#B39CD0]/80 hover:shadow-[#B39CD0]/10",
-    barClass: "bg-[#B39CD0]",
-    glowClass: "group-hover:shadow-[0_8px_40px_rgba(179,156,208,0.2)]",
-  },
-  {
-    category: "cloud",
-    icon: Cloud,
-    accent: "#FFC1CC",
-    accentLight: "#b84a5f",
-    accentClass: "text-[#b84a5f] dark:text-[#FFC1CC]",
-    borderClass:
-      "border-[#FFC1CC]/30 hover:border-[#FFC1CC]/80 hover:shadow-[#FFC1CC]/10",
-    barClass: "bg-[#FFC1CC]",
-    glowClass: "group-hover:shadow-[0_8px_40px_rgba(255,193,204,0.2)]",
-  },
-];
+const SKILL_CARD_SHELL: Omit<SkillCard, "skills" | "title" | "subtitle">[] = (
+  [
+    {
+      category: "fullstack",
+      icon: Code2,
+      accentLight: "#2b7a78",
+      borderClass:
+        "border-[#A8DADC]/30 hover:border-[#A8DADC]/80 hover:shadow-[#A8DADC]/10",
+      glowClass: "group-hover:shadow-[0_8px_40px_rgba(168,218,220,0.2)]",
+    },
+    {
+      category: "backend",
+      icon: BrainCircuit,
+      accentLight: "#5a4a7a",
+      borderClass:
+        "border-[#B39CD0]/30 hover:border-[#B39CD0]/80 hover:shadow-[#B39CD0]/10",
+      glowClass: "group-hover:shadow-[0_8px_40px_rgba(179,156,208,0.2)]",
+    },
+    {
+      category: "cloud",
+      icon: Cloud,
+      accentLight: "#b84a5f",
+      borderClass:
+        "border-[#FFC1CC]/30 hover:border-[#FFC1CC]/80 hover:shadow-[#FFC1CC]/10",
+      glowClass: "group-hover:shadow-[0_8px_40px_rgba(255,193,204,0.2)]",
+    },
+  ] as const
+).map(({ category, icon, accentLight, borderClass, glowClass }) => ({
+  category,
+  icon,
+  accent: CATEGORY_META[category].accent,
+  accentLight,
+  accentClass: CATEGORY_META[category].skillAccentClass,
+  borderClass,
+  barClass: CATEGORY_META[category].dotClass,
+  glowClass,
+}));
 
 function buildSkillCards(
   skillsByCategory: SkillsSectionProps["skillsByCategory"]
