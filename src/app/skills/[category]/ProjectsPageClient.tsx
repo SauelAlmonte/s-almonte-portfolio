@@ -8,7 +8,7 @@ import { ArrowLeft, Code2, BrainCircuit, Cloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProjectCard } from "@/components/common/ProjectCard";
 import { cn } from "@/lib/utils";
-import { type ProjectCategory, type ProjectData, type CATEGORY_META } from "@/config/projects";
+import { CATEGORY_META, type ProjectCategory, type ProjectData } from "@/config/projects";
 
 gsap.registerPlugin(ScrollTrigger);
 

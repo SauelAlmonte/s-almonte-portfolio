@@ -85,7 +85,7 @@ export default function SubscribersPage() {
     });
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="admin-page-shell admin-page-shell--lg">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -117,14 +117,14 @@ export default function SubscribersPage() {
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
+      <div className="rounded-xl border border-border bg-card overflow-hidden overflow-x-auto">
         {loading ? (
-          <div className="flex items-center justify-center py-16 text-muted-foreground gap-3">
+          <div className="flex items-center justify-center gap-3 py-[length:var(--spacing-fl-admin-loading-y)] text-muted-foreground">
             <RefreshCw className="h-5 w-5 animate-spin" />
             <span className="text-sm">Loading subscribers…</span>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
+          <div className="flex flex-col items-center justify-center gap-3 py-[length:var(--spacing-fl-admin-empty-y)] text-muted-foreground">
             <Users className="h-10 w-10 opacity-30" />
             <p className="text-sm">
               {search ? "No matching subscribers found." : "No subscribers yet."}

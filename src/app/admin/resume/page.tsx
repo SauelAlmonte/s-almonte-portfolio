@@ -377,7 +377,7 @@ export default function AdminResumePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20 text-muted-foreground gap-3">
+      <div className="flex items-center justify-center gap-3 py-[length:var(--spacing-fl-admin-loading-y)] text-muted-foreground">
         <RefreshCw className="h-5 w-5 animate-spin" />
         <span className="text-sm">Loading resume data…</span>
       </div>
@@ -385,13 +385,13 @@ export default function AdminResumePage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="admin-page-shell admin-page-shell--sm">
       <div>
         <h1 className="text-2xl font-extrabold text-foreground">Resume</h1>
         <p className="text-sm text-muted-foreground mt-1">Manage your resume content</p>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border border-border bg-card">
+      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-[length:var(--spacing-fl-admin-card-pad)] sm:flex-row sm:items-center sm:justify-between">
       <p className="text-sm text-muted-foreground">
           Import default <strong className="text-foreground">experience</strong>,{" "}
           <strong className="text-foreground">education</strong>, and{" "}
@@ -421,16 +421,16 @@ export default function AdminResumePage() {
       </div>
 
       {seedMessage && (
-        <p className="text-sm text-muted-foreground bg-muted/50 px-4 py-3 rounded-xl">{seedMessage}</p>
+        <p className="admin-alert rounded-xl text-sm text-muted-foreground bg-muted/50">{seedMessage}</p>
       )}
 
       {loadError && (
-        <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-xl" role="alert">
+        <p className="admin-alert rounded-xl text-sm text-destructive bg-destructive/10" role="alert">
           {loadError}
         </p>
       )}
       {saveError && (
-        <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-xl" role="alert">
+        <p className="admin-alert rounded-xl text-sm text-destructive bg-destructive/10" role="alert">
           {saveError}
         </p>
       )}
@@ -445,7 +445,7 @@ export default function AdminResumePage() {
         </TabsList>
 
         {/* Summary */}
-        <TabsContent value="summary" className="space-y-4 mt-6">
+        <TabsContent value="summary" className="mt-[length:var(--spacing-fl-admin-stack-tight)] flex flex-col gap-[length:var(--spacing-fl-admin-stack-tight)]">
           <div className="space-y-2">
             <Label className="text-sm font-semibold">Professional Summary / Bio</Label>
             <Textarea
@@ -463,7 +463,7 @@ export default function AdminResumePage() {
         </TabsContent>
 
         {/* Experience */}
-        <TabsContent value="experience" className="mt-6 space-y-4">
+        <TabsContent value="experience" className="mt-[length:var(--spacing-fl-admin-stack-tight)] flex flex-col gap-[length:var(--spacing-fl-admin-stack-tight)]">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <p className="text-sm text-muted-foreground">{resume?.experience.length ?? 0} entries</p>
             <div className="flex flex-wrap gap-2">
@@ -524,7 +524,7 @@ export default function AdminResumePage() {
         </TabsContent>
 
         {/* Education */}
-        <TabsContent value="education" className="mt-6 space-y-4">
+        <TabsContent value="education" className="mt-[length:var(--spacing-fl-admin-stack-tight)] flex flex-col gap-[length:var(--spacing-fl-admin-stack-tight)]">
           <div className="flex justify-between items-center">
             <p className="text-sm text-muted-foreground">{resume?.education.length ?? 0} entries</p>
             <Button onClick={() => openAdd("education")} size="sm" className="gap-2 rounded-xl">
@@ -561,7 +561,7 @@ export default function AdminResumePage() {
         </TabsContent>
 
         {/* Certifications */}
-        <TabsContent value="certifications" className="mt-6 space-y-4">
+        <TabsContent value="certifications" className="mt-[length:var(--spacing-fl-admin-stack-tight)] flex flex-col gap-[length:var(--spacing-fl-admin-stack-tight)]">
           <div className="flex justify-between items-center">
             <p className="text-sm text-muted-foreground">{resume?.certifications.length ?? 0} entries</p>
             <Button onClick={() => openAdd("certification")} size="sm" className="gap-2 rounded-xl">
@@ -602,7 +602,7 @@ export default function AdminResumePage() {
         </TabsContent>
 
         {/* Resume File */}
-        <TabsContent value="file" className="mt-6 space-y-4">
+        <TabsContent value="file" className="mt-[length:var(--spacing-fl-admin-stack-tight)] flex flex-col gap-[length:var(--spacing-fl-admin-stack-tight)]">
           <div className="p-4 rounded-xl border border-border bg-card space-y-4">
             <p className="text-sm text-muted-foreground">
               Optional paths or full URLs for the two resume PDFs shown in the public download modal.
@@ -659,7 +659,7 @@ export default function AdminResumePage() {
 
       {/* Universal Dialog */}
       <Dialog open={!!dialog} onOpenChange={(o) => !o && setDialog(null)}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto gap-fl-dialog">
           <DialogHeader>
             <DialogTitle>
               {dialog?.type.includes("experience") ? (dialog.type.startsWith("edit") ? "Edit Experience" : "Add Experience")

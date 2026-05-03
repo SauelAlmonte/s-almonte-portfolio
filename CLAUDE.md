@@ -12,6 +12,10 @@ npm run lint     # ESLint check
 
 No test suite is configured. Verify UI changes by running `dev` and testing in-browser.
 
+## Shipping / Git workflow
+
+Before pushing commits (`git push`), run `npm run build` from the repository root and fix any failures. Do not push while the production build is broken.
+
 ## Architecture Overview
 
 Single-page portfolio with a hidden admin CMS, backed by MongoDB Atlas.

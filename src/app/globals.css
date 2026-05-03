@@ -103,6 +103,94 @@
   --spacing-fl-y-tight: clamp(3rem, 2.5rem + 1.25vw, 4rem);
   --spacing-fl-y-snug: clamp(0.875rem, 0.7rem + 0.65vw, 1.25rem);
   --spacing-fl-gap-cols: clamp(2.75rem, 2rem + 2.5vw, 4rem);
+
+  /*
+   * Admin — Skills category cards: fluid column floor so laptop + sidebar
+   * does not force three ultra-narrow tracks (matches clamp rhythm used for type).
+   */
+  --spacing-fl-admin-skills-gap: clamp(1rem, 0.55rem + 1.15vw, 1.75rem);
+  --spacing-fl-admin-skill-card-pad-x: clamp(0.875rem, 0.65rem + 0.75vw, 1.125rem);
+  --spacing-fl-admin-skill-card-pad-y: clamp(0.75rem, 0.55rem + 0.75vw, 1rem);
+  --min-w-fl-admin-skill-track: clamp(17rem, 10rem + 13vw, 22.5rem);
+
+  /*
+   * Admin dashboard — shared fluid rhythm (layout shell, grids, cards, alerts).
+   * Text sizes already flow from --text-* above when using text-* utilities.
+   */
+  --spacing-fl-admin-stack: clamp(1.25rem, 0.92rem + 1.35vw, 2rem);
+  --spacing-fl-admin-stack-tight: clamp(1rem, 0.82rem + 0.65vw, 1.5rem);
+  --spacing-fl-admin-grid-gap: clamp(0.875rem, 0.6rem + 0.95vw, 1.25rem);
+  --spacing-fl-admin-card-pad: clamp(0.875rem, 0.65rem + 0.85vw, 1.25rem);
+  --spacing-fl-admin-main-x: clamp(1rem, 0.65rem + 1.35vw, 2rem);
+  --spacing-fl-admin-main-y: clamp(1rem, 0.75rem + 1vw, 2rem);
+  --spacing-fl-admin-sidebar-pad: clamp(1rem, 0.68rem + 0.95vw, 1.5rem);
+  --spacing-fl-admin-loading-y: clamp(4rem, 12vw + 2rem, 6rem);
+  --spacing-fl-admin-login-max: clamp(18rem, 88vw, 24rem);
+  --spacing-fl-admin-empty-y: clamp(3rem, 6vw + 1.5rem, 4.5rem);
+  --spacing-fl-admin-shell-max-lg: 80rem;
+  --spacing-fl-admin-shell-max-md: 72rem;
+  --spacing-fl-admin-shell-max-sm: 56rem;
+}
+
+@layer components {
+  /**
+   * Responsive grid: column count follows available width; min track width uses clamp
+   * so ~1024px viewports with admin sidebar get 2 columns instead of 3 squished cards.
+   */
+  .admin-skills-grid {
+    display: grid;
+    gap: var(--spacing-fl-admin-skills-gap);
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, var(--min-w-fl-admin-skill-track)), 1fr)
+    );
+  }
+
+  /** Standard admin page column: fluid vertical gap + capped width for readability */
+  .admin-page-shell {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-fl-admin-stack);
+  }
+
+  .admin-page-shell--lg {
+    max-width: min(100%, var(--spacing-fl-admin-shell-max-lg));
+  }
+
+  .admin-page-shell--md {
+    max-width: min(100%, var(--spacing-fl-admin-shell-max-md));
+  }
+
+  .admin-page-shell--sm {
+    max-width: min(100%, var(--spacing-fl-admin-shell-max-sm));
+  }
+
+  /** Inline alerts / notices — fluid padding aligned with admin cards (pair with rounded-xl) */
+  .admin-alert {
+    padding-inline: var(--spacing-fl-admin-card-pad);
+    padding-block: var(--spacing-fl-admin-card-pad);
+  }
+
+  /** Project cards grid — fluid gutters; column breakpoints stay in JSX */
+  .admin-projects-grid {
+    display: grid;
+    gap: var(--spacing-fl-admin-grid-gap);
+    grid-template-columns: 1fr;
+  }
+
+  @media (width >= 48rem) {
+    .admin-projects-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (width >= 80rem) {
+    .admin-projects-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
 }
 
 :root {
