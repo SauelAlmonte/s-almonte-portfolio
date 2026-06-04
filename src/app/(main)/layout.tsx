@@ -1,4 +1,5 @@
 import { Navbar, Footer } from "@/components/layout";
+import { JsonLd } from "@/components/common/JsonLd";
 
 export default function MainLayout({
   children,
@@ -7,6 +8,7 @@ export default function MainLayout({
 }) {
   return (
     <>
+      <JsonLd />
       <Navbar />
       <main>{children}</main>
       <Footer />

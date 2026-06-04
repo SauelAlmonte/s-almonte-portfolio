@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/db/mongoose";
 import { Project } from "@/lib/models/Project";
 import { auth } from "@/auth";
 import { buildProjectCreateDoc } from "@/lib/projects/admin-project-write";
+import { revalidatePublicProjects } from "@/lib/cache/revalidate-public";
 
 export async function GET() {
   const session = await auth();
@@ -36,6 +37,7 @@ export async function POST(req: Request) {
   try {
     await connectToDatabase();
     const project = await Project.create(doc);
+    revalidatePublicProjects();
     return NextResponse.json({ project }, { status: 201 });
   } catch (err) {
     console.error("[admin/projects POST]", err);

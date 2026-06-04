@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { Skill } from "@/lib/models/Skill";
 import { getSkillSeedPayloads } from "@/config/skills";
+import { revalidatePublicHome } from "@/lib/cache/revalidate-public";
 
 /**
  * Upserts default skills from `config/skills.ts` (match on name + category).
@@ -22,6 +23,7 @@ export async function POST() {
       );
     }
     const skills = await Skill.find().sort({ category: 1, order: 1, name: 1 }).lean();
+    revalidatePublicHome();
     return NextResponse.json({
       ok: true,
       message: `Synced ${rows.length} skills from portfolio config.`,

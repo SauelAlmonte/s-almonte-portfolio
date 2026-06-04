@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/db/mongoose";
 import { Project } from "@/lib/models/Project";
 import { auth } from "@/auth";
 import { buildProjectPartialUpdate } from "@/lib/projects/admin-project-write";
+import { revalidatePublicProjects } from "@/lib/cache/revalidate-public";
 
 export async function PUT(
   req: Request,
@@ -30,6 +31,7 @@ export async function PUT(
     if (!project) {
       return NextResponse.json({ error: "Project not found." }, { status: 404 });
     }
+    revalidatePublicProjects();
     return NextResponse.json({ project });
   } catch (err) {
     console.error("[admin/projects PUT]", err);
@@ -51,6 +53,7 @@ export async function DELETE(
   try {
     await connectToDatabase();
     await Project.findByIdAndDelete(id);
+    revalidatePublicProjects();
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[admin/projects DELETE]", err);
