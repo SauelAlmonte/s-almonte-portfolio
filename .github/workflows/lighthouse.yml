@@ -17,22 +17,33 @@ jobs:
     name: Lighthouse audit (production build)
     runs-on: ubuntu-latest
 
-    # Build-time PLACEHOLDERS only — never real secrets. The audited pages
-    # (home + skills) fall back to config data when MongoDB is unreachable, so
-    # no live DB or auth is required to measure performance, a11y, and SEO.
+    # Build-time values only — no real secrets.
+    # - NEXT_PUBLIC_SITE_URL is the production origin so canonical/OG/JSON-LD
+    #   URLs are audited as they ship (the pages are still SERVED at localhost).
+    # - mongoose.ts throws at module load if MONGODB_URI is unset, so a
+    #   placeholder is required for `next build`. The 127.0.0.1 host is refused
+    #   instantly (10s fail-fast), so the audited public pages fall back to
+    #   config data — no live DB needed.
+    # - RESEND_API_KEY / AUTH_SECRET are placeholders; nothing is sent or
+    #   authenticated during a Lighthouse run.
     env:
-      NEXT_PUBLIC_SITE_URL: "http://localhost:3000"
+      NEXT_PUBLIC_SITE_URL: "https://s-almonte.vercel.app"
       NEXT_PUBLIC_GITHUB_URL: "https://github.com/SauelAlmonte"
       NEXT_PUBLIC_LINKEDIN_URL: "https://linkedin.com/in/sauel-almonte"
-      AUTH_URL: "http://localhost:3000"
+      AUTH_URL: "https://s-almonte.vercel.app"
       AUTH_SECRET: "lighthouse-ci-build-placeholder-not-a-secret"
+      MONGODB_URI: "mongodb://127.0.0.1:27017/lighthouse-ci-placeholder"
+      RESEND_API_KEY: "re_lighthouse_ci_placeholder"
 
     steps:
+      # Actions pinned to immutable commit SHAs (supply-chain hardening).
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "lts/*"
           cache: "npm"

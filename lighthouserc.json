@@ -3,7 +3,7 @@
     "collect": {
       "startServerCommand": "npm run start",
       "startServerReadyPattern": "Ready in",
-      "startServerReadyTimeout": 30000,
+      "startServerReadyTimeout": 60000,
       "url": [
         "http://localhost:3000/",
         "http://localhost:3000/skills/fullstack",
