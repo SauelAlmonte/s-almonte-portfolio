@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { Project } from "@/lib/models/Project";
 import { PROJECTS } from "@/config/projects";
+import { revalidatePublicProjects } from "@/lib/cache/revalidate-public";
 
 /**
  * Copies `config/projects.ts` into MongoDB (upsert by `slug`).
@@ -39,6 +40,7 @@ export async function POST() {
     }
 
     const projects = await Project.find().sort({ order: 1, createdAt: -1 }).lean();
+    revalidatePublicProjects();
     return NextResponse.json({
       ok: true,
       message: `Imported ${PROJECTS.length} projects from portfolio config.`,

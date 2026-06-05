@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/db/mongoose";
 import { Skill } from "@/lib/models/Skill";
 import { auth } from "@/auth";
 import { buildSkillPartialUpdate } from "@/lib/skills/admin-skill-write";
+import { revalidatePublicHome } from "@/lib/cache/revalidate-public";
 
 export async function PUT(
   req: Request,
@@ -31,6 +32,7 @@ export async function PUT(
     if (!skill) {
       return NextResponse.json({ error: "Skill not found." }, { status: 404 });
     }
+    revalidatePublicHome();
     return NextResponse.json({ skill });
   } catch (err) {
     console.error("[admin/skills PUT]", err);
@@ -56,6 +58,7 @@ export async function DELETE(
     if (!removed) {
       return NextResponse.json({ error: "Skill not found." }, { status: 404 });
     }
+    revalidatePublicHome();
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[admin/skills DELETE]", err);

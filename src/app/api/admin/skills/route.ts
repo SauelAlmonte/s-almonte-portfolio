@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/db/mongoose";
 import { Skill } from "@/lib/models/Skill";
 import { auth } from "@/auth";
 import { buildSkillCreateDoc } from "@/lib/skills/admin-skill-write";
+import { revalidatePublicHome } from "@/lib/cache/revalidate-public";
 
 export async function GET() {
   const session = await auth();
@@ -43,6 +44,7 @@ export async function POST(req: Request) {
   try {
     await connectToDatabase();
     const skill = await Skill.create(doc);
+    revalidatePublicHome();
     return NextResponse.json({ skill }, { status: 201 });
   } catch (err) {
     console.error("[admin/skills POST]", err);

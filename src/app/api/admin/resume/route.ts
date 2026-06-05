@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { ResumeData } from "@/lib/models/ResumeData";
 import { auth } from "@/auth";
+import { revalidatePublicHome } from "@/lib/cache/revalidate-public";
 
 const ACTIONS = new Set([
   "updateSummary",
@@ -128,6 +129,7 @@ export async function PATCH(req: Request) {
     }
 
     await resume.save();
+    revalidatePublicHome();
     return NextResponse.json({ resume });
   } catch (err) {
     console.error("[admin/resume PATCH]", err);

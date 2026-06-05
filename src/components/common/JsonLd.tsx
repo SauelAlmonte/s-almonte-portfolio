@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config/site";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 
 export function JsonLd() {
   const person = {
@@ -26,7 +27,7 @@ export function JsonLd() {
       siteConfig.social.linkedin,
       siteConfig.social.youtube,
     ].filter(Boolean),
-    image: `${siteConfig.url}/og-image.png`,
+    image: `${siteConfig.url}/opengraph-image`,
   };
 
   const website = {
@@ -43,11 +44,11 @@ export function JsonLd() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(person) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(website) }}
       />
     </>
   );

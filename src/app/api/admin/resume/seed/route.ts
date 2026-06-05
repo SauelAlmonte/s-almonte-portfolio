@@ -7,6 +7,7 @@ import {
   RESUME_SEED_EDUCATION,
   getResumeSeedExperiences,
 } from "@/config/resume";
+import { revalidatePublicHome } from "@/lib/cache/revalidate-public";
 
 async function getOrCreateResume() {
   let doc = await ResumeData.findOne();
@@ -40,6 +41,7 @@ export async function POST() {
     });
 
     await resume.save();
+    revalidatePublicHome();
     const fresh = await ResumeData.findOne().lean();
 
     return NextResponse.json({

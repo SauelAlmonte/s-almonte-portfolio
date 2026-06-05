@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/common/ThemeProvider";
-import { JsonLd } from "@/components/common/JsonLd";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
@@ -35,14 +34,7 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     title: siteConfig.title,
     description: siteConfig.description,
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: `${siteConfig.person.name} — ${siteConfig.person.jobTitle}`,
-      },
-    ],
+    // Image is supplied automatically by src/app/opengraph-image.tsx
   },
 
   /* ── Twitter / X Card ── */
@@ -51,7 +43,7 @@ export const metadata: Metadata = {
     title: siteConfig.title,
     description: siteConfig.description,
     creator: "@SauelAlmonte",
-    images: ["/og-image.png"],
+    // Image is supplied automatically by src/app/opengraph-image.tsx
   },
 
   /* ── Robots ── */
@@ -84,7 +76,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           enableSystem
           disableTransitionOnChange
         >
-          <JsonLd />
           {children}
         </ThemeProvider>
       </body>

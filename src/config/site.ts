@@ -4,6 +4,9 @@ export const siteConfig = {
   title: "Sauel Almonte — Full-Stack & AI Engineer",
   description:
     "Full-Stack Software Engineer based in Boston, MA specializing in scalable cloud applications, AI-powered automation, and modern web experiences. AWS Certified. Mentor. Builder.",
+  /** Short value-prop line — consumed by the OG image card. */
+  tagline:
+    "Scalable cloud applications · AI-powered automation · Modern web experiences",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
 
   /* ── Person metadata (used in JSON-LD & meta tags) ── */
