@@ -1,0 +1,61 @@
+name: E2E Tests
+
+# Runs the Playwright E2E suite against the PRODUCTION build (next build →
+# next start, configured in playwright.config.ts) on every PR to main and on
+# main itself. The HTML report is uploaded as an artifact for debugging.
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: Playwright E2E (production build)
+    runs-on: ubuntu-latest
+
+    # Build-time placeholders only — no real secrets. mongoose.ts throws at
+    # module load without MONGODB_URI and the Resend client without its key, so
+    # both need a non-empty value for `next build`. The 127.0.0.1 Mongo host is
+    # refused instantly, so pages fall back to config data — no live DB needed.
+    env:
+      NEXT_PUBLIC_SITE_URL: "https://s-almonte.vercel.app"
+      NEXT_PUBLIC_GITHUB_URL: "https://github.com/SauelAlmonte"
+      NEXT_PUBLIC_LINKEDIN_URL: "https://linkedin.com/in/sauel-almonte"
+      AUTH_URL: "https://s-almonte.vercel.app"
+      AUTH_SECRET: "playwright-ci-build-placeholder-not-a-secret"
+      MONGODB_URI: "mongodb://127.0.0.1:27017/playwright-ci-placeholder"
+      RESEND_API_KEY: "re_playwright_ci_placeholder"
+
+    steps:
+      # Actions pinned to immutable commit SHAs (supply-chain hardening).
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "lts/*"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14

@@ -17,13 +17,14 @@
 
 ## ✨ Features
 
-- **Animated UI** — GSAP ScrollTrigger, horizontal scroll-jacking, stagger reveals, and parallax effects
+- **Animated UI** — GSAP ScrollTrigger reveals, parallax, and staggered animations, with full `prefers-reduced-motion` support
 - **Light & Dark Mode** — System-aware theme switching via `next-themes`
+- **Admin CMS** — Google-OAuth-protected dashboard to manage projects, skills, resume, and subscribers — no code changes needed
 - **Contact Form** — Powered by Resend with dual email notifications and subscriber opt-in
-- **MongoDB Backend** — Subscriber management and dynamic content via Mongoose
+- **MongoDB Backend** — Dynamic content + subscriber management via Mongoose, with ISR and on-demand revalidation
 - **Skills & Projects** — Categorized skill cards with animated progress bars linking to project pages
+- **SEO & AEO** — Per-route metadata, JSON-LD structured data, dynamic OG images, sitemap/robots, and an `llms.txt` for AI answer engines
 - **Fully Responsive** — Optimized for all screen sizes from mobile to widescreen
-- **Admin Panel** *(coming soon)* — CMS for managing projects, skills, and resume without touching code
 
 ---
 
@@ -34,10 +35,12 @@
 | **Framework** | Next.js 16 (App Router) |
 | **Language** | TypeScript |
 | **Styling** | TailwindCSS v4 + ShadCN UI |
-| **Animations** | GSAP + ScrollTrigger |
+| **Animation** | GSAP + ScrollTrigger · Motion (LazyMotion) · Three.js / React Three Fiber + drei |
+| **Auth** | Auth.js (NextAuth v5) + Google OAuth |
 | **Database** | MongoDB Atlas via Mongoose |
 | **Email** | Resend + React Email |
 | **Forms** | React Hook Form + Zod |
+| **Testing / CI** | Playwright (E2E) · Lighthouse CI · CodeQL |
 | **Deployment** | Vercel |
 
 ---
@@ -47,22 +50,53 @@
 ```
 src/
 ├── app/
-│   ├── api/contact/        # Contact form API route
-│   ├── skills/[category]/  # Dynamic project pages
+│   ├── (main)/             # Public single-page site
+│   ├── admin/              # Protected CMS (projects, skills, resume, subscribers)
+│   ├── api/                # Route handlers: admin, auth, contact
+│   ├── skills/[category]/  # Dynamic project category pages
+│   ├── opengraph-image.tsx # Dynamically generated social card
+│   ├── sitemap.ts          # + robots.ts
 │   └── layout.tsx
 ├── components/
 │   ├── layout/             # Navbar, Footer
 │   ├── sections/           # Hero, About, Experience, Skills, Contact
-│   ├── common/             # Shared components
+│   ├── common/             # Shared (JsonLd, MotionProvider, …)
+│   ├── resume/             # Resume download UI
 │   └── ui/                 # ShadCN components
-├── config/                 # Site config & project data
+├── config/                 # Site config & static data
 ├── emails/                 # React Email templates
 ├── hooks/                  # Custom React hooks (GSAP, scroll)
 ├── lib/
-│   ├── db/                 # MongoDB connection
-│   └── models/             # Mongoose models
+│   ├── auth/ · cache/ · db/ · models/
+│   ├── projects/ · resume/ · skills/ · validations/
+│   └── seo/                # JSON-LD serialization
+├── auth.ts                 # Auth.js (NextAuth) config
+├── proxy.ts                # /admin route protection
 └── types/                  # TypeScript types
+
+e2e/                        # Playwright E2E tests
+.github/workflows/          # CodeQL · Lighthouse CI · E2E
 ```
+
+---
+
+## 🧪 Automated Testing & CI
+
+Every pull request to `main` runs three automated gates via GitHub Actions:
+
+| Gate | What it checks |
+|---|---|
+| **Playwright (E2E)** | Browser tests against a production build (`next build && next start`) covering the public surfaces — homepage, skills navigation, and category pages |
+| **Lighthouse CI** | Performance, Accessibility, Best-Practices, and SEO of the production build, with assertion budgets (a11y & SEO are hard-gated) |
+| **CodeQL** | Static security analysis (JavaScript/TypeScript) on every push and PR |
+
+Run the E2E suite locally:
+
+```bash
+npm run test:e2e        # Playwright — auto-starts the dev server
+```
+
+> All three run their tooling inside the ephemeral CI runner, so they add **zero runtime dependencies** and the project stays at **0 audit findings**.
 
 ---
 
