@@ -12,6 +12,12 @@ export const contentType = "image/png";
  * in sync with siteConfig automatically — no design asset to maintain.
  */
 export default function OpengraphImage() {
+  // Derive the credential line from real config data instead of hardcoding it.
+  const awsCertified = siteConfig.person.certifications.some((c) => /aws/i.test(c));
+  const credentialLine = awsCertified
+    ? `${siteConfig.person.location} · AWS Certified`
+    : siteConfig.person.location;
+
   return new ImageResponse(
     (
       <div
@@ -44,11 +50,11 @@ export default function OpengraphImage() {
         </div>
 
         <div style={{ fontSize: 28, color: "#94a3b8", marginTop: 28, maxWidth: 900 }}>
-          Scalable cloud applications · AI-powered automation · Modern web experiences
+          {siteConfig.tagline}
         </div>
 
         <div style={{ display: "flex", fontSize: 26, color: "#cbd5e1", marginTop: "auto", fontWeight: 500 }}>
-          {siteConfig.person.location} · AWS Certified
+          {credentialLine}
         </div>
       </div>
     ),

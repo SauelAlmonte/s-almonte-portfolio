@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { CATEGORY_META, type ProjectCategory } from "@/config/projects";
 import { siteConfig } from "@/config/site";
 import { loadPublishedProjectsByCategory } from "@/lib/projects/load-published-projects";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 import { ProjectsPageClient } from "./ProjectsPageClient";
 
 /**
@@ -94,7 +95,7 @@ export default async function CategoryPage({ params }: PageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <ProjectsPageClient category={cat} projects={projects} meta={meta} />
     </>
