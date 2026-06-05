@@ -99,6 +99,20 @@ export function Skills({ skillsByCategory }: SkillsSectionProps) {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      const reduceMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      /* Reduced motion: show everything in its final state, no animation. */
+      if (reduceMotion) {
+        gsap.set(headingRef.current, { opacity: 1, y: 0 });
+        gsap.set(cardRefs.current.filter(Boolean), { opacity: 1, y: 0, scale: 1 });
+        barRefs.current.forEach((bars) =>
+          bars.forEach((bar) => bar && gsap.set(bar, { scaleX: 1 }))
+        );
+        return;
+      }
+
       gsap.fromTo(
         headingRef.current,
         { opacity: 0, y: 50 },
@@ -136,15 +150,16 @@ export function Skills({ skillsByCategory }: SkillsSectionProps) {
       cardRefs.current.forEach((card, cardIdx) => {
         if (!card) return;
         const bars = barRefs.current[cardIdx];
-        const cardSkills = cards[cardIdx]?.skills ?? [];
         bars.forEach((bar, barIdx) => {
           if (!bar) return;
-          const target = cardSkills[barIdx]?.proficiency ?? 0;
+          /* Animate scaleX (compositor-only) instead of width (layout). The
+             bar's resting width is its proficiency %, scaled in from the left. */
           gsap.fromTo(
             bar,
-            { width: "0%" },
+            { scaleX: 0 },
             {
-              width: `${target}%`,
+              scaleX: 1,
+              transformOrigin: "left center",
               duration: 1.2,
               ease: "power2.out",
               delay: barIdx * 0.1,
@@ -260,7 +275,11 @@ export function Skills({ skillsByCategory }: SkillsSectionProps) {
                       <div
                         ref={(el) => { barRefs.current[cardIdx][barIdx] = el; }}
                         className={cn("h-full rounded-full", card.barClass)}
-                        style={{ width: "0%" }}
+                        style={{
+                          width: `${skill.proficiency}%`,
+                          transform: "scaleX(0)",
+                          transformOrigin: "left center",
+                        }}
                         role="progressbar"
                         aria-valuenow={skill.proficiency}
                         aria-valuemin={0}

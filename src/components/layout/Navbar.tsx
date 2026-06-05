@@ -21,11 +21,23 @@ export function Navbar() {
 
   useEffect(() => {
     if (!navRef.current) return;
-    gsap.fromTo(
-      navRef.current,
-      { y: -80, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: 0.2 }
-    );
+    const ctx = gsap.context(() => {
+      const reduceMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (reduceMotion) {
+        gsap.set(navRef.current, { y: 0, opacity: 1 });
+        return;
+      }
+      gsap.fromTo(
+        navRef.current,
+        { y: -80, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: 0.2 }
+      );
+    }, navRef);
+
+    return () => ctx.revert();
   }, []);
 
   const handleNavClick = (href: string) => {
