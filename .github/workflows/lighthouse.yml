@@ -1,0 +1,52 @@
+name: Lighthouse CI
+
+# Audits the PRODUCTION build (npm run build → next start) on every PR to main,
+# and on main itself to track the baseline over time. Full reports are uploaded
+# to temporary public storage (links appear in the job log) — no secrets needed.
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    name: Lighthouse audit (production build)
+    runs-on: ubuntu-latest
+
+    # Build-time PLACEHOLDERS only — never real secrets. The audited pages
+    # (home + skills) fall back to config data when MongoDB is unreachable, so
+    # no live DB or auth is required to measure performance, a11y, and SEO.
+    env:
+      NEXT_PUBLIC_SITE_URL: "http://localhost:3000"
+      NEXT_PUBLIC_GITHUB_URL: "https://github.com/SauelAlmonte"
+      NEXT_PUBLIC_LINKEDIN_URL: "https://linkedin.com/in/sauel-almonte"
+      AUTH_URL: "http://localhost:3000"
+      AUTH_SECRET: "lighthouse-ci-build-placeholder-not-a-secret"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (production)
+        run: npm run build
+
+      # Official GoogleChrome Lighthouse CI, installed globally in the ephemeral
+      # runner — NOT a project devDependency, so the repo stays at 0 audit
+      # findings. Reads ./lighthouserc.json (collect + assert + upload).
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.15.x
+          lhci autorun --config=./lighthouserc.json
