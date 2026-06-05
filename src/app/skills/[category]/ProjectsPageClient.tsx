@@ -3,14 +3,11 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowLeft, Code2, BrainCircuit, Cloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProjectCard } from "@/components/common/ProjectCard";
 import { cn } from "@/lib/utils";
 import { CATEGORY_META, type ProjectCategory, type ProjectData } from "@/config/projects";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const CATEGORY_ICONS: Record<ProjectCategory, React.ElementType> = {
   fullstack: Code2,
@@ -34,6 +31,18 @@ export function ProjectsPageClient({ category, projects, meta }: ProjectsPageCli
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      const reduceMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const cards = gridRef.current ? Array.from(gridRef.current.children) : [];
+
+      /* Reduced motion: render final state immediately, no animation */
+      if (reduceMotion) {
+        gsap.set(headerRef.current, { opacity: 1, y: 0 });
+        if (cards.length) gsap.set(cards, { opacity: 1, y: 0, scale: 1 });
+        return;
+      }
+
       /* Header entrance */
       gsap.fromTo(
         headerRef.current,
@@ -42,9 +51,9 @@ export function ProjectsPageClient({ category, projects, meta }: ProjectsPageCli
       );
 
       /* Cards stagger */
-      if (gridRef.current?.children) {
+      if (cards.length) {
         gsap.fromTo(
-          Array.from(gridRef.current.children),
+          cards,
           { opacity: 0, y: 50, scale: 0.96 },
           {
             opacity: 1,

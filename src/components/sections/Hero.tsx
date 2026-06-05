@@ -35,21 +35,58 @@ export function Hero() {
 
   /* GSAP entrance animation */
   useEffect(() => {
-    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+    const ctx = gsap.context(() => {
+      const els = [
+        greetingRef.current, nameRef.current, roleContainerRef.current,
+        descRef.current, ctaRef.current, socialRef.current, scrollRef.current,
+      ];
+      const reduceMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    tl.fromTo(greetingRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 })
-      .fromTo(nameRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7 }, "-=0.3")
-      .fromTo(roleContainerRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3")
-      .fromTo(descRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2")
-      .fromTo(ctaRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2")
-      .fromTo(socialRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.2")
-      .fromTo(scrollRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5 }, "-=0.1");
+      /* Reduced motion: reveal everything immediately, no entrance animation. */
+      if (reduceMotion) {
+        gsap.set(els, { opacity: 1, y: 0 });
+        return;
+      }
+
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      tl.fromTo(greetingRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 })
+        .fromTo(nameRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7 }, "-=0.3")
+        .fromTo(roleContainerRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3")
+        .fromTo(descRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2")
+        .fromTo(ctaRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2")
+        .fromTo(socialRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.2")
+        .fromTo(scrollRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5 }, "-=0.1");
+    }, sectionRef);
+
+    return () => ctx.revert();
   }, []);
 
   /* Role cycling animation */
   useEffect(() => {
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* Capture the node now so cleanup kills tweens on the right element. */
+    const roleEl = roleRef.current;
+
+    const advanceRole = () =>
+      setRoleIndex((prev) => {
+        const next = (prev + 1) % ROLES.length;
+        setDisplayedRole(ROLES[next]);
+        return next;
+      });
+
     const interval = setInterval(() => {
       if (!roleRef.current) return;
+
+      /* Reduced motion: swap the text without the fade/slide animation. */
+      if (reduceMotion) {
+        advanceRole();
+        return;
+      }
 
       gsap.to(roleRef.current, {
         opacity: 0,
@@ -57,11 +94,7 @@ export function Hero() {
         duration: 0.3,
         ease: "power2.in",
         onComplete: () => {
-          setRoleIndex((prev) => {
-            const next = (prev + 1) % ROLES.length;
-            setDisplayedRole(ROLES[next]);
-            return next;
-          });
+          advanceRole();
           gsap.fromTo(
             roleRef.current,
             { opacity: 0, y: 10 },
@@ -71,7 +104,10 @@ export function Hero() {
       });
     }, 2800);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      gsap.killTweensOf(roleEl);
+    };
   }, []);
 
   const handleScrollDown = () => {

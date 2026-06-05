@@ -77,6 +77,16 @@ export function Contact() {
   /* GSAP scroll animations */
   useEffect(() => {
     const ctx = gsap.context(() => {
+      const reduceMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      /* Reduced motion: reveal both columns immediately, no slide-in. */
+      if (reduceMotion) {
+        gsap.set([leftRef.current, rightRef.current], { opacity: 1, x: 0 });
+        return;
+      }
+
       gsap.fromTo(
         leftRef.current,
         { opacity: 0, x: -60 },
