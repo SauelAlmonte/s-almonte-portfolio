@@ -101,13 +101,7 @@ export function Hero() {
           travelling dots. Reduced motion shows it instantly. */}
       <m.div
         aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(69% 63% at 72% 42%, rgba(179,156,208,0.12), transparent 70%)," +
-            "radial-gradient(52% 52% at 78% 60%, rgba(168,218,220,0.08), transparent 72%)," +
-            "radial-gradient(46% 46% at 60% 30%, rgba(255,193,204,0.05), transparent 70%)",
-        }}
+        className="hero-aurora pointer-events-none absolute inset-0"
         initial={reduceMotion ? false : { opacity: 0 }}
         animate={{ opacity: reduceMotion || globeSettled ? 1 : 0 }}
         transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}

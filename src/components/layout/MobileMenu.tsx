@@ -88,8 +88,7 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(168,218,220,0.10), transparent 70%)" }}
+          className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(168,218,220,0.10),transparent_70%)]"
         />
 
         {/* Minimal header — just a close affordance, like the reference's clean top. */}
