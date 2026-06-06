@@ -347,3 +347,87 @@
     cursor: pointer;
   }
 }
+
+/* ── Effects that Tailwind utilities can't express ───────────────────────
+   `@property` (registers an animatable angle) and `@keyframes` have no utility
+   equivalent, so they live at the top level. The pseudo-element / mask effects
+   below sit in @layer components — the Tailwind-v4 home for non-utility
+   patterns (same place the project keeps its .admin-* classes). */
+@property --nav-beam {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes nav-orbit {
+  to {
+    --nav-beam: 360deg;
+  }
+}
+
+@layer components {
+  /* Navbar glass pill: a bright conic-gradient "comet" masked to a 1.4px ring,
+     orbiting the rounded border as --nav-beam rotates. */
+  .nav-pill::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.4px;
+    background: conic-gradient(
+      from var(--nav-beam),
+      transparent 0deg,
+      transparent 300deg,
+      rgba(168, 218, 220, 0.05) 312deg,
+      rgba(168, 218, 220, 0.85) 340deg,
+      #eafbfb 351deg,
+      rgba(179, 156, 208, 0.85) 360deg
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: nav-orbit 7.5s linear infinite;
+    pointer-events: none;
+  }
+
+  /* static hairline so the border reads between streak passes */
+  .nav-pill::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid rgb(255 255 255 / 0.08);
+    pointer-events: none;
+  }
+
+  /* subtle grain on the glass */
+  .nav-grain {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Hero brand glow — a 3-layer radial wash behind the globe (too complex for a
+     readable arbitrary value). */
+  .hero-aurora {
+    background:
+      radial-gradient(69% 63% at 72% 42%, rgba(179, 156, 208, 0.12), transparent 70%),
+      radial-gradient(52% 52% at 78% 60%, rgba(168, 218, 220, 0.08), transparent 72%),
+      radial-gradient(46% 46% at 60% 30%, rgba(255, 193, 204, 0.05), transparent 70%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-pill::before {
+    animation: none;
+  }
+}

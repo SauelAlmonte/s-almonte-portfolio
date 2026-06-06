@@ -1,48 +1,78 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
-import { useScrolled } from "@/hooks/useScrolled";
 import { useActiveSection } from "@/hooks/useActiveSection";
+import { onHeroSettled } from "@/lib/heroSettle";
 import { ThemeToggle } from "./ThemeToggle";
 import { MobileMenu } from "./MobileMenu";
 
 const SECTION_IDS = siteConfig.nav.map((item) => item.href.replace("#", ""));
+// Desktop links drop "Contact" — the "Get in touch" CTA is the single path there.
+const NAV_LINKS = siteConfig.nav.filter((item) => item.href !== "#contact");
+
+// Run entrance setup before paint so the header never flashes in before the
+// globe-gated reveal; falls back to useEffect during SSR (no window).
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export function Navbar() {
   const navRef = useRef<HTMLElement>(null);
   const router = useRouter();
-  const scrolled = useScrolled();
   const activeSection = useActiveSection(SECTION_IDS);
 
-  useEffect(() => {
-    if (!navRef.current) return;
-    const ctx = gsap.context(() => {
-      const reduceMotion =
-        typeof window !== "undefined" &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* Entrance. On the home hero (every size) the header holds until the globe
+     settles, then glides down as one unit on a smooth ease — landing right after
+     the dots and just before the copy cascades. Other pages (no globe) reveal it
+     right away; reduced motion shows it instantly. The hidden state is set in a
+     layout effect so it never flashes in during the wait. */
+  useIsoLayoutEffect(() => {
+    const node = navRef.current;
+    if (!node) return;
 
-      if (reduceMotion) {
-        gsap.set(navRef.current, { y: 0, opacity: 1 });
-        return;
-      }
-      gsap.fromTo(
-        navRef.current,
-        { y: -80, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: 0.2 }
-      );
-    }, navRef);
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      gsap.set(node, { yPercent: 0, opacity: 1 });
+      return;
+    }
 
-    return () => ctx.revert();
+    const isHome = window.location.pathname === "/";
+
+    gsap.set(node, { yPercent: -100, opacity: 0 });
+
+    let played = false;
+    const reveal = () => {
+      if (played) return;
+      played = true;
+      gsap.to(node, {
+        yPercent: 0,
+        opacity: 1,
+        duration: 0.85,
+        ease: "power2.inOut",
+        overwrite: "auto",
+      });
+    };
+
+    if (isHome) {
+      const off = onHeroSettled(reveal); // fires immediately if already settled
+      const fallback = window.setTimeout(reveal, 3200); // safety if settle never fires
+      return () => {
+        off();
+        clearTimeout(fallback);
+        gsap.killTweensOf(node);
+      };
+    }
+
+    reveal();
+    return () => gsap.killTweensOf(node);
   }, []);
 
   const handleNavClick = (href: string) => {
-    const id = href.replace("#", "");
-    const el = document.getElementById(id);
+    const el = document.getElementById(href.replace("#", ""));
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -50,84 +80,80 @@ export function Navbar() {
     <>
       <a
         href="#home"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#2b7a78] dark:focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:font-medium"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-[#A8DADC] focus:px-4 focus:py-2 focus:font-medium focus:text-[#06232b]"
       >
         Skip to content
       </a>
 
-      <header
-        ref={navRef}
-        className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-          scrolled
-            ? "bg-background/90 backdrop-blur-md shadow-sm border-b border-border"
-            : "bg-transparent"
-        )}
-      >
+      <header ref={navRef} className="fixed inset-x-0 top-3 z-50 px-4 sm:top-4">
         <nav
           aria-label="Main navigation"
-          className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
+          className="nav-pill relative isolate mx-auto flex w-full items-center justify-between gap-2 rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.015)),rgba(12,11,22,0.55)] px-3 py-2.5 shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.14),inset_0_-1px_1px_rgba(0,0,0,0.5),0_20px_50px_-24px_rgba(0,0,0,0.9)] backdrop-blur-xl md:w-fit"
         >
-          {/* Logo */}
-          <div className="flex items-center gap-1">
+          {/* grain texture on the glass */}
+          <span aria-hidden className="nav-grain" />
+
+          {/* Brand: real 3D monogram chip + hover-revealed admin lock */}
+          <div className="group/brand relative z-10 flex items-center gap-1">
             <button
               onClick={() => handleNavClick("#home")}
               aria-label="Go to top"
-              className="group/logo flex items-center gap-2 focus:outline-none"
+              className="group/logo flex cursor-pointer items-center focus:outline-none"
             >
-              <span className="text-xl font-bold tracking-tight">
-                <span className="text-[#2b7a78] dark:text-primary">S</span>
-                <span className="text-foreground">A</span>
-              </span>
-              <span className="hidden sm:block text-sm font-medium text-muted-foreground group-hover/logo:text-foreground transition-colors">
-                Sauel Almonte
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/12 bg-[linear-gradient(160deg,rgba(255,255,255,0.12),rgba(255,255,255,0.02))] text-sm font-bold text-[#A8DADC] shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.22),0_4px_12px_-4px_rgba(0,0,0,0.7)] transition-transform duration-300 group-hover/logo:-translate-y-0.5">
+                {/* ink-centered SA (caps sit high in the line box) */}
+                <span className="block leading-none [text-indent:0.5px] [transform:translateY(-0.01em)]">SA</span>
               </span>
             </button>
 
-            {/* Secret admin entry — only visible when hovering the lock itself */}
+            {/* Secret admin entry — reveals on brand hover/focus, action unchanged */}
             <button
               onClick={() => router.push("/admin/login")}
               aria-label="Admin login"
               title="Admin"
-              className="opacity-0 hover:opacity-100 focus:opacity-100 transition-opacity duration-200 p-1 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10"
+              className="cursor-pointer rounded-md p-1 text-[#6f6f80] opacity-0 transition-all duration-200 hover:bg-white/5 hover:text-[#A8DADC] focus:opacity-100 group-hover/brand:opacity-100"
             >
               <Lock className="h-3.5 w-3.5" />
             </button>
           </div>
 
-          {/* Desktop nav links */}
-          <ul className="hidden md:flex items-center gap-1" role="list">
-            {siteConfig.nav.map((item) => {
+          {/* Desktop links — flip vertically on hover, no pills */}
+          <ul className="relative z-10 hidden items-center gap-0.5 md:flex" role="list">
+            {NAV_LINKS.map((item) => {
               const id = item.href.replace("#", "");
               const isActive = activeSection === id;
-
               return (
                 <li key={item.href}>
                   <button
                     onClick={() => handleNavClick(item.href)}
-                    className={cn(
-                      "relative px-4 py-2 text-sm font-medium rounded-md transition-all duration-200",
-                      "hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                      isActive
-                        ? "text-[#2b7a78] dark:text-primary"
-                        : "text-muted-foreground hover:text-[#2b7a78] dark:hover:text-primary"
-                    )}
                     aria-current={isActive ? "page" : undefined}
-                  >
-                    {item.label}
-                    {isActive && (
-                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[#2b7a78] dark:bg-primary rounded-full" />
+                    className={cn(
+                      "group/flip cursor-pointer rounded-full py-2 pl-[0.35rem] pr-3 text-sm font-medium tracking-tight transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8DADC]/50",
+                      isActive ? "text-[#ECECF2]" : "text-[#b9b9c6] hover:text-[#ECECF2]",
                     )}
+                  >
+                    <span className="block h-[1.3em] overflow-hidden">
+                      <span className="block transition-transform duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/flip:-translate-y-1/2">
+                        <span className="block h-[1.3em] leading-[1.3em]">{item.label}</span>
+                        <span className="block h-[1.3em] leading-[1.3em] text-[#A8DADC]">{item.label}</span>
+                      </span>
+                    </span>
                   </button>
                 </li>
               );
             })}
           </ul>
 
-          {/* Right side: theme toggle + mobile menu */}
-          <div className="flex items-center gap-1">
+          {/* Right: theme toggle, Get in touch CTA (desktop), mobile menu */}
+          <div className="relative z-10 flex items-center gap-1.5">
             <ThemeToggle />
-            <MobileMenu navItems={siteConfig.nav} activeSection={activeSection} />
+            <button
+              onClick={() => handleNavClick("#contact")}
+              className="hidden h-9 cursor-pointer items-center rounded-full border border-[#8fcfd1]/60 bg-[linear-gradient(180deg,#c7ecee,#A8DADC_46%,#8ccfd1)] px-4 text-sm font-semibold text-[#06232b] shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_6px_16px_-8px_rgba(168,218,220,0.3)] transition-shadow duration-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_10px_24px_-10px_rgba(168,218,220,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8DADC] focus-visible:ring-offset-2 focus-visible:ring-offset-[#080711] md:inline-flex"
+            >
+              Get in touch
+            </button>
+            <MobileMenu navItems={NAV_LINKS} activeSection={activeSection} />
           </div>
         </nav>
       </header>
