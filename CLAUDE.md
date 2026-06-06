@@ -70,7 +70,7 @@ Use `cn()` from `src/lib/utils.ts` (re-exports `clsx` + `tailwind-merge`) for co
 
 ## Required Environment Variables
 
-See [.env.example](.env.example) for a full template.
+Set these in `.env.local` (gitignored — never commit real secrets):
 
 ```
 MONGODB_URI

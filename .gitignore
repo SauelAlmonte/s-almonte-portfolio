@@ -49,7 +49,6 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
-# .env.example IS committed (no real secrets, template only)
 
 # vercel
 .vercel
