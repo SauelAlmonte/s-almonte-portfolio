@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import gsap from "gsap";
 import { m, AnimatePresence, useReducedMotion } from "motion/react";
 import { Github, Linkedin, Mail, Youtube, ArrowDown } from "lucide-react";
 import { SocialLink, type SocialLinkItem } from "@/components/common/SocialLink";
@@ -26,32 +25,55 @@ const SOCIAL_LINKS: SocialLinkItem[] = [
   { label: "Contact", href: "#contact", icon: Mail, accent: "#A8DADC", external: false },
 ];
 
+/* Entrance choreography. The copy column is one variant parent; each line is a
+   child carrying its index as `custom`. When the parent flips to "show" (once
+   the globe settles), each line computes its own delay — front-loaded so the
+   greeting lands first, then a beat, then the name and the rest cascade. */
+const LEAD = 0.4; // beat after the first line draws the eye before the cascade
+const STAGGER = 0.22; // gap between the remaining lines — spaced out, deliberate
+// Soft spring: lower stiffness = each line takes longer to settle, so the
+// cascade reads as graceful rather than snapping into place.
+const SPRING = { type: "spring", stiffness: 150, damping: 22, mass: 0.9 } as const;
+
+// Parent only conducts: it flips the label; children own their timing.
+const copyVariants = { hidden: {}, show: {} };
+
+/* Transform + opacity only — compositor-cheap, no layout or paint thrash.
+   Spring easing so each line settles naturally instead of on a fixed clock. */
+const lineVariants = {
+  hidden: { opacity: 0, y: 22, scale: 0.985 },
+  show: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { ...SPRING, delay: i === 0 ? 0 : LEAD + (i - 1) * STAGGER },
+  }),
+};
+
+/* Reduced-motion alternative: a gentle crossfade, no transform. */
+const reducedLineVariants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { duration: 0.3 } },
+};
+
 export function Hero() {
-  const sectionRef = useRef<HTMLElement>(null);
   const [roleIndex, setRoleIndex] = useState(0);
   const [globeSettled, setGlobeSettled] = useState(false);
+  const [revealed, setRevealed] = useState(false);
   const reduceMotion = useReducedMotion();
 
-  /* Entrance — enhances already-visible content; reduced motion shows it instantly. */
+  /* Reveal the copy once the globe has settled into place, so the lines
+     cascade in after the dots land — not while they're still travelling.
+     The fallback timeout guarantees the hero never ships blank if WebGL is
+     unavailable and `onSettled` never fires; reduced motion shows it at once. */
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const items = gsap.utils.toArray<HTMLElement>("[data-hero-stagger]");
-      if (reduce) {
-        gsap.set(items, { opacity: 1, y: 0 });
-        return;
-      }
-      gsap.from(items, {
-        opacity: 0,
-        y: 24,
-        duration: 0.8,
-        ease: "power3.out",
-        stagger: 0.1,
-        delay: 0.15,
-      });
-    }, sectionRef);
-    return () => ctx.revert();
-  }, []);
+    if (reduceMotion || globeSettled) {
+      setRevealed(true);
+      return;
+    }
+    const fallback = setTimeout(() => setRevealed(true), 2800);
+    return () => clearTimeout(fallback);
+  }, [globeSettled, reduceMotion]);
 
   /* Cycle the role label. Motion handles the crossfade (respects reduced motion). */
   useEffect(() => {
@@ -59,9 +81,10 @@ export function Hero() {
     return () => clearInterval(id);
   }, []);
 
+  const lines = reduceMotion ? reducedLineVariants : lineVariants;
+
   return (
     <section
-      ref={sectionRef}
       id="home"
       aria-label="Hero"
       className="relative isolate min-h-[100svh] overflow-hidden bg-[#080711] text-[#ECECF2]"
@@ -98,24 +121,32 @@ export function Hero() {
 
       {/* Content. */}
       <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-24 sm:px-8">
-        <div className="max-w-2xl">
-          <p
-            data-hero-stagger
+        <m.div
+          className="max-w-2xl"
+          variants={copyVariants}
+          initial="hidden"
+          animate={revealed ? "show" : "hidden"}
+        >
+          <m.p
+            custom={0}
+            variants={lines}
             className="mb-3 text-[clamp(0.95rem,1.2vw,1.125rem)] font-medium tracking-tight text-[#A8DADC]"
           >
             Hi, I&apos;m Sauel <span className="text-[#8A8A98]">(Sol)</span>
-          </p>
+          </m.p>
 
-          <h1
-            data-hero-stagger
+          <m.h1
+            custom={1}
+            variants={lines}
             className="text-[clamp(2.6rem,7vw,5.75rem)] font-bold leading-[1.0] tracking-[-0.035em] text-balance text-[#F4F4F8] [text-shadow:0_2px_40px_rgba(0,0,0,0.5)]"
           >
             Sauel Almonte
-          </h1>
+          </m.h1>
 
           {/* Cycling role */}
-          <div
-            data-hero-stagger
+          <m.div
+            custom={2}
+            variants={lines}
             className="mt-3 flex min-h-[2.75rem] items-center text-[clamp(1.5rem,2.8vw,2.2rem)] font-semibold tracking-tight"
             aria-live="polite"
           >
@@ -131,21 +162,23 @@ export function Hero() {
                 {ROLES[roleIndex]}
               </m.span>
             </AnimatePresence>
-          </div>
+          </m.div>
 
-          <p
-            data-hero-stagger
+          <m.p
+            custom={3}
+            variants={lines}
             className="mt-6 max-w-[34rem] text-[clamp(1rem,1.4vw,1.2rem)] leading-[1.7] text-[#C8C8D4] text-pretty"
           >
             I build full-stack web applications and AI-powered tools. AWS
             certified, bilingual (EN/ES), based in Boston, and mentoring the next
             wave of engineers.
-          </p>
+          </m.p>
 
           {/* CTAs — 3D pills matching the social chips: domed surface, bevel,
               spring lift on hover, press-in on tap. */}
-          <div
-            data-hero-stagger
+          <m.div
+            custom={4}
+            variants={lines}
             className="mt-10 flex max-w-md items-center gap-2.5 sm:gap-3"
           >
             {/* Primary: domed cyan. */}
@@ -173,15 +206,15 @@ export function Hero() {
             >
               Get in touch
             </m.a>
-          </div>
+          </m.div>
 
           {/* Socials */}
-          <div data-hero-stagger className="mt-8 flex items-center gap-3">
+          <m.div custom={5} variants={lines} className="mt-8 flex items-center gap-3">
             {SOCIAL_LINKS.map((item) => (
               <SocialLink key={item.label} item={item} tone="dark" />
             ))}
-          </div>
-        </div>
+          </m.div>
+        </m.div>
       </div>
 
       {/* Scroll cue */}
