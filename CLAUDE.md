@@ -87,3 +87,13 @@ NEXT_PUBLIC_LINKEDIN_URL
 ```
 
 **Local Google login ends on Vercel:** In development, [`src/lib/auth/normalize-dev-auth-urls.ts`](src/lib/auth/normalize-dev-auth-urls.ts) rewires production-style `AUTH_URL` / `NEXTAUTH_URL` to `http://localhost:<PORT>` (override with `AUTH_FORCE_PRODUCTION_ORIGIN_DEV=1` for tunnels). Still add Google redirect URI `http://localhost:3000/api/auth/callback/google` (and your actual port). Set `AUTH_URL=http://localhost:PORT` explicitly if you dev on a non-default port (`4000`, etc.).
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
