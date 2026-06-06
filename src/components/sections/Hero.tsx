@@ -1,256 +1,192 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import gsap from "gsap";
+import { m, AnimatePresence, useReducedMotion } from "motion/react";
 import { Github, Linkedin, Mail, Youtube, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+// 3D globe is heavy + browser-only: lazy, client-only, out of the initial bundle.
+const GlobeCanvas = dynamic(() => import("@/components/hero/GlobeCanvas"), {
+  ssr: false,
+});
 
 const ROLES = [
   "Full-Stack Engineer",
   "AI Engineer",
-  "Mentor & Advocate",
   "Cloud Developer",
+  "Mentor & Advocate",
 ];
 
 const SOCIAL_LINKS = [
-  { label: "GitHub",   href: "https://github.com/SauelAlmonte",          icon: Github, external: true  },
-  { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte",    icon: Linkedin, external: true },
-  { label: "YouTube",  href: "https://youtube.com/@yourchannel",         icon: Youtube, external: true },
-  { label: "Contact",  href: "#contact",                                  icon: Mail,     external: false },
+  { label: "GitHub", href: "https://github.com/SauelAlmonte", icon: Github, external: true },
+  { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte", icon: Linkedin, external: true },
+  { label: "YouTube", href: "https://youtube.com/@yourchannel", icon: Youtube, external: true },
+  { label: "Contact", href: "#contact", icon: Mail, external: false },
 ];
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  const greetingRef = useRef<HTMLParagraphElement>(null);
-  const nameRef = useRef<HTMLHeadingElement>(null);
-  const roleContainerRef = useRef<HTMLDivElement>(null);
-  const roleRef = useRef<HTMLSpanElement>(null);
-  const descRef = useRef<HTMLParagraphElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
-  const socialRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [globeSettled, setGlobeSettled] = useState(false);
+  const reduceMotion = useReducedMotion();
 
-  const [, setRoleIndex] = useState(0);
-  const [displayedRole, setDisplayedRole] = useState(ROLES[0]);
-
-  /* GSAP entrance animation */
+  /* Entrance — enhances already-visible content; reduced motion shows it instantly. */
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const els = [
-        greetingRef.current, nameRef.current, roleContainerRef.current,
-        descRef.current, ctaRef.current, socialRef.current, scrollRef.current,
-      ];
-      const reduceMotion =
-        typeof window !== "undefined" &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      /* Reduced motion: reveal everything immediately, no entrance animation. */
-      if (reduceMotion) {
-        gsap.set(els, { opacity: 1, y: 0 });
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const items = gsap.utils.toArray<HTMLElement>("[data-hero-stagger]");
+      if (reduce) {
+        gsap.set(items, { opacity: 1, y: 0 });
         return;
       }
-
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      tl.fromTo(greetingRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 })
-        .fromTo(nameRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7 }, "-=0.3")
-        .fromTo(roleContainerRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3")
-        .fromTo(descRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2")
-        .fromTo(ctaRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2")
-        .fromTo(socialRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.2")
-        .fromTo(scrollRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5 }, "-=0.1");
+      gsap.from(items, {
+        opacity: 0,
+        y: 24,
+        duration: 0.8,
+        ease: "power3.out",
+        stagger: 0.1,
+        delay: 0.15,
+      });
     }, sectionRef);
-
     return () => ctx.revert();
   }, []);
 
-  /* Role cycling animation */
+  /* Cycle the role label. Motion handles the crossfade (respects reduced motion). */
   useEffect(() => {
-    const reduceMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    /* Capture the node now so cleanup kills tweens on the right element. */
-    const roleEl = roleRef.current;
-
-    const advanceRole = () =>
-      setRoleIndex((prev) => {
-        const next = (prev + 1) % ROLES.length;
-        setDisplayedRole(ROLES[next]);
-        return next;
-      });
-
-    const interval = setInterval(() => {
-      if (!roleRef.current) return;
-
-      /* Reduced motion: swap the text without the fade/slide animation. */
-      if (reduceMotion) {
-        advanceRole();
-        return;
-      }
-
-      gsap.to(roleRef.current, {
-        opacity: 0,
-        y: -10,
-        duration: 0.3,
-        ease: "power2.in",
-        onComplete: () => {
-          advanceRole();
-          gsap.fromTo(
-            roleRef.current,
-            { opacity: 0, y: 10 },
-            { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }
-          );
-        },
-      });
-    }, 2800);
-
-    return () => {
-      clearInterval(interval);
-      gsap.killTweensOf(roleEl);
-    };
+    const id = setInterval(() => setRoleIndex((i) => (i + 1) % ROLES.length), 2600);
+    return () => clearInterval(id);
   }, []);
-
-  const handleScrollDown = () => {
-    const about = document.getElementById("about");
-    if (about) about.scrollIntoView({ behavior: "smooth" });
-  };
 
   return (
     <section
       ref={sectionRef}
       id="home"
       aria-label="Hero"
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8"
+      className="relative isolate min-h-[100svh] overflow-hidden bg-[#080711] text-[#ECECF2]"
     >
-      {/* Background blobs — greenish primary tint to match section headings */}
-      <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-primary/18 blur-[120px]" />
-        <div className="absolute top-1/2 -right-40 w-[450px] h-[450px] rounded-full bg-primary/12 blur-[120px]" />
-        <div className="absolute -bottom-20 left-1/3 w-[400px] h-[400px] rounded-full bg-primary/10 blur-[100px]" />
-      </div>
+      {/* Brand glow behind the globe. It fades in only once the globe has
+          settled into place, so it never lights the landing zone ahead of the
+          travelling dots. Reduced motion shows it instantly. */}
+      <m.div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(69% 63% at 72% 42%, rgba(179,156,208,0.12), transparent 70%)," +
+            "radial-gradient(52% 52% at 78% 60%, rgba(168,218,220,0.08), transparent 72%)," +
+            "radial-gradient(46% 46% at 60% 30%, rgba(255,193,204,0.05), transparent 70%)",
+        }}
+        initial={reduceMotion ? false : { opacity: 0 }}
+        animate={{ opacity: reduceMotion || globeSettled ? 1 : 0 }}
+        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+      />
 
-      {/* Content */}
-      <div className="w-full max-w-4xl mx-auto text-center space-y-fl-y-snug">
+      {/* The dotted earth. */}
+      <GlobeCanvas onSettled={() => setGlobeSettled(true)} />
 
-        {/* Greeting */}
-        <p
-          ref={greetingRef}
-          className="inline-flex items-center gap-2 text-sm font-medium tracking-widest uppercase text-[#2b7a78] dark:text-primary opacity-0"
-        >
-          <span className="w-8 h-px bg-[#2b7a78] dark:bg-primary inline-block" />
-          HI, I&apos;M SAUEL &#40;SOL&#41;
-          <span className="w-8 h-px bg-[#2b7a78] dark:bg-primary inline-block" />
-        </p>
+      {/* Legibility scrim: darken the left/bottom where the copy sits. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#080711] via-[#080711]/82 to-transparent lg:via-[#080711]/55"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#080711] to-transparent"
+      />
 
-        {/* Name */}
-        <h1
-          ref={nameRef}
-          className="opacity-0 text-7xl font-extrabold tracking-tight leading-none lg:text-8xl"
-        >
-          <span className="text-foreground">Sauel </span>
-          <span className="text-[#2b7a78] dark:text-primary">Almonte</span>
-        </h1>
-
-        {/* Animated role */}
-        <div
-          ref={roleContainerRef}
-          className="opacity-0 h-10 flex items-center justify-center mt-2!"
-        >
-          <p className="text-2xl font-medium text-muted-foreground">
-            <span className="text-[#50406a] dark:text-accent font-semibold">
-              <span ref={roleRef}>{displayedRole}</span>
-            </span>
-            {" "}based in Boston, MA
+      {/* Content. */}
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-24 sm:px-8">
+        <div className="max-w-xl">
+          <p data-hero-stagger className="mb-4 text-sm font-medium text-[#A8DADC]">
+            Hi, I&apos;m Sauel <span className="text-[#8A8A98]">(Sol)</span>
           </p>
-        </div>
 
-        {/* Description */}
-        <p
-          ref={descRef}
-          className="opacity-0 max-w-2xl mx-auto text-lg text-muted-foreground leading-relaxed mt-2!"
-        >
-          I build <span className="text-foreground font-medium">scalable web applications</span> and{" "}
-          <span className="text-foreground font-medium">AI-powered solutions</span>&#44; from polished
-          frontends to cloud-deployed backends. Bilingual (EN/ES) and passionate about mentoring the
-          next generation of engineers.
-        </p>
-
-        {/* CTA Buttons */}
-        <div
-          ref={ctaRef}
-          className="opacity-0 flex flex-col sm:flex-row gap-4 items-center justify-center pt-2"
-        >
-          <Button
-            type="button"
-            size="lg"
-            className="w-full sm:w-auto bg-[#2b7a78] dark:bg-primary text-primary-foreground hover:bg-[#236663] dark:hover:bg-primary/90 font-semibold px-8 rounded-full shadow-lg shadow-[#2b7a78]/25 dark:shadow-primary/25 transition-all duration-200 hover:shadow-[#2b7a78]/40 dark:hover:shadow-primary/40 hover:scale-105"
-            aria-label="Scroll to Skills and Projects"
-            onClick={() => {
-              document.getElementById("skills")?.scrollIntoView({ behavior: "smooth" });
-            }}
+          <h1
+            data-hero-stagger
+            className="text-5xl font-semibold leading-[1.04] tracking-tight text-balance sm:text-6xl"
           >
-            View My Work
-            <ArrowDown className="ml-2 h-4 w-4" aria-hidden />
-          </Button>
+            Sauel Almonte
+          </h1>
 
-          <Button
-            variant="outline"
-            size="lg"
-            className="w-full sm:w-auto rounded-full px-8 border-border hover:border-[#2b7a78] dark:hover:border-primary hover:text-[#2b7a78] dark:hover:text-primary font-semibold transition-all duration-200 hover:scale-105"
-            onClick={() => {
-              document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-            }}
+          {/* Cycling role */}
+          <div
+            data-hero-stagger
+            className="mt-4 flex h-9 items-center text-xl font-medium sm:text-2xl"
+            aria-live="polite"
           >
-            Get In Touch
-          </Button>
-        </div>
+            <AnimatePresence mode="wait">
+              <m.span
+                key={roleIndex}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+                className="text-[#A8DADC]"
+              >
+                {ROLES[roleIndex]}
+              </m.span>
+            </AnimatePresence>
+          </div>
 
-        {/* Social Links */}
-        <div
-          ref={socialRef}
-          className="opacity-0 flex items-center justify-center gap-4 pt-2"
-        >
-          {SOCIAL_LINKS.map(({ label, href, icon: Icon, external }) =>
-            external ? (
+          <p
+            data-hero-stagger
+            className="mt-6 max-w-md text-base leading-relaxed text-[#C4C4D0] text-pretty"
+          >
+            I build full-stack web applications and AI-powered tools. AWS
+            certified, bilingual (EN/ES), based in Boston, and mentoring the next
+            wave of engineers.
+          </p>
+
+          {/* CTAs */}
+          <div data-hero-stagger className="mt-8 flex flex-wrap items-center gap-3">
+            <Button
+              asChild
+              size="lg"
+              className="rounded-full bg-[#A8DADC] px-7 text-[#0b0b14] shadow-lg shadow-[#A8DADC]/20 transition-transform hover:bg-[#bce6e8] hover:scale-[1.03]"
+            >
+              <a href="#experience">
+                View my work
+                <ArrowDown className="ml-1 h-4 w-4" aria-hidden />
+              </a>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="rounded-full border-white/20 bg-white/5 px-7 text-[#ECECF2] transition-colors hover:bg-white/10 hover:text-white"
+            >
+              <a href="#contact">Get in touch</a>
+            </Button>
+          </div>
+
+          {/* Socials */}
+          <div data-hero-stagger className="mt-8 flex items-center gap-2">
+            {SOCIAL_LINKS.map(({ label, href, icon: Icon, external }) => (
               <a
                 key={label}
                 href={href}
-                target="_blank"
-                rel="noopener noreferrer"
                 aria-label={label}
-                className="p-2.5 rounded-full border border-foreground/25 dark:border-border shadow-sm shadow-foreground/10 text-[#2b7a78] dark:text-muted-foreground hover:text-[#2b7a78] dark:hover:text-primary hover:border-[#2b7a78] dark:hover:border-primary hover:bg-[#2b7a78]/10 dark:hover:bg-primary/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-110"
+                {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[#C4C4D0] transition-colors hover:border-[#A8DADC]/50 hover:text-[#A8DADC]"
               >
-                <Icon className="h-5 w-5" />
+                <Icon className="h-[18px] w-[18px]" aria-hidden />
               </a>
-            ) : (
-              <button
-                key={label}
-                onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
-                aria-label={label}
-                className="p-2.5 rounded-full border border-foreground/25 dark:border-border shadow-sm shadow-foreground/10 text-[#2b7a78] dark:text-muted-foreground hover:text-[#2b7a78] dark:hover:text-primary hover:border-[#2b7a78] dark:hover:border-primary hover:bg-[#2b7a78]/10 dark:hover:bg-primary/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-110"
-              >
-                <Icon className="h-5 w-5" />
-              </button>
-            )
-          )}
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div
-        ref={scrollRef}
-        className="opacity-0 absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+      {/* Scroll cue */}
+      <a
+        href="#about"
+        aria-label="Scroll to about"
+        className="absolute inset-x-0 bottom-6 z-10 mx-auto flex w-fit flex-col items-center gap-1 text-[#8A8A98] transition-colors hover:text-[#A8DADC]"
       >
-        <button
-          onClick={handleScrollDown}
-          aria-label="Scroll to about section"
-          className="flex flex-col items-center gap-2 text-muted-foreground hover:text-[#2b7a78] dark:hover:text-primary transition-colors group"
-        >
-          <span className="text-xs tracking-widest uppercase font-medium">Scroll</span>
-          <div className="w-px h-8 bg-linear-to-b from-[#2b7a78] to-transparent dark:from-primary group-hover:h-12 transition-all duration-300" />
-          <ArrowDown className="h-4 w-4 animate-bounce" />
-        </button>
-      </div>
+        <span className="text-xs tracking-wide">Scroll</span>
+        <ArrowDown className="h-4 w-4 animate-bounce" aria-hidden />
+      </a>
     </section>
   );
 }
