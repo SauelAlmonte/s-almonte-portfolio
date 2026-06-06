@@ -65,3 +65,6 @@ next-env.d.ts
 
 # graphify — generated knowledge graph output, not for repo
 /graphify-out/
+
+# local reference docs (external, regenerable — not committed)
+/reference/
