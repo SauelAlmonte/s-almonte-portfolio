@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { m, AnimatePresence, useReducedMotion } from "motion/react";
 import { Github, Linkedin, Mail, Youtube, ArrowDown } from "lucide-react";
 import { SocialLink, type SocialLinkItem } from "@/components/common/SocialLink";
+import { markHeroSettled } from "@/lib/heroSettle";
 
 // 3D globe is heavy + browser-only: lazy, client-only, out of the initial bundle.
 const GlobeCanvas = dynamic(() => import("@/components/hero/GlobeCanvas"), {
@@ -67,9 +68,15 @@ export function Hero() {
      The fallback timeout guarantees the hero never ships blank if WebGL is
      unavailable and `onSettled` never fires; reduced motion shows it at once. */
   useEffect(() => {
-    if (reduceMotion || globeSettled) {
+    if (reduceMotion) {
       setRevealed(true);
       return;
+    }
+    if (globeSettled) {
+      // Hold a short beat after the globe lands so the navbar glides in first,
+      // then the copy cascades right behind it.
+      const t = setTimeout(() => setRevealed(true), 400);
+      return () => clearTimeout(t);
     }
     const fallback = setTimeout(() => setRevealed(true), 2800);
     return () => clearTimeout(fallback);
@@ -107,7 +114,12 @@ export function Hero() {
       />
 
       {/* The dotted earth. */}
-      <GlobeCanvas onSettled={() => setGlobeSettled(true)} />
+      <GlobeCanvas
+        onSettled={() => {
+          setGlobeSettled(true);
+          markHeroSettled(); // let the global navbar glide in after the globe lands
+        }}
+      />
 
       {/* Legibility scrim: darken the left/bottom where the copy sits. */}
       <div

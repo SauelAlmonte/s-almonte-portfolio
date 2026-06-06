@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { Lock } from "lucide-react";
@@ -8,8 +8,14 @@ import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 import { useScrolled } from "@/hooks/useScrolled";
 import { useActiveSection } from "@/hooks/useActiveSection";
+import { onHeroSettled } from "@/lib/heroSettle";
 import { ThemeToggle } from "./ThemeToggle";
 import { MobileMenu } from "./MobileMenu";
+
+// Run the entrance setup before paint so the header never flashes in before
+// the globe-gated reveal; falls back to useEffect during SSR (no window).
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const SECTION_IDS = siteConfig.nav.map((item) => item.href.replace("#", ""));
 
@@ -19,25 +25,51 @@ export function Navbar() {
   const scrolled = useScrolled();
   const activeSection = useActiveSection(SECTION_IDS);
 
-  useEffect(() => {
-    if (!navRef.current) return;
-    const ctx = gsap.context(() => {
-      const reduceMotion =
-        typeof window !== "undefined" &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* Entrance. On the home hero at tablet+, the header holds until the globe
+     settles, then glides down as one unit on a smooth ease. Mobile, or any page
+     without the globe, reveals it right away; reduced motion shows it instantly.
+     The hidden state is set in a layout effect so it never flashes in during
+     the wait. */
+  useIsoLayoutEffect(() => {
+    const node = navRef.current;
+    if (!node) return;
 
-      if (reduceMotion) {
-        gsap.set(navRef.current, { y: 0, opacity: 1 });
-        return;
-      }
-      gsap.fromTo(
-        navRef.current,
-        { y: -80, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: 0.2 },
-      );
-    }, navRef);
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      gsap.set(node, { yPercent: 0, opacity: 1 });
+      return;
+    }
 
-    return () => ctx.revert();
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+    const isHome = window.location.pathname === "/";
+
+    gsap.set(node, { yPercent: -100, opacity: 0 });
+
+    let played = false;
+    const reveal = () => {
+      if (played) return;
+      played = true;
+      gsap.to(node, {
+        yPercent: 0,
+        opacity: 1,
+        duration: 0.85,
+        ease: "power2.inOut",
+        overwrite: "auto",
+      });
+    };
+
+    if (isHome && isDesktop) {
+      const off = onHeroSettled(reveal); // fires immediately if already settled
+      const fallback = window.setTimeout(reveal, 3200); // safety if settle never fires
+      return () => {
+        off();
+        clearTimeout(fallback);
+        gsap.killTweensOf(node);
+      };
+    }
+
+    reveal();
+    return () => gsap.killTweensOf(node);
   }, []);
 
   const handleNavClick = (href: string) => {
