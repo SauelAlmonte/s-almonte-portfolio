@@ -127,7 +127,7 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
                 whileTap={{ scale: 0.99 }}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "group flex w-full items-center gap-4 border-b border-white/[0.07] py-[18px] text-left transition-colors duration-200 last:border-b-0",
+                  "group flex w-full cursor-pointer items-center gap-4 border-b border-white/[0.07] py-[18px] text-left transition-colors duration-200 last:border-b-0",
                   isActive ? "text-[#A8DADC]" : "text-[#E6E6EE]",
                 )}
               >

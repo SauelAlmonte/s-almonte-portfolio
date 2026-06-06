@@ -68,18 +68,14 @@ export function Hero() {
      The fallback timeout guarantees the hero never ships blank if WebGL is
      unavailable and `onSettled` never fires; reduced motion shows it at once. */
   useEffect(() => {
-    if (reduceMotion) {
-      setRevealed(true);
-      return;
-    }
-    if (globeSettled) {
-      // Hold a short beat after the globe lands so the navbar glides in first,
-      // then the copy cascades right behind it.
-      const t = setTimeout(() => setRevealed(true), 400);
-      return () => clearTimeout(t);
-    }
-    const fallback = setTimeout(() => setRevealed(true), 2800);
-    return () => clearTimeout(fallback);
+    // Reduced motion reveals at once; once the globe settles, hold a short beat
+    // so the navbar glides in first and the copy cascades right behind it;
+    // otherwise a safety fallback so the hero never ships blank. Driving it
+    // through a timeout keeps setState out of the effect body (no cascading
+    // render warning).
+    const delay = reduceMotion ? 0 : globeSettled ? 400 : 2800;
+    const t = setTimeout(() => setRevealed(true), delay);
+    return () => clearTimeout(t);
   }, [globeSettled, reduceMotion]);
 
   /* Cycle the role label. Motion handles the crossfade (respects reduced motion). */
@@ -227,7 +223,7 @@ export function Hero() {
       <a
         href="#about"
         aria-label="Scroll to about"
-        className="absolute inset-x-0 bottom-6 z-10 mx-auto flex w-fit flex-col items-center gap-1 text-[#8A8A98] transition-colors hover:text-[#A8DADC]"
+        className="absolute inset-x-0 bottom-6 z-10 mx-auto flex w-fit cursor-pointer flex-col items-center gap-1 text-[#8A8A98] transition-colors hover:text-[#A8DADC]"
       >
         <span className="text-xs tracking-wide">Scroll</span>
         <ArrowDown className="h-4 w-4 animate-bounce" aria-hidden />
