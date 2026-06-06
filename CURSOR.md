@@ -49,11 +49,11 @@ No automated test runner is wired up yet; verify behaviour in the browser after 
 
 ## Environment
 
-Copy [.env.example](.env.example) to `.env.local` and fill values.
+Create `.env.local` and fill the values listed in [`CLAUDE.md`](CLAUDE.md#required-environment-variables). Never commit real secrets.
 
 Important for Google admin login locally:
 
-- `AUTH_URL` / `NEXTAUTH_URL` must not point at production when you expect localhost (or rely on dev normaliser + `.env.example` docs).
+- `AUTH_URL` / `NEXTAUTH_URL` must not point at production when you expect localhost (or rely on the dev normaliser).
 - Google OAuth client needs redirect URI `http://localhost:<port>/api/auth/callback/google` (and prod URL where deployed).
 
 Secrets must not ship in `NEXT_PUBLIC_*`.
@@ -73,4 +73,3 @@ Secrets must not ship in `NEXT_PUBLIC_*`.
 
 - [`README.md`](README.md) — public repo overview  
 - [`CLAUDE.md`](CLAUDE.md) — architecture and env cheat sheet  
-- [`.env.example`](.env.example) — env template with auth/dev notes  
