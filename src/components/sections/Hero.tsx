@@ -147,7 +147,7 @@ export function Hero() {
           <m.div
             custom={2}
             variants={lines}
-            className="mt-3 flex min-h-[2.75rem] items-center text-[clamp(1.5rem,2.8vw,2.2rem)] font-semibold tracking-tight"
+            className="mt-2 flex min-h-[2.75rem] items-center text-[clamp(1.5rem,2.8vw,2.2rem)] font-semibold tracking-tight"
             aria-live="polite"
           >
             <AnimatePresence mode="wait">
@@ -167,7 +167,7 @@ export function Hero() {
           <m.p
             custom={3}
             variants={lines}
-            className="mt-6 max-w-[34rem] text-[clamp(1rem,1.4vw,1.2rem)] leading-[1.7] text-[#C8C8D4] text-pretty"
+            className="mt-4 max-w-[34rem] text-[clamp(1rem,1.4vw,1.2rem)] leading-[1.5] text-[#C8C8D4] text-pretty"
           >
             I build full-stack web applications and AI-powered tools. AWS
             certified, bilingual (EN/ES), based in Boston, and mentoring the next
@@ -179,7 +179,7 @@ export function Hero() {
           <m.div
             custom={4}
             variants={lines}
-            className="mt-10 flex max-w-md items-center gap-2.5 sm:gap-3"
+            className="mt-6 flex max-w-md items-center gap-2.5 sm:gap-3"
           >
             {/* Primary: domed cyan. */}
             <m.a
