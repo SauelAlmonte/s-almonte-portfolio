@@ -35,6 +35,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SectionHeading } from "@/components/common/SectionHeading";
+import { SocialLink, type SocialLinkItem } from "@/components/common/SocialLink";
 import { cn } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -53,10 +54,10 @@ const ContactSchema = z.object({
 
 type ContactFormData = z.infer<typeof ContactSchema>;
 
-const SOCIALS = [
-  { label: "GitHub",   href: "https://github.com/SauelAlmonte",       icon: Github   },
-  { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte", icon: Linkedin },
-  { label: "YouTube",  href: "https://youtube.com/@yourchannel",      icon: Youtube  },
+const SOCIALS: SocialLinkItem[] = [
+  { label: "GitHub",   href: "https://github.com/SauelAlmonte",       icon: Github,   accent: "#A8DADC" },
+  { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte", icon: Linkedin, accent: "#B39CD0" },
+  { label: "YouTube",  href: "https://youtube.com/@yourchannel",      icon: Youtube,  accent: "#FFC1CC" },
 ];
 
 type ModalState = "idle" | "consent" | "success";
@@ -202,17 +203,8 @@ export function Contact() {
                   Connect with me
                 </p>
                 <div className="flex items-center gap-3">
-                  {SOCIALS.map(({ label, href, icon: Icon }) => (
-                    <a
-                      key={label}
-                      href={href}
-                      target={href.startsWith("mailto") ? undefined : "_blank"}
-                      rel="noopener noreferrer"
-                      aria-label={label}
-                      className="w-11 h-11 rounded-full border border-foreground/25 dark:border-border bg-card shadow-sm shadow-foreground/10 flex items-center justify-center text-[#2b7a78] dark:text-muted-foreground hover:text-[#2b7a78] dark:hover:text-primary hover:border-[#2b7a78] dark:hover:border-primary hover:bg-[#2b7a78]/10 dark:hover:bg-primary/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-110"
-                    >
-                      <Icon className="h-5 w-5" />
-                    </a>
+                  {SOCIALS.map((item) => (
+                    <SocialLink key={item.label} item={item} tone="surface" size={44} />
                   ))}
                 </div>
               </div>
