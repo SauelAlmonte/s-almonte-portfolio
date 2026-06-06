@@ -63,3 +63,6 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# graphify — generated knowledge graph output, not for repo
+/graphify-out/
