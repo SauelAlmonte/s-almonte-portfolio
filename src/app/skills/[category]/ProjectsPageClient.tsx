@@ -3,13 +3,13 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
-import { ArrowLeft, Code2, BrainCircuit, Cloud } from "lucide-react";
+import { ArrowLeft, Code2, BrainCircuit, Cloud, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProjectCard } from "@/components/common/ProjectCard";
 import { cn } from "@/lib/utils";
 import { CATEGORY_META, type ProjectCategory, type ProjectData } from "@/config/projects";
 
-const CATEGORY_ICONS: Record<ProjectCategory, React.ElementType> = {
+const CATEGORY_ICONS: Record<ProjectCategory, LucideIcon> = {
   fullstack: Code2,
   backend: BrainCircuit,
   cloud: Cloud,

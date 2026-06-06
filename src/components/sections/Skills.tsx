@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowUpRight, Code2, BrainCircuit, Cloud } from "lucide-react";
+import { ArrowUpRight, Code2, BrainCircuit, Cloud, type LucideIcon } from "lucide-react";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { cn } from "@/lib/utils";
 import { CATEGORY_META, type ProjectCategory } from "@/config/projects";
@@ -26,7 +26,7 @@ interface Skill {
 
 interface SkillCard {
   category: ProjectCategory;
-  icon: React.ElementType;
+  icon: LucideIcon;
   title: string;
   subtitle: string;
   accent: string;
