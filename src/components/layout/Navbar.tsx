@@ -6,30 +6,30 @@ import gsap from "gsap";
 import { Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
-import { useScrolled } from "@/hooks/useScrolled";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { onHeroSettled } from "@/lib/heroSettle";
 import { ThemeToggle } from "./ThemeToggle";
 import { MobileMenu } from "./MobileMenu";
 
-// Run the entrance setup before paint so the header never flashes in before
-// the globe-gated reveal; falls back to useEffect during SSR (no window).
+const SECTION_IDS = siteConfig.nav.map((item) => item.href.replace("#", ""));
+// Desktop links drop "Contact" — the "Get in touch" CTA is the single path there.
+const NAV_LINKS = siteConfig.nav.filter((item) => item.href !== "#contact");
+
+// Run entrance setup before paint so the header never flashes in before the
+// globe-gated reveal; falls back to useEffect during SSR (no window).
 const useIsoLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
-
-const SECTION_IDS = siteConfig.nav.map((item) => item.href.replace("#", ""));
 
 export function Navbar() {
   const navRef = useRef<HTMLElement>(null);
   const router = useRouter();
-  const scrolled = useScrolled();
   const activeSection = useActiveSection(SECTION_IDS);
 
-  /* Entrance. On the home hero at tablet+, the header holds until the globe
-     settles, then glides down as one unit on a smooth ease. Mobile, or any page
-     without the globe, reveals it right away; reduced motion shows it instantly.
-     The hidden state is set in a layout effect so it never flashes in during
-     the wait. */
+  /* Entrance. On the home hero (every size) the header holds until the globe
+     settles, then glides down as one unit on a smooth ease — landing right after
+     the dots and just before the copy cascades. Other pages (no globe) reveal it
+     right away; reduced motion shows it instantly. The hidden state is set in a
+     layout effect so it never flashes in during the wait. */
   useIsoLayoutEffect(() => {
     const node = navRef.current;
     if (!node) return;
@@ -40,7 +40,6 @@ export function Navbar() {
       return;
     }
 
-    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
     const isHome = window.location.pathname === "/";
 
     gsap.set(node, { yPercent: -100, opacity: 0 });
@@ -58,7 +57,7 @@ export function Navbar() {
       });
     };
 
-    if (isHome && isDesktop) {
+    if (isHome) {
       const off = onHeroSettled(reveal); // fires immediately if already settled
       const fallback = window.setTimeout(reveal, 3200); // safety if settle never fires
       return () => {
@@ -73,8 +72,7 @@ export function Navbar() {
   }, []);
 
   const handleNavClick = (href: string) => {
-    const id = href.replace("#", "");
-    const el = document.getElementById(id);
+    const el = document.getElementById(href.replace("#", ""));
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -87,80 +85,75 @@ export function Navbar() {
         Skip to content
       </a>
 
-      <header
-        ref={navRef}
-        className={cn(
-          "fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300",
-          scrolled
-            ? "border-white/10 bg-[#080711]/80 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] backdrop-blur-xl"
-            : "border-transparent bg-transparent",
-        )}
-      >
+      <header ref={navRef} className="fixed inset-x-0 top-3 z-50 px-4 sm:top-4">
         <nav
           aria-label="Main navigation"
-          className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8"
+          className="nav-pill relative isolate mx-auto flex w-full items-center justify-between gap-2 rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.015)),rgba(12,11,22,0.55)] px-3 py-2.5 shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.14),inset_0_-1px_1px_rgba(0,0,0,0.5),0_20px_50px_-24px_rgba(0,0,0,0.9)] backdrop-blur-xl md:w-fit"
         >
-          {/* Logo: 3D monogram chip */}
-          <div className="flex items-center gap-2">
+          {/* grain texture on the glass */}
+          <span aria-hidden className="nav-grain" />
+
+          {/* Brand: real 3D monogram chip + hover-revealed admin lock */}
+          <div className="group/brand relative z-10 flex items-center gap-1">
             <button
               onClick={() => handleNavClick("#home")}
               aria-label="Go to top"
-              className="group/logo flex cursor-pointer items-center gap-2.5 focus:outline-none"
+              className="group/logo flex cursor-pointer items-center focus:outline-none"
             >
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/12 bg-[linear-gradient(160deg,rgba(255,255,255,0.10),rgba(255,255,255,0.02)_55%,rgba(0,0,0,0.25))] text-sm font-bold tracking-tight shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.22),0_4px_12px_-4px_rgba(0,0,0,0.7)] transition-transform duration-300 group-hover/logo:-translate-y-0.5">
-                <span className="text-[#A8DADC]">S</span>
-                <span className="text-[#ECECF2]">A</span>
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/12 bg-[linear-gradient(160deg,rgba(255,255,255,0.12),rgba(255,255,255,0.02))] text-sm font-bold text-[#A8DADC] shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.22),0_4px_12px_-4px_rgba(0,0,0,0.7)] transition-transform duration-300 group-hover/logo:-translate-y-0.5">
+                {/* ink-centered SA (caps sit high in the line box) */}
+                <span className="block leading-none [text-indent:0.5px] [transform:translateY(-0.01em)]">SA</span>
               </span>
             </button>
 
-            {/* Secret admin entry — only visible on hover/focus */}
+            {/* Secret admin entry — reveals on brand hover/focus, action unchanged */}
             <button
               onClick={() => router.push("/admin/login")}
               aria-label="Admin login"
               title="Admin"
-              className="cursor-pointer rounded-md p-1 text-[#6f6f80] opacity-0 transition-opacity duration-200 hover:bg-white/5 hover:text-[#A8DADC] hover:opacity-100 focus:opacity-100"
+              className="cursor-pointer rounded-md p-1 text-[#6f6f80] opacity-0 transition-all duration-200 hover:bg-white/5 hover:text-[#A8DADC] focus:opacity-100 group-hover/brand:opacity-100"
             >
               <Lock className="h-3.5 w-3.5" />
             </button>
           </div>
 
-          {/* Desktop nav links */}
-          <ul className="hidden items-center gap-0.5 md:flex" role="list">
-            {siteConfig.nav.map((item) => {
+          {/* Desktop links — flip vertically on hover, no pills */}
+          <ul className="relative z-10 hidden items-center gap-0.5 md:flex" role="list">
+            {NAV_LINKS.map((item) => {
               const id = item.href.replace("#", "");
               const isActive = activeSection === id;
-
               return (
                 <li key={item.href}>
                   <button
                     onClick={() => handleNavClick(item.href)}
                     aria-current={isActive ? "page" : undefined}
                     className={cn(
-                      "group/nav relative cursor-pointer rounded-full px-3.5 py-2 text-sm font-medium tracking-tight transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8DADC]/60",
-                      isActive ? "text-[#A8DADC]" : "text-[#9b9baa] hover:text-[#ECECF2]",
+                      "group/flip cursor-pointer rounded-full py-2 pl-[0.35rem] pr-3 text-sm font-medium tracking-tight transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8DADC]/50",
+                      isActive ? "text-[#ECECF2]" : "text-[#b9b9c6] hover:text-[#ECECF2]",
                     )}
                   >
-                    {item.label}
-                    {/* animated underline: grows from centre on hover, full when active */}
-                    <span
-                      aria-hidden
-                      className={cn(
-                        "pointer-events-none absolute inset-x-3.5 bottom-1 h-px origin-center rounded-full transition-transform duration-300 ease-out",
-                        isActive
-                          ? "scale-x-100 bg-[#A8DADC]"
-                          : "scale-x-0 bg-[#ECECF2]/40 group-hover/nav:scale-x-100",
-                      )}
-                    />
+                    <span className="block h-[1.3em] overflow-hidden">
+                      <span className="block transition-transform duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/flip:-translate-y-1/2">
+                        <span className="block h-[1.3em] leading-[1.3em]">{item.label}</span>
+                        <span className="block h-[1.3em] leading-[1.3em] text-[#A8DADC]">{item.label}</span>
+                      </span>
+                    </span>
                   </button>
                 </li>
               );
             })}
           </ul>
 
-          {/* Right side: theme toggle + mobile menu */}
-          <div className="flex items-center gap-1.5">
+          {/* Right: theme toggle, Get in touch CTA (desktop), mobile menu */}
+          <div className="relative z-10 flex items-center gap-1.5">
             <ThemeToggle />
-            <MobileMenu navItems={siteConfig.nav} activeSection={activeSection} />
+            <button
+              onClick={() => handleNavClick("#contact")}
+              className="hidden h-9 cursor-pointer items-center rounded-full border border-[#8fcfd1]/60 bg-[linear-gradient(180deg,#c7ecee,#A8DADC_46%,#8ccfd1)] px-4 text-sm font-semibold text-[#06232b] shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_6px_16px_-8px_rgba(168,218,220,0.3)] transition-shadow duration-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_10px_24px_-10px_rgba(168,218,220,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8DADC] focus-visible:ring-offset-2 focus-visible:ring-offset-[#080711] md:inline-flex"
+            >
+              Get in touch
+            </button>
+            <MobileMenu navItems={NAV_LINKS} activeSection={activeSection} />
           </div>
         </nav>
       </header>
