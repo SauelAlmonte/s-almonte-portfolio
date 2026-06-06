@@ -1,7 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X, ChevronRight, Github, Linkedin, Youtube } from "lucide-react";
+import {
+  Menu,
+  X,
+  ChevronRight,
+  Home,
+  User,
+  Briefcase,
+  Layers,
+  Mail,
+  Github,
+  Linkedin,
+  Youtube,
+  type LucideIcon,
+} from "lucide-react";
 import { m } from "motion/react";
 import {
   Sheet,
@@ -18,6 +31,15 @@ interface MobileMenuProps {
   activeSection: string;
 }
 
+// One line icon per section, keyed by anchor.
+const NAV_ICONS: Record<string, LucideIcon> = {
+  "#home": Home,
+  "#about": User,
+  "#experience": Briefcase,
+  "#skills": Layers,
+  "#contact": Mail,
+};
+
 const SOCIALS: SocialLinkItem[] = [
   { label: "GitHub", href: "https://github.com/SauelAlmonte", icon: Github, accent: "#A8DADC" },
   { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte", icon: Linkedin, accent: "#B39CD0" },
@@ -27,11 +49,11 @@ const SOCIALS: SocialLinkItem[] = [
 const EASE = [0.16, 1, 0.3, 1] as const;
 const listVariants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.07, delayChildren: 0.16 } },
+  show: { transition: { staggerChildren: 0.06, delayChildren: 0.14 } },
 };
 const itemVariants = {
-  hidden: { opacity: 0, x: 20 },
-  show: { opacity: 1, x: 0, transition: { duration: 0.45, ease: EASE } },
+  hidden: { opacity: 0, x: 22 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.5, ease: EASE } },
 };
 
 export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
@@ -54,31 +76,30 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
         </button>
       </SheetTrigger>
 
+      {/* Glass panel: translucent + heavy blur so the hero reads through it. */}
       <SheetContent
         side="right"
         showCloseButton={false}
-        className="flex w-[88vw] max-w-[22rem] flex-col gap-0 overflow-hidden border-l border-white/10 bg-[#080711]/95 p-0 text-[#ECECF2] backdrop-blur-xl sm:max-w-[22rem]"
+        className="flex w-[86vw] max-w-[21rem] flex-col gap-0 overflow-hidden border-l border-white/10 bg-[#080711]/45 p-0 text-[#ECECF2] shadow-[-24px_0_60px_-30px_rgba(0,0,0,0.9)] backdrop-blur-2xl sm:max-w-[21rem]"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
-        {/* faint top-corner accent (restrained, no heavy glow) */}
+        {/* top sheen + faint corner accent (the only glow, kept restrained) */}
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-10 -top-16 h-44 w-44 rounded-full"
+          className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full"
           style={{ background: "radial-gradient(circle, rgba(168,218,220,0.10), transparent 70%)" }}
         />
 
-        {/* Header */}
+        {/* Minimal header — just a close affordance, like the reference's clean top. */}
         <m.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: EASE }}
-          className="flex items-center justify-between px-5 pt-5"
+          className="flex items-center justify-between px-6 pt-6"
         >
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/12 bg-[linear-gradient(160deg,rgba(255,255,255,0.10),rgba(255,255,255,0.02)_55%,rgba(0,0,0,0.25))] text-sm font-bold tracking-tight shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.22),0_4px_12px_-4px_rgba(0,0,0,0.7)]">
-            <span className="text-[#A8DADC]">S</span>
-            <span className="text-[#ECECF2]">A</span>
-          </span>
+          <span className="text-xs font-medium uppercase tracking-[0.22em] text-[#7e7e8c]">Menu</span>
           <button
             onClick={() => setOpen(false)}
             aria-label="Close navigation menu"
@@ -88,37 +109,46 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
           </button>
         </m.div>
 
-        {/* Nav links — large, techy, staggered */}
+        {/* Nav list — icon + label rows, generous spacing, hairline dividers. */}
         <m.nav
           variants={listVariants}
           initial="hidden"
           animate="show"
           aria-label="Mobile navigation"
-          className="mt-10 flex flex-1 flex-col gap-1.5 px-4"
+          className="mt-6 flex flex-1 flex-col px-6"
         >
           {navItems.map((item) => {
             const isActive = activeSection === item.href.replace("#", "");
+            const Icon = NAV_ICONS[item.href] ?? ChevronRight;
             return (
               <m.button
                 key={item.href}
                 variants={itemVariants}
                 onClick={() => go(item.href)}
-                whileTap={{ scale: 0.98 }}
+                whileTap={{ scale: 0.99 }}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "group flex cursor-pointer items-center justify-between rounded-xl border px-4 py-3 text-left text-[clamp(1rem,3.8vw,1.15rem)] font-medium tracking-tight transition-colors duration-200",
-                  isActive
-                    ? "border-white/10 bg-[linear-gradient(160deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02)_55%,rgba(0,0,0,0.2))] text-[#A8DADC] shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.14)]"
-                    : "border-transparent text-[#b6b6c2] hover:bg-white/[0.04] hover:text-[#ECECF2]",
+                  "group flex w-full items-center gap-4 border-b border-white/[0.07] py-[18px] text-left transition-colors duration-200 last:border-b-0",
+                  isActive ? "text-[#A8DADC]" : "text-[#E6E6EE]",
                 )}
               >
-                {item.label}
+                <Icon
+                  className={cn(
+                    "h-[26px] w-[26px] shrink-0 transition-colors duration-200",
+                    isActive ? "text-[#A8DADC]" : "text-[#9ea0ad] group-hover:text-[#ECECF2]",
+                  )}
+                  strokeWidth={1.75}
+                  aria-hidden
+                />
+                <span className="text-[clamp(1.05rem,4.4vw,1.2rem)] font-medium tracking-tight">
+                  {item.label}
+                </span>
                 <ChevronRight
                   className={cn(
-                    "h-4 w-4 shrink-0 transition-all duration-200",
+                    "ml-auto h-4 w-4 shrink-0 transition-all duration-200",
                     isActive
                       ? "translate-x-0 text-[#A8DADC] opacity-100"
-                      : "-translate-x-1.5 opacity-0 group-hover:translate-x-0 group-hover:opacity-60",
+                      : "-translate-x-1.5 opacity-0 group-hover:translate-x-0 group-hover:opacity-50",
                   )}
                   aria-hidden
                 />
@@ -127,12 +157,12 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
           })}
         </m.nav>
 
-        {/* Footer: socials + CTA */}
+        {/* Footer: socials + CTA, sitting on the glass. */}
         <m.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: EASE, delay: 0.45 }}
-          className="mt-auto border-t border-white/10 px-5 pb-7 pt-5"
+          transition={{ duration: 0.5, ease: EASE, delay: 0.4 }}
+          className="mt-auto border-t border-white/10 px-6 pb-7 pt-5"
         >
           <p className="text-xs font-medium tracking-wide text-[#7e7e8c]">Connect</p>
           <div className="mt-3 flex items-center gap-2.5">
