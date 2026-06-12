@@ -22,9 +22,9 @@ type PortraitCardProps = {
  * Pointer-reactive 3D portrait. Motion owns everything here (entrance +
  * tilt are component-state, not scroll-driven); the GSAP scroll parallax
  * lives on a wrapper div in About so the two libraries never share an
- * element. Depth comes from a real CSS perspective: the card rotates in
- * 3D and the badges sit at +z, so they parallax against the photo as it
- * tilts.
+ * element. Depth comes from a real CSS perspective on the card rotation;
+ * the badges parallax against the photo via a pointer-driven 2D shift
+ * (not translateZ — see the badgeX/badgeY note below).
  */
 export function PortraitCard({ reduceMotion }: PortraitCardProps) {
   /* (pointer: fine) never changes mid-session; lazy init avoids a
@@ -44,6 +44,14 @@ export function PortraitCard({ reduceMotion }: PortraitCardProps) {
   const sy = useSpring(my, { stiffness: 160, damping: 20 });
   const rotateX = useTransform(sy, [-0.5, 0.5], [9, -9]);
   const rotateY = useTransform(sx, [-0.5, 0.5], [-11, 11]);
+
+  /* Badge "depth" is faked with a pointer-driven x/y shift instead of a
+     real translateZ: a static z-offset under perspective makes the
+     browser upscale the badge's raster (~4%), which keeps the mono text
+     permanently blurry until a re-raster (hover) happens. A 2D shift
+     keeps text crisp at rest and still parallaxes against the photo. */
+  const badgeX = useTransform(sx, [-0.5, 0.5], [-10, 10]);
+  const badgeY = useTransform(sy, [-0.5, 0.5], [-8, 8]);
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!tiltEnabled) return;
@@ -121,10 +129,10 @@ export function PortraitCard({ reduceMotion }: PortraitCardProps) {
             />
           </div>
 
-          {/* Floating badges — static +z offset lives on the wrapper;
-              Motion animates the inner element, so the two transforms
-              never fight over one node. */}
-          <div className="absolute -right-4 -bottom-4 transform-3d translate-z-12">
+          {/* Floating badges — the pointer-parallax shift lives on the
+              wrapper; Motion animates the inner element, so the two
+              transforms never fight over one node. */}
+          <m.div style={{ x: badgeX, y: badgeY }} className="absolute -right-4 -bottom-4">
             <m.div
               variants={badge(0.85)}
               className="flex items-center gap-2 rounded-full border border-primary/25 bg-stage/70 px-4 py-2 shadow-lg backdrop-blur-md"
@@ -135,9 +143,9 @@ export function PortraitCard({ reduceMotion }: PortraitCardProps) {
               </span>
               <span className="h-1.5 w-1.5 rounded-full bg-primary motion-safe:animate-pulse" />
             </m.div>
-          </div>
+          </m.div>
 
-          <div className="absolute -top-4 -left-4 transform-3d translate-z-12">
+          <m.div style={{ x: badgeX, y: badgeY }} className="absolute -top-4 -left-4">
             <m.div
               variants={badge(1)}
               className="flex items-center gap-2 rounded-full border border-primary/25 bg-stage/70 px-4 py-2 shadow-lg backdrop-blur-md"
@@ -147,7 +155,7 @@ export function PortraitCard({ reduceMotion }: PortraitCardProps) {
                 EN / ES
               </span>
             </m.div>
-          </div>
+          </m.div>
         </m.div>
       </m.div>
     </div>

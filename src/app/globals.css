@@ -405,6 +405,30 @@
   }
 }
 
+/* About HUD backdrop: glyphs breathe between near-invisible and lit. */
+@keyframes hud-twinkle {
+  0%,
+  100% {
+    opacity: 0.12;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* About glow blobs: slow autonomous drift so the backdrop has ambient
+   life even when the page is idle (GSAP owns scroll-y on the wrapper;
+   this animates an inner node, so the transforms never collide). */
+@keyframes blob-breathe {
+  0%,
+  100% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.14) translate(2%, -3%);
+  }
+}
+
 @layer components {
   /* Navbar glass pill: a bright conic-gradient "comet" masked to a 1.4px ring,
      orbiting the rounded border as --nav-beam rotates. */

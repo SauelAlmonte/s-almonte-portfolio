@@ -13,6 +13,7 @@ import {
 import { gsap, ScrollTrigger, SCROLL_MEDIA } from "@/lib/scroll/gsap";
 import { useScrollSection } from "@/lib/scroll/useScrollSection";
 import { Download, GraduationCap, ExternalLink } from "lucide-react";
+import { AboutBackdrop, AboutDial } from "@/components/about/AboutBackdrop";
 import { PortraitCard } from "@/components/about/PortraitCard";
 import { formatCredentialPeriod } from "@/lib/resume/format-credential-period";
 
@@ -47,6 +48,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
   const gridRef          = useRef<HTMLDivElement>(null);
   const blob1Ref         = useRef<HTMLDivElement>(null);
   const blob2Ref         = useRef<HTMLDivElement>(null);
+  const dialDriftRef     = useRef<HTMLDivElement>(null);
   const headerDriftRef   = useRef<HTMLDivElement>(null);
   const stageRef         = useRef<HTMLDivElement>(null);
   const stackRef         = useRef<HTMLDivElement>(null);
@@ -169,6 +171,18 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
         },
       });
 
+      /* HUD dial rides its own slow plane between the grid and content. */
+      gsap.to(dialDriftRef.current, {
+        y: -70 * k,
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.5,
+        },
+      });
+
       /* Midground plane: the display header lags the page. */
       headerDrift(16 * k);
 
@@ -241,13 +255,16 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
 
       stages.forEach((stage, i) => {
         if (i === 0) return;
+        /* The incoming paragraph waits until the outgoing one is 85%
+           gone — both share grid cell 1/1, so any real overlap window
+           reads as two paragraphs printed on top of each other. */
         seq
           .to(stages[i - 1], { autoAlpha: 0, y: -48, duration: 1 })
           .fromTo(
             stage,
             { autoAlpha: 0, y: 48 },
             { autoAlpha: 1, y: 0, duration: 1 },
-            "<35%",
+            "<85%",
           );
       });
       if (cta) seq.to(cta, { autoAlpha: 1, y: 0, duration: 0.7 }, ">-0.25");
@@ -353,20 +370,22 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       aria-label="About Me"
       className="relative py-fl-section px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
-      {/* Layered parallax backdrop: instrument grid (slow plane) + glow blobs */}
+      {/* Layered parallax backdrop: instrument grid (slow plane) + HUD
+          dials/glyphs + glow blobs. GSAP owns scroll-y on the ref'd
+          wrappers; the autonomous breathe/spin/twinkle animations live
+          on inner nodes so the transforms never collide. */}
       <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
         <div
           ref={gridRef}
           className="absolute inset-x-0 -inset-y-32 opacity-[0.08] bg-[linear-gradient(color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px)] bg-size-[44px_44px] mask-[radial-gradient(85%_70%_at_50%_30%,black,transparent_80%)]"
         />
-        <div
-          ref={blob1Ref}
-          className="absolute -top-20 right-[-5%] w-125 h-125 rounded-full bg-cat-fullstack/10 blur-[100px]"
-        />
-        <div
-          ref={blob2Ref}
-          className="absolute bottom-[-10%] left-[-5%] w-100 h-100 rounded-full bg-cat-backend/8 blur-[90px]"
-        />
+        <AboutBackdrop />
+        <div ref={blob1Ref} className="absolute -top-20 right-[-5%] w-125 h-125">
+          <div className="h-full w-full rounded-full bg-cat-fullstack/10 blur-[100px] motion-safe:animate-[blob-breathe_18s_ease-in-out_infinite]" />
+        </div>
+        <div ref={blob2Ref} className="absolute bottom-[-10%] left-[-5%] w-100 h-100">
+          <div className="h-full w-full rounded-full bg-cat-backend/8 blur-[90px] motion-safe:animate-[blob-breathe_24s_ease-in-out_infinite_-9s]" />
+        </div>
       </div>
 
       <div className="max-w-6xl mx-auto space-y-fl-y-xl">
@@ -408,6 +427,8 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
           ref={stageRef}
           className="relative grid grid-cols-1 gap-12 lg:-mt-16 lg:grid-cols-12 lg:items-center lg:gap-8"
         >
+          {/* HUD dial rides the pin with the stage (see AboutDial). */}
+          <AboutDial dialRef={dialDriftRef} />
           {/* Portrait — pulled up into the header's space on desktop;
               centered in its column so the gutter stays balanced at 1024.
               Bottom padding below lg clears the Boston badge + halo ring
