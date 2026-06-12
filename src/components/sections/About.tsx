@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import {
   m,
@@ -34,6 +34,7 @@ const STATS = [
 
 /** Cinematic ease for every Motion reveal in this section. */
 const EASE = [0.16, 1, 0.3, 1] as const;
+const emptySubscribe = () => () => {};
 
 type AboutProps = {
   professionalSummary: string;
@@ -62,6 +63,12 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
      window. */
   const reduceMotionPref = useReducedMotion();
   const reduceMotion = reduceMotionPref ?? false;
+  const hydrated = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
+  const showPortraitHalo = hydrated && reduceMotionPref === false;
 
   const cmsBioParagraphs = useMemo(() => {
     const t = professionalSummary.trim();
@@ -407,7 +414,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
               from the stacked bio text. */}
           <div className="flex justify-center pb-6 lg:col-span-5 lg:-mt-20 lg:pb-0">
             <div ref={portraitDriftRef} className="relative">
-              {reduceMotionPref === false && (
+              {showPortraitHalo && (
                 <div
                   aria-hidden
                   className="pointer-events-none absolute -inset-24 -z-10"
