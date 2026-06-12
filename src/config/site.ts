@@ -1,3 +1,26 @@
+/* ── Pending content ──
+   TODO(sauel): replace with the real channel URL when it exists. This is the
+   single source for the YouTube social link shown in Hero, Contact, and the
+   mobile menu. (JSON-LD intentionally keeps using `social.youtube`, which
+   stays empty until NEXT_PUBLIC_YOUTUBE_URL is set — we never want the
+   placeholder leaking into structured data.) */
+const YOUTUBE_FALLBACK_URL = "https://youtube.com/@yourchannel";
+
+const isValidHttpUrl = (value: string): boolean => {
+  try {
+    const { protocol } = new URL(value);
+    return protocol === "https:" || protocol === "http:";
+  } catch {
+    return false;
+  }
+};
+
+const rawYoutubeUrl = process.env.NEXT_PUBLIC_YOUTUBE_URL;
+export const YOUTUBE_CHANNEL_URL =
+  rawYoutubeUrl && isValidHttpUrl(rawYoutubeUrl)
+    ? rawYoutubeUrl
+    : YOUTUBE_FALLBACK_URL;
+
 export const siteConfig = {
   /* ── Identity ── */
   name: "Sauel Almonte",

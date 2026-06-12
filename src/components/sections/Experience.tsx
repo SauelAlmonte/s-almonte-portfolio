@@ -1,16 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap } from "@/lib/scroll/gsap";
 import { MapPin, Calendar, Download, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { cn } from "@/lib/utils";
 import type { LandingExperienceCard, LandingResumePdfChoice } from "@/config/experience";
 import { ResumeDownloadChoiceModal } from "@/components/resume/ResumeDownloadChoiceModal";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export type ExperienceSectionProps = {
   experiences: LandingExperienceCard[];

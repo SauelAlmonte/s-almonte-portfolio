@@ -25,6 +25,7 @@ const PINK = new THREE.Color("#FFC1CC");
 
 export function GlobeScene({ onSettled }: { onSettled?: () => void }) {
   const group = useRef<THREE.Group>(null);
+  const tilt = useRef<THREE.Group>(null);
   const settled = useRef(false);
   const { gl, size } = useThree();
   const dpr = Math.min(gl.getPixelRatio(), 2);
@@ -37,6 +38,22 @@ export function GlobeScene({ onSettled }: { onSettled?: () => void }) {
     mq.addEventListener("change", on);
     return () => mq.removeEventListener("change", on);
   }, []);
+
+  /* Cursor-reactive parallax: normalized pointer position, consumed by a
+     damped tilt in useFrame. Listening on `window` (not the canvas) because
+     the hero copy sits above the canvas and would swallow pointer events.
+     Mouse-only — touch dragging a tilt feels broken — and off under reduced
+     motion. */
+  const pointer = useRef({ x: 0, y: 0 });
+  useEffect(() => {
+    if (reduced || !window.matchMedia("(pointer: fine)").matches) return;
+    const onMove = (e: PointerEvent) => {
+      pointer.current.x = (e.clientX / window.innerWidth) * 2 - 1;
+      pointer.current.y = (e.clientY / window.innerHeight) * 2 - 1;
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
+  }, [reduced]);
 
   // Load the land mask and sample the dots + arcs once.
   const mask = useLoader(THREE.TextureLoader, "/textures/earth-mask.png");
@@ -204,12 +221,25 @@ export function GlobeScene({ onSettled }: { onSettled?: () => void }) {
     pointMat.uniforms.uTime.value = t;
     particleMat.uniforms.uTime.value = t;
     if (!reduced) arcMat.uniforms.uTime.value = t;
+    // PerformanceMonitor may step the canvas DPR down under load; keep the
+    // point-size math in the shader in sync so dots don't change size.
+    const liveDpr = Math.min(gl.getPixelRatio(), 2);
+    pointMat.uniforms.uPixelRatio.value = liveDpr;
+    particleMat.uniforms.uPixelRatio.value = liveDpr;
 
     const g = group.current;
     if (!g) return;
     if (!reduced) g.rotation.y += delta * 0.045;
     // frame-rate-independent exponential ease-out (smooth slide-in + resize follow)
     const dampF = THREE.MathUtils.damp;
+
+    // Damped pointer parallax on the wrapper group, so it composes with (and
+    // never fights) the globe's own rotation/position easing below.
+    const tl = tilt.current;
+    if (tl && !reduced) {
+      tl.rotation.x = dampF(tl.rotation.x, pointer.current.y * 0.045, 2.5, delta);
+      tl.rotation.y = dampF(tl.rotation.y, pointer.current.x * 0.08, 2.5, delta);
+    }
     g.scale.setScalar(dampF(g.scale.x, target.scale, 3, delta));
     g.position.x = dampF(g.position.x, target.x, 2.4, delta);
     g.position.y = dampF(g.position.y, target.y, 3, delta);
@@ -224,14 +254,16 @@ export function GlobeScene({ onSettled }: { onSettled?: () => void }) {
   });
 
   return (
-    <group ref={group} position={[3.6, 0, 0]} rotation={[0.35, 0, 0.12]}>
-      <points geometry={earthGeom} material={pointMat} />
-      <lineSegments geometry={arcGeom} material={arcMat} />
-      <points geometry={particleGeom} material={particleMat} />
-      <lineSegments geometry={graticuleGeom} material={graticuleMat} />
-      <mesh material={atmoMat}>
-        <sphereGeometry args={[RADIUS * 1.16, 48, 48]} />
-      </mesh>
+    <group ref={tilt}>
+      <group ref={group} position={[3.6, 0, 0]} rotation={[0.35, 0, 0.12]}>
+        <points geometry={earthGeom} material={pointMat} />
+        <lineSegments geometry={arcGeom} material={arcMat} />
+        <points geometry={particleGeom} material={particleMat} />
+        <lineSegments geometry={graticuleGeom} material={graticuleMat} />
+        <mesh material={atmoMat}>
+          <sphereGeometry args={[RADIUS * 1.16, 48, 48]} />
+        </mesh>
+      </group>
     </group>
   );
 }

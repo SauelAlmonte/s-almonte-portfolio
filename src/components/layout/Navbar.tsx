@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import gsap from "gsap";
+import { m } from "motion/react";
 import { Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { gsap } from "@/lib/scroll/gsap";
 import { siteConfig } from "@/config/site";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { onHeroSettled } from "@/lib/heroSettle";
+import { useScrollTo } from "@/components/common/ScrollProvider";
 import { ThemeToggle } from "./ThemeToggle";
 import { MobileMenu } from "./MobileMenu";
 
@@ -20,10 +22,38 @@ const NAV_LINKS = siteConfig.nav.filter((item) => item.href !== "#contact");
 const useIsoLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
+// Width of the gliding active-link indicator (px). Constant width so it can
+// move on `x` alone — pure transform, no width/scale artifacts on its glow.
+const INDICATOR_W = 20;
+
 export function Navbar() {
   const navRef = useRef<HTMLElement>(null);
   const router = useRouter();
   const activeSection = useActiveSection(SECTION_IDS);
+  const scrollTo = useScrollTo();
+
+  /* Gliding scroll-spy indicator: a small glow bar that slides to sit under
+     the active link (Motion spring on `x` only). Hidden when the section in
+     view has no desktop link (e.g. #contact, which lives in the CTA). */
+  const linkRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [indicator, setIndicator] = useState({ x: 0, visible: false });
+  useEffect(() => {
+    const measure = () => {
+      const btn = linkRefs.current[activeSection];
+      if (!btn) {
+        setIndicator((cur) => ({ ...cur, visible: false }));
+        return;
+      }
+      // offsetLeft is relative to the positioned <ul>, where the bar lives.
+      setIndicator({
+        x: btn.offsetLeft + btn.offsetWidth / 2 - INDICATOR_W / 2,
+        visible: true,
+      });
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [activeSection]);
 
   /* Entrance. On the home hero (every size) the header holds until the globe
      settles, then glides down as one unit on a smooth ease — landing right after
@@ -71,10 +101,9 @@ export function Navbar() {
     return () => gsap.killTweensOf(node);
   }, []);
 
-  const handleNavClick = (href: string) => {
-    const el = document.getElementById(href.replace("#", ""));
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
+  // In-page navigation rides the shared Lenis instance (native scrollIntoView
+  // would fight its smoothing); falls back gracefully when Lenis is absent.
+  const handleNavClick = (href: string) => scrollTo(href);
 
   return (
     <>
@@ -119,12 +148,25 @@ export function Navbar() {
 
           {/* Desktop links — flip vertically on hover, no pills */}
           <ul className="relative z-10 hidden items-center gap-0.5 md:flex" role="list">
+            {/* Gliding active indicator — moves on transform only. */}
+            <li role="presentation" aria-hidden className="pointer-events-none">
+              <m.span
+                initial={false}
+                animate={{ x: indicator.x, opacity: indicator.visible ? 1 : 0 }}
+                transition={{ type: "spring", stiffness: 320, damping: 30 }}
+                style={{ width: INDICATOR_W }}
+                className="absolute bottom-[3px] left-0 h-[2px] rounded-full bg-[#A8DADC] shadow-[0_0_10px_rgba(168,218,220,0.85)]"
+              />
+            </li>
             {NAV_LINKS.map((item) => {
               const id = item.href.replace("#", "");
               const isActive = activeSection === id;
               return (
                 <li key={item.href}>
                   <button
+                    ref={(el) => {
+                      linkRefs.current[id] = el;
+                    }}
                     onClick={() => handleNavClick(item.href)}
                     aria-current={isActive ? "page" : undefined}
                     className={cn(

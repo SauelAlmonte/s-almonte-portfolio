@@ -4,8 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap } from "@/lib/scroll/gsap";
 import {
   MapPin,
   Github,
@@ -36,9 +35,8 @@ import {
 } from "@/components/ui/dialog";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { SocialLink, type SocialLinkItem } from "@/components/common/SocialLink";
+import { YOUTUBE_CHANNEL_URL } from "@/config/site";
 import { cn } from "@/lib/utils";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const ContactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -57,7 +55,7 @@ type ContactFormData = z.infer<typeof ContactSchema>;
 const SOCIALS: SocialLinkItem[] = [
   { label: "GitHub",   href: "https://github.com/SauelAlmonte",       icon: Github,   accent: "#A8DADC" },
   { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte", icon: Linkedin, accent: "#B39CD0" },
-  { label: "YouTube",  href: "https://youtube.com/@yourchannel",      icon: Youtube,  accent: "#FFC1CC" },
+  { label: "YouTube",  href: YOUTUBE_CHANNEL_URL,                     icon: Youtube,  accent: "#FFC1CC" },
 ];
 
 type ModalState = "idle" | "consent" | "success";

@@ -23,6 +23,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { SocialLink, type SocialLinkItem } from "@/components/common/SocialLink";
+import { useLenis, useScrollTo } from "@/components/common/ScrollProvider";
+import { YOUTUBE_CHANNEL_URL } from "@/config/site";
 import { NavItem } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -43,7 +45,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
 const SOCIALS: SocialLinkItem[] = [
   { label: "GitHub", href: "https://github.com/SauelAlmonte", icon: Github, accent: "#A8DADC" },
   { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte", icon: Linkedin, accent: "#B39CD0" },
-  { label: "YouTube", href: "https://youtube.com/@yourchannel", icon: Youtube, accent: "#FFC1CC" },
+  { label: "YouTube", href: YOUTUBE_CHANNEL_URL, icon: Youtube, accent: "#FFC1CC" },
 ];
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -58,21 +60,39 @@ const itemVariants = {
 
 export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
   const [open, setOpen] = useState(false);
+  const lenis = useLenis();
+  const scrollTo = useScrollTo();
+
+  /* Radix locks body scroll while the sheet is open; Lenis must also stop so
+     wheel/touch momentum doesn't keep gliding the page under the overlay.
+     Routed through one handler so ESC / outside-click / link clicks all
+     restart Lenis the same way. */
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next);
+    if (next) lenis?.stop();
+    else lenis?.start();
+  };
 
   const go = (href: string) => {
-    setOpen(false);
-    const el = document.getElementById(href.replace("#", ""));
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    handleOpenChange(false); // restart Lenis before asking it to scroll
+    scrollTo(href);
   };
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
         <button
           aria-label="Open navigation menu"
           className="grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-[#ECECF2] transition-colors duration-200 hover:border-[#A8DADC]/40 hover:text-[#A8DADC] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8DADC]/60 md:hidden"
         >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {/* Quarter-turn while the glyph swaps reads as a hamburger↔close morph. */}
+          <m.span
+            animate={{ rotate: open ? 90 : 0 }}
+            transition={{ duration: 0.3, ease: EASE }}
+            className="grid place-items-center"
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </m.span>
         </button>
       </SheetTrigger>
 
@@ -80,9 +100,16 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
       <SheetContent
         side="right"
         showCloseButton={false}
+        aria-describedby={undefined} // nav links are self-describing; silences Radix's missing-Description warning
         className="flex w-[86vw] max-w-[21rem] flex-col gap-0 overflow-hidden border-l border-white/10 bg-[#080711]/45 p-0 text-[#ECECF2] shadow-[-24px_0_60px_-30px_rgba(0,0,0,0.9)] backdrop-blur-2xl sm:max-w-[21rem]"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+
+        {/* faint instrument grid, masked toward the glowing corner */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[linear-gradient(rgba(168,218,220,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(168,218,220,0.7)_1px,transparent_1px)] bg-size-[36px_36px] mask-[radial-gradient(120%_90%_at_100%_0%,black,transparent_75%)]"
+        />
 
         {/* top sheen + faint corner accent (the only glow, kept restrained) */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
@@ -100,7 +127,7 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
         >
           <span className="text-xs font-medium uppercase tracking-[0.22em] text-[#7e7e8c]">Menu</span>
           <button
-            onClick={() => setOpen(false)}
+            onClick={() => handleOpenChange(false)}
             aria-label="Close navigation menu"
             className="grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-[#C4C4D0] transition-colors duration-200 hover:border-[#A8DADC]/40 hover:text-[#A8DADC] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8DADC]/60"
           >
