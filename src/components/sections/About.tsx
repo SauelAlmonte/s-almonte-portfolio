@@ -359,13 +359,16 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
           </m.div>
         </div>
 
-        {/* Pinned stage: asymmetric portrait + sequenced bio */}
+        {/* Pinned stage: asymmetric portrait + sequenced bio. Negative top
+            margin tucks it under the header (space-y sets margin-bottom on
+            the header, so this composes instead of conflicting). */}
         <div
           ref={stageRef}
-          className="relative grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center lg:gap-8"
+          className="relative grid grid-cols-1 gap-12 lg:-mt-16 lg:grid-cols-12 lg:items-center lg:gap-8"
         >
-          {/* Portrait — pulled up into the header's space on desktop */}
-          <div className="flex justify-center lg:col-span-5 lg:-mt-20 lg:justify-start lg:pl-6">
+          {/* Portrait — pulled up into the header's space on desktop;
+              centered in its column so the gutter stays balanced at 1024 */}
+          <div className="flex justify-center lg:col-span-5 lg:-mt-20">
             <div ref={portraitDriftRef} className="relative">
               {isDesktop && !reduceMotion && (
                 <div
@@ -385,7 +388,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="lg:col-span-6 lg:col-start-7"
+            className="lg:col-span-7 lg:col-start-6 xl:col-span-6 xl:col-start-7"
           >
             <div className="space-y-5 text-muted-foreground leading-relaxed lg:grid lg:items-center lg:space-y-0">
               {bioParagraphs.map((content, i) => (
