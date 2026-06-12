@@ -55,9 +55,13 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
   const eduDriftRef      = useRef<HTMLDivElement>(null);
   const statValueRefs    = useRef<(HTMLSpanElement | null)[]>([]);
 
-  /* `useReducedMotion()` is null until the media query resolves (SSR-safe);
-     treat "unknown" as "animate" so the first paint matches the common case. */
-  const reduceMotion = useReducedMotion() ?? false;
+  /* `useReducedMotion()` is null until the media query resolves (SSR-safe).
+     For animations, treat "unknown" as "animate" so the first paint matches
+     the common case; the WebGL halo gates on the resolved tri-state instead,
+     so reduced-motion users never even fetch the chunk during the null
+     window. */
+  const reduceMotionPref = useReducedMotion();
+  const reduceMotion = reduceMotionPref ?? false;
 
   const cmsBioParagraphs = useMemo(() => {
     const t = professionalSummary.trim();
@@ -403,7 +407,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
               from the stacked bio text. */}
           <div className="flex justify-center pb-6 lg:col-span-5 lg:-mt-20 lg:pb-0">
             <div ref={portraitDriftRef} className="relative">
-              {!reduceMotion && (
+              {reduceMotionPref === false && (
                 <div
                   aria-hidden
                   className="pointer-events-none absolute -inset-24 -z-10"

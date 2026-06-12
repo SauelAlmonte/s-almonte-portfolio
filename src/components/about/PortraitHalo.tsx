@@ -114,8 +114,10 @@ function DotRing({
 export default function PortraitHalo() {
   const wrap = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(true);
-  const [tabHidden, setTabHidden] = useState(false);
-  // Client-only component (`ssr: false`) — window is safe in lazy initializers.
+  // Client-only component (`ssr: false`) — document/window are safe in lazy
+  // initializers. Seeding from document.hidden keeps a background-tab mount
+  // on "demand" instead of rendering until the first visibility event.
+  const [tabHidden, setTabHidden] = useState(() => document.hidden);
   const [webgl] = useState(() => supportsWebGL());
 
   useEffect(() => {
