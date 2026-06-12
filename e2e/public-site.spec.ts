@@ -9,11 +9,11 @@ test.describe("public site", () => {
   });
 
   test("a skills card navigates to its category page", async ({ page }) => {
-    await page.goto("/");
-    const card = page.getByRole("button", {
+    await page.goto("/#skills");
+    const card = page.getByRole("link", {
       name: /Explore Full-Stack Web Dev projects/i,
     });
-    await card.scrollIntoViewIfNeeded();
+    await expect(card).toBeVisible();
     await card.click();
     await expect(page).toHaveURL(/\/skills\/fullstack/);
     await expect(
