@@ -12,9 +12,7 @@ import {
 } from "motion/react";
 import { gsap, ScrollTrigger, SCROLL_MEDIA } from "@/lib/scroll/gsap";
 import { useScrollSection } from "@/lib/scroll/useScrollSection";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Download, GraduationCap, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { PortraitCard } from "@/components/about/PortraitCard";
 import { formatCredentialPeriod } from "@/lib/resume/format-credential-period";
 
@@ -50,6 +48,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
   const blob2Ref         = useRef<HTMLDivElement>(null);
   const headerDriftRef   = useRef<HTMLDivElement>(null);
   const stageRef         = useRef<HTMLDivElement>(null);
+  const stackRef         = useRef<HTMLDivElement>(null);
   const portraitDriftRef = useRef<HTMLDivElement>(null);
   const statsDriftRef    = useRef<HTMLDivElement>(null);
   const statsRef         = useRef<HTMLDivElement>(null);
@@ -59,9 +58,6 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
   /* `useReducedMotion()` is null until the media query resolves (SSR-safe);
      treat "unknown" as "animate" so the first paint matches the common case. */
   const reduceMotion = useReducedMotion() ?? false;
-  /* WebGL halo is desktop-only — `useMediaQuery` is false during SSR/hydration
-     so the lazy chunk never loads on phones. */
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   const cmsBioParagraphs = useMemo(() => {
     const t = professionalSummary.trim();
@@ -131,16 +127,17 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       );
     };
 
-    mm.add(SCROLL_MEDIA.desktop, () => {
+    /* All parallax planes, scaled by `k` so smaller screens get the same
+       depth at gentler offsets. */
+    const buildPlanes = (k: number) => {
       const section = sectionRef.current;
-      if (!section) return;
 
       /* Background plane (slowest): the instrument grid drifts visibly. */
-      gridDrift(-120);
+      gridDrift(-120 * k);
 
       /* Ambient color — not a depth plane, just alive. */
       gsap.to(blob1Ref.current, {
-        y: -180,
+        y: -180 * k,
         ease: "none",
         scrollTrigger: {
           trigger: section,
@@ -150,8 +147,8 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
         },
       });
       gsap.to(blob2Ref.current, {
-        y: 120,
-        x: -40,
+        y: 120 * k,
+        x: -40 * k,
         ease: "none",
         scrollTrigger: {
           trigger: section,
@@ -161,65 +158,16 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
         },
       });
 
-      /* Midground plane: the display header lags the page by ~32px. */
-      headerDrift(16);
-
-      /* Foreground: pinned stage. The bio paragraphs play as a scrubbed
-         sequence while the portrait drifts against them — GSAP owns the
-         [data-bio-stage]/[data-cta-stage] WRAPPERS; Motion only ever
-         touches the inner elements, so no node is shared. */
-      const stages = Array.from(
-        section.querySelectorAll<HTMLElement>("[data-bio-stage]"),
-      );
-      const cta = section.querySelector<HTMLElement>("[data-cta-stage]");
-
-      if (stages.length > 1) {
-        gsap.set(stages.slice(1), { autoAlpha: 0, y: 48 });
-        if (cta) gsap.set(cta, { autoAlpha: 0, y: 24 });
-
-        const seq = gsap.timeline({
-          scrollTrigger: {
-            trigger: stageRef.current,
-            start: "center center",
-            end: `+=${stages.length * 55}%`,
-            pin: true,
-            scrub: 0.6,
-            anticipatePin: 1,
-          },
-          defaults: { ease: "none" },
-        });
-
-        stages.forEach((stage, i) => {
-          if (i === 0) return;
-          seq
-            .to(stages[i - 1], { autoAlpha: 0, y: -48, duration: 1 })
-            .fromTo(
-              stage,
-              { autoAlpha: 0, y: 48 },
-              { autoAlpha: 1, y: 0, duration: 1 },
-              "<35%",
-            );
-        });
-        if (cta) seq.to(cta, { autoAlpha: 1, y: 0, duration: 0.7 }, ">-0.25");
-        seq.to({}, { duration: 0.5 }); // hold the last beat before release
-
-        /* Portrait slow counter-drift across the whole pin — the visible
-           rate differential while the text swaps. */
-        seq.fromTo(
-          portraitDriftRef.current,
-          { y: 56 },
-          { y: -56, duration: seq.duration() },
-          0,
-        );
-      }
+      /* Midground plane: the display header lags the page. */
+      headerDrift(16 * k);
 
       /* Stats band gets extra travel as it passes center (ends near 0 so
          the resting layout keeps its designed spacing). */
       gsap.fromTo(
         statsDriftRef.current,
-        { y: 48 },
+        { y: 48 * k },
         {
-          y: -12,
+          y: -12 * k,
           ease: "none",
           scrollTrigger: {
             trigger: statsDriftRef.current,
@@ -234,9 +182,9 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
          them, so the two blocks visibly converge as they enter. */
       gsap.fromTo(
         eduDriftRef.current,
-        { y: 72 },
+        { y: 72 * k },
         {
-          y: -16,
+          y: -16 * k,
           ease: "none",
           scrollTrigger: {
             trigger: eduDriftRef.current,
@@ -246,18 +194,80 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
           },
         },
       );
+    };
 
+    /* Pinned stage: the bio paragraphs play as a scrubbed sequence while
+       the portrait drifts against them — GSAP owns the [data-bio-stage]/
+       [data-cta-stage] WRAPPERS; Motion only ever touches the inner
+       elements, so no node is shared. The overlap stacking (display:grid +
+       grid-area 1/1) is applied HERE rather than via classes, so
+       reduced-motion and no-pin states keep the natural stacked flow. */
+    const buildStage = () => {
+      const section = sectionRef.current;
+      if (!section) return;
+      const stages = Array.from(
+        section.querySelectorAll<HTMLElement>("[data-bio-stage]"),
+      );
+      const cta = section.querySelector<HTMLElement>("[data-cta-stage]");
+      if (stages.length <= 1) return;
+
+      gsap.set(stackRef.current, { display: "grid", alignItems: "center" });
+      gsap.set(stages, { gridArea: "1 / 1", marginBottom: 0 });
+      gsap.set(stages.slice(1), { autoAlpha: 0, y: 48 });
+      if (cta) gsap.set(cta, { autoAlpha: 0, y: 24 });
+
+      const seq = gsap.timeline({
+        scrollTrigger: {
+          trigger: stageRef.current,
+          start: "center center",
+          end: `+=${stages.length * 55}%`,
+          pin: true,
+          scrub: 0.6,
+          anticipatePin: 1,
+        },
+        defaults: { ease: "none" },
+      });
+
+      stages.forEach((stage, i) => {
+        if (i === 0) return;
+        seq
+          .to(stages[i - 1], { autoAlpha: 0, y: -48, duration: 1 })
+          .fromTo(
+            stage,
+            { autoAlpha: 0, y: 48 },
+            { autoAlpha: 1, y: 0, duration: 1 },
+            "<35%",
+          );
+      });
+      if (cta) seq.to(cta, { autoAlpha: 1, y: 0, duration: 0.7 }, ">-0.25");
+      seq.to({}, { duration: 0.5 }); // hold the last beat before release
+
+      /* Portrait slow counter-drift across the whole pin — the visible
+         rate differential while the text swaps. */
+      seq.fromTo(
+        portraitDriftRef.current,
+        { y: 56 },
+        { y: -56, duration: seq.duration() },
+        0,
+      );
+    };
+
+    /* Same experience on every tier — only the plane offsets scale down. */
+    mm.add(SCROLL_MEDIA.desktop, () => {
+      buildPlanes(1);
+      buildStage();
       startCounters();
     });
 
     mm.add(SCROLL_MEDIA.tablet, () => {
-      /* Reduced offsets, fewer planes, no pin. */
-      gridDrift(-60);
-      headerDrift(10);
+      buildPlanes(0.7);
+      buildStage();
       startCounters();
     });
 
     mm.add(SCROLL_MEDIA.phone, () => {
+      buildPlanes(0.45);
+      buildStage();
       startCounters();
     });
 
@@ -387,7 +397,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
               centered in its column so the gutter stays balanced at 1024 */}
           <div className="flex justify-center lg:col-span-5 lg:-mt-20">
             <div ref={portraitDriftRef} className="relative">
-              {isDesktop && !reduceMotion && (
+              {!reduceMotion && (
                 <div
                   aria-hidden
                   className="pointer-events-none absolute -inset-24 -z-10"
@@ -407,9 +417,11 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             viewport={{ once: true, amount: 0.2 }}
             className="lg:col-span-7 lg:col-start-6 xl:col-span-6 xl:col-start-7"
           >
-            <div className="space-y-5 text-muted-foreground leading-relaxed lg:grid lg:items-center lg:space-y-0">
+            {/* Natural stacked flow by default; the pin clauses switch this
+                to an overlap grid via GSAP so paragraphs can sequence. */}
+            <div ref={stackRef} className="space-y-5 text-muted-foreground leading-relaxed">
               {bioParagraphs.map((content, i) => (
-                <div key={i} data-bio-stage className="lg:[grid-area:1/1]">
+                <div key={i} data-bio-stage>
                   <m.p variants={staggerItem} className="max-w-prose text-lg">
                     {content}
                   </m.p>
@@ -420,15 +432,13 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             <div data-cta-stage className="mt-8">
               <m.div variants={staggerItem}>
                 <ResumeDownloadChoiceModal choices={pdfChoices}>
-                  <Button
-                    size="lg"
-                    variant="outline"
+                  <button
                     type="button"
-                    className="rounded-full px-8 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold shadow-sm shadow-foreground/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-105 group cursor-pointer"
+                    className="cta-dome group inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full px-8 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-stage"
                   >
-                    <Download className="mr-2 h-4 w-4 motion-safe:group-hover:animate-bounce" />
+                    <Download className="h-4 w-4 motion-safe:group-hover:animate-bounce" />
                     Download Resume
-                  </Button>
+                  </button>
                 </ResumeDownloadChoiceModal>
               </m.div>
             </div>
