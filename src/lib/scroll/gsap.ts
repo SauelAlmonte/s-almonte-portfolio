@@ -16,13 +16,19 @@ if (typeof window !== "undefined") {
 
 /**
  * Shared `gsap.matchMedia` conditions so every section animates (or doesn't)
- * on the same breakpoints. Pinning and heavy scroll effects belong only in
- * `desktop`; `mobile` keeps things light; the two reduced clauses must show
- * content instantly with no motion.
+ * on the same breakpoints. Pinning and heavy scroll effects default to
+ * `desktop`; a section may deliberately opt the smaller tiers into the same
+ * choreography at scaled-down offsets (About does). The two reduced clauses
+ * must show content instantly with no motion.
  */
 export const SCROLL_MEDIA = {
   desktop: "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
   desktopReduced: "(min-width: 1024px) and (prefers-reduced-motion: reduce)",
+  /** Mid tier — same effects as desktop where a section opts in, scaled down. */
+  tablet:
+    "(min-width: 768px) and (max-width: 1023px) and (prefers-reduced-motion: no-preference)",
+  /** Smallest tier — gentlest offsets; sections choose what to keep here. */
+  phone: "(max-width: 767px) and (prefers-reduced-motion: no-preference)",
   mobile: "(max-width: 1023px)",
   reduced: "(prefers-reduced-motion: reduce)",
 } as const;

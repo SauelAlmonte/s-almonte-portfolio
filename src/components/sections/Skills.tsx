@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { gsap } from "@/lib/scroll/gsap";
 import { ArrowUpRight, Code2, BrainCircuit, Cloud, type LucideIcon } from "lucide-react";
 import { SectionHeading } from "@/components/common/SectionHeading";
@@ -91,9 +91,8 @@ export function Skills({ skillsByCategory }: SkillsSectionProps) {
 
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const barRefs = useRef<(HTMLDivElement | null)[][]>([[], [], []]);
-  const router = useRouter();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -198,19 +197,11 @@ export function Skills({ skillsByCategory }: SkillsSectionProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-6 xl:gap-8">
           {cards.map((card, cardIdx) => (
-            <div
+            <Link
               key={card.category}
               ref={(el) => { cardRefs.current[cardIdx] = el; }}
-              role="button"
-              tabIndex={0}
+              href={`/skills/${card.category}`}
               aria-label={`Explore ${card.title} projects`}
-              onClick={() => router.push(`/skills/${card.category}`)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  router.push(`/skills/${card.category}`);
-                }
-              }}
               className={cn(
                 "group relative flex cursor-pointer flex-col gap-5 rounded-3xl border bg-card p-5 sm:gap-6 sm:p-6 xl:p-7",
                 "transition-all duration-300 shadow-md",
@@ -305,7 +296,7 @@ export function Skills({ skillsByCategory }: SkillsSectionProps) {
                   background: `radial-gradient(ellipse at top left, ${card.accent}0D, transparent 70%)`,
                 }}
               />
-            </div>
+            </Link>
           ))}
         </div>
       </div>
