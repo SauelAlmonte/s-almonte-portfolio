@@ -202,7 +202,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
        elements, so no node is shared. The overlap stacking (display:grid +
        grid-area 1/1) is applied HERE rather than via classes, so
        reduced-motion and no-pin states keep the natural stacked flow. */
-    const buildStage = () => {
+    const buildStage = (portraitTravel: number) => {
       const section = sectionRef.current;
       if (!section) return;
       const stages = Array.from(
@@ -243,31 +243,35 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       seq.to({}, { duration: 0.5 }); // hold the last beat before release
 
       /* Portrait slow counter-drift across the whole pin — the visible
-         rate differential while the text swaps. */
-      seq.fromTo(
-        portraitDriftRef.current,
-        { y: 56 },
-        { y: -56, duration: seq.duration() },
-        0,
-      );
+         rate differential while the text swaps. Disabled (0) in the
+         1-column tiers: there the portrait sits directly above the text,
+         and the +y start would shove it into the paragraphs. */
+      if (portraitTravel > 0) {
+        seq.fromTo(
+          portraitDriftRef.current,
+          { y: portraitTravel },
+          { y: -portraitTravel, duration: seq.duration() },
+          0,
+        );
+      }
     };
 
     /* Same experience on every tier — only the plane offsets scale down. */
     mm.add(SCROLL_MEDIA.desktop, () => {
       buildPlanes(1);
-      buildStage();
+      buildStage(56);
       startCounters();
     });
 
     mm.add(SCROLL_MEDIA.tablet, () => {
       buildPlanes(0.7);
-      buildStage();
+      buildStage(0);
       startCounters();
     });
 
     mm.add(SCROLL_MEDIA.phone, () => {
       buildPlanes(0.45);
-      buildStage();
+      buildStage(0);
       startCounters();
     });
 
@@ -394,8 +398,10 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
           className="relative grid grid-cols-1 gap-12 lg:-mt-16 lg:grid-cols-12 lg:items-center lg:gap-8"
         >
           {/* Portrait — pulled up into the header's space on desktop;
-              centered in its column so the gutter stays balanced at 1024 */}
-          <div className="flex justify-center lg:col-span-5 lg:-mt-20">
+              centered in its column so the gutter stays balanced at 1024.
+              Bottom padding below lg clears the Boston badge + halo ring
+              from the stacked bio text. */}
+          <div className="flex justify-center pb-6 lg:col-span-5 lg:-mt-20 lg:pb-0">
             <div ref={portraitDriftRef} className="relative">
               {!reduceMotion && (
                 <div
