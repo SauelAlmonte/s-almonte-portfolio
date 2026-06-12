@@ -45,12 +45,40 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 
-  /* Portfolio brand colors */
-  --color-cyan: var(--portfolio-cyan);
-  --color-pink: var(--portfolio-pink);
-  --color-lavender: var(--portfolio-lavender);
-  --color-slate: var(--portfolio-slate);
-  --color-light: var(--portfolio-light);
+  /* ── Portfolio design tokens (hero-derived) — see DESIGN-TOKENS.md ──
+     Tiers: stage/surface = 60% · ink/structure = 30% · accent = 10%.
+     The brand accent is the hero glow and is exposed as shadcn `primary`
+     (+ the accent-soft/strong gradient steps); shadcn's own `accent` var
+     remains the component hover-surface. Category colors are a data tier:
+     category identity + scene atmosphere only, never interactive accent. */
+  --color-stage: var(--stage);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-ink-bright: var(--ink-bright);
+  --color-ink: var(--ink);
+  --color-ink-secondary: var(--ink-secondary);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-ink: var(--accent-ink);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-cat-fullstack: var(--cat-fullstack);
+  --color-cat-fullstack-deep: var(--cat-fullstack-deep);
+  --color-cat-backend: var(--cat-backend);
+  --color-cat-backend-deep: var(--cat-backend-deep);
+  --color-cat-cloud: var(--cat-cloud);
+  --color-cat-cloud-deep: var(--cat-cloud-deep);
+
+  /* Deprecated aliases — older components (resume modal) still use these
+     utilities; new code uses the cat- and semantic tokens above. */
+  --color-cyan: var(--cat-fullstack);
+  --color-pink: var(--cat-cloud);
+  --color-lavender: var(--cat-backend);
+  --color-slate: #2c2c2c;
+  --color-light: #e4e4e4;
 
   /*
    * Fluid type: clamp between compact phones (~20rem) and wide desktops (~80rem).
@@ -195,12 +223,36 @@
 :root {
   --radius: 0.625rem;
 
-  /* Portfolio palette */
-  --portfolio-slate: #2C2C2C;
-  --portfolio-light: #E4E4E4;
-  --portfolio-cyan: #A8DADC;
-  --portfolio-pink: #FFC1CC;
-  --portfolio-lavender: #B39CD0;
+  /* ── Hero-derived portfolio tokens (theme-independent) ──
+     Extracted from the shipped hero/globe (#080711 stage, #A8DADC glow).
+     WebGL shaders can't read CSS vars — src/config/tokens.ts mirrors these
+     for the 3D scene; change them together. All steps verified WCAG AA for
+     their documented use (audit table in DESIGN-TOKENS.md). */
+  --stage: #080711;
+  --surface: #12101d;
+  --surface-raised: #1a1828;
+  --ink-bright: #f4f4f8;
+  --ink: #ececf2;
+  --ink-secondary: #c6c7d2;
+  --ink-muted: #9a9aa7;
+  --ink-faint: #757584; /* UI-only (3:1) — never body text */
+  --accent-soft: #c7ecee;
+  --accent-strong: #8ccfd1;
+  --accent-ink: #06232b; /* text on accent fills */
+
+  /* Category/data tier — `deep` steps are the AA-darkened variants for
+     light surfaces (admin + skills sub-pages). */
+  --cat-fullstack: #a8dadc;
+  --cat-fullstack-deep: #226562;
+  --cat-backend: #b39cd0;
+  --cat-backend-deep: #5a4a7a;
+  --cat-cloud: #ffc1cc;
+  --cat-cloud-deep: #a23d51;
+
+  /* Functional (light values; .dark overrides below) */
+  --success: #1e7a5c;
+  --warning: #8a6116;
+  --info: #5a4a7a;
 
   /*
    * Light mode — 60-30-10 rule + WCAG 2.2 AA
@@ -255,49 +307,58 @@
 }
 
 .dark {
-  /* Dark mode — #2C2C2C background, #E4E4E4 foreground */
-  --background: oklch(0.22 0 0);
-  --foreground: oklch(0.91 0 0);
-  --card: oklch(0.27 0 0);
-  --card-foreground: oklch(0.91 0 0);
-  --popover: oklch(0.27 0 0);
-  --popover-foreground: oklch(0.91 0 0);
+  /* Dark mode — the hero's world (#080711 violet-black stage, #A8DADC glow).
+     The public landing is hard-wrapped in `.dark` so it always reads as the
+     hero; admin dark mode shares the same world. 60/30/10: background/card =
+     60%, secondary/muted/border = 30%, primary (the glow) = 10%. */
+  --background: var(--stage);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
 
-  /* Primary: light cyan #A8DADC */
-  --primary: oklch(0.84 0.055 196);
-  --primary-foreground: oklch(0.22 0 0);
+  /* Primary IS the brand accent: the hero glow cyan */
+  --primary: #a8dadc;
+  --primary-foreground: var(--accent-ink);
 
-  /* Secondary: soft pink #FFC1CC */
-  --secondary: oklch(0.87 0.06 5);
-  --secondary-foreground: oklch(0.22 0 0);
+  /* Secondary: raised violet-dark surface (structural 30% tier) */
+  --secondary: var(--surface-raised);
+  --secondary-foreground: var(--ink-secondary);
 
   /* Muted */
-  --muted: oklch(0.30 0 0);
-  --muted-foreground: oklch(0.65 0 0);
+  --muted: #15131f;
+  --muted-foreground: var(--ink-muted);
 
-  /* Accent: lavender #B39CD0 */
-  --accent: oklch(0.70 0.09 297);
-  --accent-foreground: oklch(0.22 0 0);
+  /* Accent = component hover-surface (cyan-tinted dark), NOT the brand glow */
+  --accent: #16202c;
+  --accent-foreground: #a8dadc;
 
-  --destructive: oklch(0.704 0.191 22.216);
+  /* Functional — harmonized with the hero family (rose, not stock red) */
+  --destructive: #e0697c;
+  --success: #7fd9b9;
+  --warning: #e5c687;
+  --info: #b39cd0;
+
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.84 0.055 196);
+  /* 38% clears WCAG 1.4.11 (3:1 component boundary) against --card */
+  --input: oklch(1 0 0 / 38%);
+  --ring: #a8dadc;
 
-  --chart-1: oklch(0.84 0.055 196);
-  --chart-2: oklch(0.87 0.06 5);
-  --chart-3: oklch(0.70 0.09 297);
-  --chart-4: oklch(0.646 0.222 41.116);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --chart-1: #a8dadc;
+  --chart-2: #b39cd0;
+  --chart-3: #ffc1cc;
+  --chart-4: #8ccfd1;
+  --chart-5: #e5c687;
 
-  --sidebar: oklch(0.27 0 0);
-  --sidebar-foreground: oklch(0.91 0 0);
-  --sidebar-primary: oklch(0.84 0.055 196);
-  --sidebar-primary-foreground: oklch(0.22 0 0);
-  --sidebar-accent: oklch(0.70 0.09 297);
-  --sidebar-accent-foreground: oklch(0.91 0 0);
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: #a8dadc;
+  --sidebar-primary-foreground: var(--accent-ink);
+  --sidebar-accent: #16202c;
+  --sidebar-accent-foreground: #a8dadc;
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.84 0.055 196);
+  --sidebar-ring: #a8dadc;
 }
 
 /*
@@ -378,10 +439,10 @@
       from var(--nav-beam),
       transparent 0deg,
       transparent 300deg,
-      rgba(168, 218, 220, 0.05) 312deg,
-      rgba(168, 218, 220, 0.85) 340deg,
-      #eafbfb 351deg,
-      rgba(179, 156, 208, 0.85) 360deg
+      color-mix(in srgb, var(--cat-fullstack) 5%, transparent) 312deg,
+      color-mix(in srgb, var(--cat-fullstack) 85%, transparent) 340deg,
+      color-mix(in srgb, var(--accent-soft) 60%, white) 351deg,
+      color-mix(in srgb, var(--cat-backend) 85%, transparent) 360deg
     );
     -webkit-mask:
       linear-gradient(#000 0 0) content-box,
@@ -420,9 +481,29 @@
      readable arbitrary value). */
   .hero-aurora {
     background:
-      radial-gradient(69% 63% at 72% 42%, rgba(179, 156, 208, 0.12), transparent 70%),
-      radial-gradient(52% 52% at 78% 60%, rgba(168, 218, 220, 0.08), transparent 72%),
-      radial-gradient(46% 46% at 60% 30%, rgba(255, 193, 204, 0.05), transparent 70%);
+      radial-gradient(69% 63% at 72% 42%, color-mix(in srgb, var(--cat-backend) 12%, transparent), transparent 70%),
+      radial-gradient(52% 52% at 78% 60%, color-mix(in srgb, var(--cat-fullstack) 8%, transparent), transparent 72%),
+      radial-gradient(46% 46% at 60% 30%, color-mix(in srgb, var(--cat-cloud) 5%, transparent), transparent 70%);
+  }
+
+  /* Domed accent CTA (navbar "Get in touch", mobile-menu CTA, hero primary).
+     Colors/bevel/glow only — sizing stays in utilities at the call site.
+     #a8dadc literal = the hero glow (this file is the token source). */
+  .cta-dome {
+    border: 1px solid color-mix(in srgb, var(--accent-strong) 60%, transparent);
+    background: linear-gradient(180deg, var(--accent-soft), #a8dadc 46%, var(--accent-strong));
+    color: var(--accent-ink);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.7),
+      inset 0 -2px 3px rgb(0 40 45 / 0.18),
+      0 6px 16px -8px color-mix(in srgb, #a8dadc 30%, transparent);
+    transition: box-shadow 0.3s;
+  }
+  .cta-dome:hover {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.78),
+      inset 0 -2px 3px rgb(0 40 45 / 0.2),
+      0 10px 24px -10px color-mix(in srgb, #a8dadc 40%, transparent);
   }
 }
 

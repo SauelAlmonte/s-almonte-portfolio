@@ -10,6 +10,7 @@ import { HeroPoster } from "@/components/hero/HeroPoster";
 import { gsap, SCROLL_MEDIA } from "@/lib/scroll/gsap";
 import { useScrollSection } from "@/lib/scroll/useScrollSection";
 import { YOUTUBE_CHANNEL_URL } from "@/config/site";
+import { BRAND } from "@/config/tokens";
 
 // 3D globe is heavy + browser-only: lazy, client-only, out of the initial bundle.
 // The poster fills the slot while the chunk loads — no layout shift, no flash.
@@ -26,10 +27,10 @@ const ROLES = [
 ];
 
 const SOCIAL_LINKS: SocialLinkItem[] = [
-  { label: "GitHub", href: "https://github.com/SauelAlmonte", icon: Github, accent: "#A8DADC", external: true },
-  { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte", icon: Linkedin, accent: "#B39CD0", external: true },
-  { label: "YouTube", href: YOUTUBE_CHANNEL_URL, icon: Youtube, accent: "#FFC1CC", external: true },
-  { label: "Contact", href: "#contact", icon: Mail, accent: "#A8DADC", external: false },
+  { label: "GitHub", href: "https://github.com/SauelAlmonte", icon: Github, accent: BRAND.fullstack, external: true },
+  { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte", icon: Linkedin, accent: BRAND.backend, external: true },
+  { label: "YouTube", href: YOUTUBE_CHANNEL_URL, icon: Youtube, accent: BRAND.cloud, external: true },
+  { label: "Contact", href: "#contact", icon: Mail, accent: BRAND.accent, external: false },
 ];
 
 /* Entrance choreography. The copy column is one variant parent; each line is a
@@ -98,9 +99,11 @@ export function Hero() {
         ease: "none",
         scrollTrigger,
       });
+      // Translate/opacity only — never scale this wrapper: R3F's resize
+      // observer measures the transformed rect, so a scaled canvas parent
+      // forces WebGL buffer resizes on every scrub tick.
       gsap.to(sceneRef.current, {
         yPercent: 6,
-        scale: 0.95,
         opacity: 0.3,
         ease: "none",
         scrollTrigger,
@@ -136,7 +139,7 @@ export function Hero() {
       ref={sectionRef}
       id="home"
       aria-label="Hero"
-      className="relative isolate min-h-[100svh] overflow-hidden bg-[#080711] text-[#ECECF2]"
+      className="relative isolate min-h-[100svh] overflow-hidden bg-stage text-ink"
     >
       {/* Brand glow behind the globe. It fades in only once the globe has
           settled into place, so it never lights the landing zone ahead of the
@@ -162,11 +165,11 @@ export function Hero() {
       {/* Legibility scrim: darken the left/bottom where the copy sits. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#080711] via-[#080711]/82 to-transparent lg:via-[#080711]/55"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-stage via-stage/82 to-transparent lg:via-stage/55"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#080711] to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-stage to-transparent"
       />
 
       {/* Content. The wrapper div is the GSAP scroll-out target; Motion only
@@ -184,15 +187,15 @@ export function Hero() {
           <m.p
             custom={0}
             variants={lines}
-            className="mb-3 text-[clamp(0.95rem,1.2vw,1.125rem)] font-medium tracking-tight text-[#A8DADC]"
+            className="mb-3 text-[clamp(0.95rem,1.2vw,1.125rem)] font-medium tracking-tight text-primary"
           >
-            Hi, I&apos;m Sauel <span className="text-[#8A8A98]">(Sol)</span>
+            Hi, I&apos;m Sauel <span className="text-ink-muted">(Sol)</span>
           </m.p>
 
           <m.h1
             custom={1}
             variants={lines}
-            className="text-[clamp(2.6rem,7vw,5.75rem)] font-bold leading-[1.0] tracking-[-0.035em] text-balance text-[#F4F4F8] [text-shadow:0_2px_40px_rgba(0,0,0,0.5)]"
+            className="text-[clamp(2.6rem,7vw,5.75rem)] font-bold leading-[1.0] tracking-[-0.035em] text-balance text-ink-bright [text-shadow:0_2px_40px_rgba(0,0,0,0.5)]"
           >
             Sauel Almonte
           </m.h1>
@@ -211,7 +214,7 @@ export function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.35, ease: "easeOut" }}
-                className="text-[#A8DADC] [text-shadow:0_0_28px_rgba(168,218,220,0.35)]"
+                className="text-primary [text-shadow:0_0_28px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
               >
                 {ROLES[roleIndex]}
               </m.span>
@@ -221,7 +224,7 @@ export function Hero() {
           <m.p
             custom={3}
             variants={lines}
-            className="mt-4 max-w-[34rem] text-[clamp(1rem,1.4vw,1.2rem)] leading-[1.5] text-[#C8C8D4] text-pretty"
+            className="mt-4 max-w-[34rem] text-[clamp(1rem,1.4vw,1.2rem)] leading-[1.5] text-ink-secondary text-pretty"
           >
             I build full-stack web applications and AI-powered tools. AWS
             certified, bilingual (EN/ES), based in Boston, and mentoring the next
@@ -241,7 +244,7 @@ export function Hero() {
               whileHover={reduceMotion ? undefined : { y: -3, scale: 1.03 }}
               whileTap={reduceMotion ? undefined : { y: 0, scale: 0.97 }}
               transition={{ type: "spring", stiffness: 280, damping: 18, mass: 0.6 }}
-              className="group flex h-[clamp(2.5rem,8.5vw,3rem)] flex-1 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-[#8fcfd1]/60 bg-[linear-gradient(180deg,#c7ecee,#A8DADC_46%,#8ccfd1)] px-[clamp(0.875rem,3vw,1.5rem)] text-[clamp(0.8125rem,2.3vw,1rem)] font-semibold text-[#06232b] shadow-[inset_0_1px_0_rgba(255,255,255,0.7),inset_0_-2px_3px_rgba(0,40,45,0.18),0_6px_16px_-8px_rgba(168,218,220,0.22)] transition-shadow duration-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.78),inset_0_-2px_3px_rgba(0,40,45,0.2),0_12px_26px_-10px_rgba(168,218,220,0.38)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A8DADC] focus-visible:ring-offset-2 focus-visible:ring-offset-[#080711]"
+              className="cta-dome group flex h-[clamp(2.5rem,8.5vw,3rem)] flex-1 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-[clamp(0.875rem,3vw,1.5rem)] text-[clamp(0.8125rem,2.3vw,1rem)] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-stage"
             >
               View my work
               <ArrowDown
@@ -256,7 +259,7 @@ export function Hero() {
               whileHover={reduceMotion ? undefined : { y: -3, scale: 1.03 }}
               whileTap={reduceMotion ? undefined : { y: 0, scale: 0.97 }}
               transition={{ type: "spring", stiffness: 280, damping: 18, mass: 0.6 }}
-              className="group flex h-[clamp(2.5rem,8.5vw,3rem)] flex-1 cursor-pointer items-center justify-center whitespace-nowrap rounded-full border border-white/12 bg-[linear-gradient(160deg,rgba(255,255,255,0.10),rgba(255,255,255,0.03)_52%,rgba(0,0,0,0.22))] px-[clamp(0.875rem,3vw,1.5rem)] text-[clamp(0.8125rem,2.3vw,1rem)] font-medium text-[#ECECF2] shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.22),inset_0_-1.5px_2px_rgba(0,0,0,0.5),0_6px_16px_-6px_rgba(0,0,0,0.85)] transition-[box-shadow,border-color,color] duration-300 hover:border-[#A8DADC]/45 hover:text-white hover:shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.26),0_8px_20px_-10px_rgba(168,218,220,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A8DADC] focus-visible:ring-offset-2 focus-visible:ring-offset-[#080711]"
+              className="group flex h-[clamp(2.5rem,8.5vw,3rem)] flex-1 cursor-pointer items-center justify-center whitespace-nowrap rounded-full border border-white/12 bg-[linear-gradient(160deg,rgba(255,255,255,0.10),rgba(255,255,255,0.03)_52%,rgba(0,0,0,0.22))] px-[clamp(0.875rem,3vw,1.5rem)] text-[clamp(0.8125rem,2.3vw,1rem)] font-medium text-ink shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.22),inset_0_-1.5px_2px_rgba(0,0,0,0.5),0_6px_16px_-6px_rgba(0,0,0,0.85)] transition-[box-shadow,border-color,color] duration-300 hover:border-primary/45 hover:text-white hover:shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.26),0_8px_20px_-10px_color-mix(in_srgb,var(--primary)_16%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-stage"
             >
               Get in touch
             </m.a>
@@ -275,7 +278,7 @@ export function Hero() {
       <a
         href="#about"
         aria-label="Scroll to about"
-        className="absolute inset-x-0 bottom-6 z-10 mx-auto flex w-fit cursor-pointer flex-col items-center gap-1 text-[#8A8A98] transition-colors hover:text-[#A8DADC]"
+        className="absolute inset-x-0 bottom-6 z-10 mx-auto flex w-fit cursor-pointer flex-col items-center gap-1 text-ink-muted transition-colors hover:text-primary"
       >
         <span className="text-xs tracking-wide">Scroll</span>
         <ArrowDown className="h-4 w-4 animate-bounce" aria-hidden />

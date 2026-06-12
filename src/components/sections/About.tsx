@@ -386,11 +386,11 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
         <div
           ref={blob1Ref}
-          className="absolute -top-20 right-[-5%] w-[500px] h-[500px] rounded-full bg-[#A8DADC]/10 blur-[100px]"
+          className="absolute -top-20 right-[-5%] w-[500px] h-[500px] rounded-full bg-cat-fullstack/10 blur-[100px]"
         />
         <div
           ref={blob2Ref}
-          className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-[#B39CD0]/8 blur-[90px]"
+          className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-cat-backend/8 blur-[90px]"
         />
       </div>
 
@@ -413,11 +413,11 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             <div ref={photoCardRef} className="relative opacity-0">
               {/* Decorative rings */}
               <div className="absolute -inset-4 rounded-full border border-primary/20 motion-safe:animate-pulse" />
-              <div className="absolute -inset-8 rounded-full border border-accent/10" />
+              <div className="absolute -inset-8 rounded-full border border-cat-backend/10" />
 
               {/* Avatar */}
-              <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full bg-linear-to-br from-primary/30 via-accent/20 to-secondary/30 flex items-center justify-center shadow-2xl ring-4 ring-primary/20">
-                <span className="text-6xl font-extrabold text-[#2b7a78] dark:text-primary tracking-tight select-none">
+              <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full bg-linear-to-br from-cat-fullstack/30 via-cat-backend/20 to-cat-cloud/30 flex items-center justify-center shadow-2xl ring-4 ring-primary/20">
+                <span className="text-6xl font-extrabold text-primary tracking-tight select-none">
                   SA
                 </span>
               </div>
@@ -428,7 +428,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
                 className="absolute -bottom-4 -right-4 bg-background border border-border rounded-2xl px-4 py-2 shadow-lg flex items-center gap-2"
                 style={{ opacity: 0, scale: 0 }}
               >
-                <MapPin className="h-4 w-4 text-[#2b7a78] dark:text-primary" />
+                <MapPin className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium text-foreground">Boston, MA</span>
               </div>
 
@@ -438,7 +438,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
                 className="absolute -top-4 -left-4 bg-background border border-border rounded-2xl px-4 py-2 shadow-lg flex items-center gap-2"
                 style={{ opacity: 0, scale: 0 }}
               >
-                <Languages className="h-4 w-4 text-accent" />
+                <Languages className="h-4 w-4 text-cat-backend" />
                 <span className="text-sm font-medium text-foreground">EN / ES</span>
               </div>
             </div>
@@ -503,7 +503,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
                   size="lg"
                   variant="outline"
                   type="button"
-                  className="rounded-full px-8 border-[#2b7a78] dark:border-primary text-[#2b7a78] dark:text-primary hover:bg-[#2b7a78] dark:hover:bg-primary hover:text-primary-foreground font-semibold shadow-sm shadow-foreground/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-105 group cursor-pointer"
+                  className="rounded-full px-8 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold shadow-sm shadow-foreground/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-105 group cursor-pointer"
                 >
                   <Download className="mr-2 h-4 w-4 motion-safe:group-hover:animate-bounce" />
                   Download Resume
@@ -523,7 +523,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
               style={{ opacity: 0 }}
             >
               <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <p className="text-4xl font-extrabold text-[#2b7a78] dark:text-primary">
+              <p className="text-4xl font-extrabold text-primary">
                 <span ref={(el) => { statValueRefs.current[i] = el; }}>0</span>
                 {stat.suffix}
               </p>
@@ -541,17 +541,17 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
               const inner = (
                 <>
                   <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 shadow-sm shadow-foreground/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <GraduationCap className="h-5 w-5 text-[#2b7a78] dark:text-primary" />
+                    <GraduationCap className="h-5 w-5 text-primary" />
                   </div>
                   <div className="space-y-1 min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-1">
                       <p className="font-semibold text-foreground text-sm leading-snug">{edu.institution}</p>
                       {edu.credentialUrl && (
-                        <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-[#2b7a78] dark:group-hover:text-primary transition-colors shrink-0 mt-0.5" />
+                        <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0 mt-0.5" />
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground leading-snug">{edu.degree}</p>
-                    <p className="text-xs text-[#2b7a78] dark:text-primary font-medium">
+                    <p className="text-xs text-primary font-medium">
                       {formatCredentialPeriod(edu.period)}
                     </p>
                     {edu.description ? (

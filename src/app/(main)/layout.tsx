@@ -13,10 +13,16 @@ export default function MainLayout({
       {/* One Lenis smooth-scroll instance for the whole public site — Navbar,
           MobileMenu, and every section's ScrollTriggers hang off it. */}
       <ScrollProvider>
-        <JsonLd />
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        {/* The public landing is dark-only by design: the `dark` class pins
+            every shadcn/token utility to the hero's #080711 world regardless
+            of the visitor's theme, so hero → sections never changes worlds.
+            Admin keeps its own light/dark toggle. */}
+        <div className="dark bg-background text-foreground">
+          <JsonLd />
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+        </div>
       </ScrollProvider>
     </MotionProvider>
   );

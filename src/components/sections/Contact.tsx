@@ -36,6 +36,7 @@ import {
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { SocialLink, type SocialLinkItem } from "@/components/common/SocialLink";
 import { YOUTUBE_CHANNEL_URL } from "@/config/site";
+import { BRAND } from "@/config/tokens";
 import { cn } from "@/lib/utils";
 
 const ContactSchema = z.object({
@@ -53,9 +54,9 @@ const ContactSchema = z.object({
 type ContactFormData = z.infer<typeof ContactSchema>;
 
 const SOCIALS: SocialLinkItem[] = [
-  { label: "GitHub",   href: "https://github.com/SauelAlmonte",       icon: Github,   accent: "#A8DADC" },
-  { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte", icon: Linkedin, accent: "#B39CD0" },
-  { label: "YouTube",  href: YOUTUBE_CHANNEL_URL,                     icon: Youtube,  accent: "#FFC1CC" },
+  { label: "GitHub",   href: "https://github.com/SauelAlmonte",       icon: Github,   accent: BRAND.fullstack },
+  { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte", icon: Linkedin, accent: BRAND.backend },
+  { label: "YouTube",  href: YOUTUBE_CHANNEL_URL,                     icon: Youtube,  accent: BRAND.cloud },
 ];
 
 type ModalState = "idle" | "consent" | "success";
@@ -152,8 +153,8 @@ export function Contact() {
       >
         {/* Background blobs */}
         <div aria-hidden="true" className="absolute inset-0 -z-10">
-          <div className="absolute -bottom-20 -left-20 w-96 h-96 rounded-full bg-[#A8DADC]/10 blur-[100px]" />
-          <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-[#B39CD0]/10 blur-[80px]" />
+          <div className="absolute -bottom-20 -left-20 w-96 h-96 rounded-full bg-cat-fullstack/10 blur-[100px]" />
+          <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-cat-backend/10 blur-[80px]" />
         </div>
 
         <div className="max-w-6xl mx-auto space-y-fl-y-lg">
@@ -182,14 +183,14 @@ export function Contact() {
 
               {/* Identity card */}
               <div className="flex items-start gap-5 p-6 rounded-2xl border border-border bg-card shadow-sm shadow-foreground/10">
-                <div className="w-14 h-14 rounded-full bg-linear-to-br from-primary/30 via-accent/20 to-secondary/30 flex items-center justify-center shrink-0 ring-2 ring-primary/20 shadow-sm shadow-foreground/10">
-                  <span className="text-lg font-extrabold text-[#2b7a78] dark:text-primary">SA</span>
+                <div className="w-14 h-14 rounded-full bg-linear-to-br from-cat-fullstack/30 via-cat-backend/20 to-cat-cloud/30 flex items-center justify-center shrink-0 ring-2 ring-primary/20 shadow-sm shadow-foreground/10">
+                  <span className="text-lg font-extrabold text-primary">SA</span>
                 </div>
                 <div className="space-y-1.5">
                   <p className="font-extrabold text-foreground text-lg leading-tight">Sauel Almonte</p>
                   <p className="text-sm text-muted-foreground">Full-Stack Engineer & AI Builder</p>
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                    <MapPin className="h-3.5 w-3.5 text-[#2b7a78] dark:text-primary shrink-0" />
+                    <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
                     <span>Boston, MA</span>
                   </div>
                 </div>
@@ -200,9 +201,11 @@ export function Contact() {
                 <p className="text-xs font-bold tracking-widest uppercase text-muted-foreground">
                   Connect with me
                 </p>
+                {/* Landing is dark-only now — the dark chip treatment with
+                    vivid hover accents replaces the old light-surface tone. */}
                 <div className="flex items-center gap-3">
                   {SOCIALS.map((item) => (
-                    <SocialLink key={item.label} item={item} tone="surface" size={44} />
+                    <SocialLink key={item.label} item={item} tone="dark" size={44} />
                   ))}
                 </div>
               </div>
@@ -222,7 +225,7 @@ export function Contact() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-sm font-semibold">
-                              Full Name <span className="text-[#2b7a78] dark:text-primary">*</span>
+                              Full Name <span className="text-primary">*</span>
                             </FormLabel>
                             <FormControl>
                               <Input placeholder="Jane Doe" {...field} className="rounded-xl border-border focus-visible:ring-primary bg-background" />
@@ -237,7 +240,7 @@ export function Contact() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-sm font-semibold">
-                              Email Address <span className="text-[#2b7a78] dark:text-primary">*</span>
+                              Email Address <span className="text-primary">*</span>
                             </FormLabel>
                             <FormControl>
                               <Input type="email" placeholder="jane@example.com" {...field} className="rounded-xl border-border focus-visible:ring-primary bg-background" />
@@ -272,7 +275,7 @@ export function Contact() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-sm font-semibold">
-                              Subject <span className="text-[#2b7a78] dark:text-primary">*</span>
+                              Subject <span className="text-primary">*</span>
                             </FormLabel>
                             <FormControl>
                               <Input placeholder="What's this about?" {...field} className="rounded-xl border-border focus-visible:ring-primary bg-background" />
@@ -290,7 +293,7 @@ export function Contact() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-sm font-semibold">
-                            Message <span className="text-[#2b7a78] dark:text-primary">*</span>
+                            Message <span className="text-primary">*</span>
                           </FormLabel>
                           <FormControl>
                             <Textarea

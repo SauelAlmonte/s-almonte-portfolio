@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { BRAND } from "@/config/tokens";
 import { sampleLandPoints, buildArcs, buildGraticule } from "./globe-geometry";
 import {
   POINT_VERT,
@@ -18,10 +19,10 @@ const CANDIDATES = 30000; // ~8k survive the land mask
 const ARC_COUNT = 14;
 const PARTICLE_COUNT = 480;
 
-// Brand palette (sRGB) — cyan / lavender / pink on a near-black stage.
-const CYAN = new THREE.Color("#A8DADC");
-const LAVENDER = new THREE.Color("#B39CD0");
-const PINK = new THREE.Color("#FFC1CC");
+// Brand palette (sRGB) from the token mirror — shaders can't read CSS vars.
+const CYAN = new THREE.Color(BRAND.fullstack);
+const LAVENDER = new THREE.Color(BRAND.backend);
+const PINK = new THREE.Color(BRAND.cloud);
 
 export function GlobeScene({ onSettled }: { onSettled?: () => void }) {
   const group = useRef<THREE.Group>(null);
@@ -217,6 +218,12 @@ export function GlobeScene({ onSettled }: { onSettled?: () => void }) {
   }, []);
 
   useFrame((state, delta) => {
+    // Clamp the frame delta: when the hero scrolls back into view after a
+    // frameloop="demand" pause, the first frames carry spiked/garbage deltas
+    // that make the damp() easing below diverge — the globe visibly inflates
+    // and re-enters from the right. 100ms cap = anything slower than 10fps
+    // is treated as one 100ms step.
+    const dt = Math.min(Math.max(delta, 0), 0.1);
     const t = state.clock.elapsedTime;
     pointMat.uniforms.uTime.value = t;
     particleMat.uniforms.uTime.value = t;
@@ -229,7 +236,7 @@ export function GlobeScene({ onSettled }: { onSettled?: () => void }) {
 
     const g = group.current;
     if (!g) return;
-    if (!reduced) g.rotation.y += delta * 0.045;
+    if (!reduced) g.rotation.y += dt * 0.045;
     // frame-rate-independent exponential ease-out (smooth slide-in + resize follow)
     const dampF = THREE.MathUtils.damp;
 
@@ -237,12 +244,12 @@ export function GlobeScene({ onSettled }: { onSettled?: () => void }) {
     // never fights) the globe's own rotation/position easing below.
     const tl = tilt.current;
     if (tl && !reduced) {
-      tl.rotation.x = dampF(tl.rotation.x, pointer.current.y * 0.045, 2.5, delta);
-      tl.rotation.y = dampF(tl.rotation.y, pointer.current.x * 0.08, 2.5, delta);
+      tl.rotation.x = dampF(tl.rotation.x, pointer.current.y * 0.045, 2.5, dt);
+      tl.rotation.y = dampF(tl.rotation.y, pointer.current.x * 0.08, 2.5, dt);
     }
-    g.scale.setScalar(dampF(g.scale.x, target.scale, 3, delta));
-    g.position.x = dampF(g.position.x, target.x, 2.4, delta);
-    g.position.y = dampF(g.position.y, target.y, 3, delta);
+    g.scale.setScalar(dampF(g.scale.x, target.scale, 3, dt));
+    g.position.x = dampF(g.position.x, target.x, 2.4, dt);
+    g.position.y = dampF(g.position.y, target.y, 3, dt);
 
     // Once the globe has converged on its resting spot, tell Hero so the brand
     // glow can fade in behind it. Gating on "settled" (not "started") keeps the

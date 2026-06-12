@@ -2,6 +2,7 @@
 
 import { m, useReducedMotion } from "motion/react";
 import type { LucideIcon } from "lucide-react";
+import { BRAND } from "@/config/tokens";
 import { cn } from "@/lib/utils";
 
 /**
@@ -51,9 +52,9 @@ export function SocialLink({
   const reduce = useReducedMotion();
 
   // On the light surface, the pale brand cyan has too little contrast, so the
-  // accent that touches text/ring is the deeper brand teal; the vivid hex still
-  // drives the dark-tone hover.
-  const accent = tone === "dark" ? item.accent : "#2b7a78";
+  // accent that touches text/ring is the AA-darkened category step; the vivid
+  // hex still drives the dark-tone hover.
+  const accent = tone === "dark" ? item.accent : BRAND.fullstackDeep;
   const isDark = tone === "dark";
 
   return (
@@ -74,8 +75,8 @@ export function SocialLink({
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         "focus-visible:[--tw-ring-color:var(--acc)]",
         isDark
-          ? "focus-visible:ring-offset-[#080711]"
-          : "focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0b0b14]",
+          ? "focus-visible:ring-offset-stage"
+          : "focus-visible:ring-offset-white dark:focus-visible:ring-offset-surface",
       )}
     >
       {/* Accent glow, revealed on hover. */}
@@ -101,7 +102,7 @@ export function SocialLink({
         <span
           className={cn(
             "transition-colors duration-300 group-hover:[color:var(--acc)]",
-            isDark ? "text-[#C4C4D0]" : "text-slate-500 dark:text-[#C4C4D0]",
+            isDark ? "text-ink-secondary" : "text-slate-500 dark:text-ink-secondary",
           )}
         >
           <Icon className="h-[18px] w-[18px]" strokeWidth={1.9} aria-hidden />
