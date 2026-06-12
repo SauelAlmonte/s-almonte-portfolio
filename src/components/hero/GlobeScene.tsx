@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { BRAND } from "@/config/tokens";
 import { sampleLandPoints, buildArcs, buildGraticule } from "./globe-geometry";
 import {
   POINT_VERT,
@@ -18,10 +19,10 @@ const CANDIDATES = 30000; // ~8k survive the land mask
 const ARC_COUNT = 14;
 const PARTICLE_COUNT = 480;
 
-// Brand palette (sRGB) — cyan / lavender / pink on a near-black stage.
-const CYAN = new THREE.Color("#A8DADC");
-const LAVENDER = new THREE.Color("#B39CD0");
-const PINK = new THREE.Color("#FFC1CC");
+// Brand palette (sRGB) from the token mirror — shaders can't read CSS vars.
+const CYAN = new THREE.Color(BRAND.fullstack);
+const LAVENDER = new THREE.Color(BRAND.backend);
+const PINK = new THREE.Color(BRAND.cloud);
 
 export function GlobeScene({ onSettled }: { onSettled?: () => void }) {
   const group = useRef<THREE.Group>(null);

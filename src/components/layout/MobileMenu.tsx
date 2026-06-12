@@ -25,6 +25,7 @@ import {
 import { SocialLink, type SocialLinkItem } from "@/components/common/SocialLink";
 import { useLenis, useScrollTo } from "@/components/common/ScrollProvider";
 import { YOUTUBE_CHANNEL_URL } from "@/config/site";
+import { BRAND } from "@/config/tokens";
 import { NavItem } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -43,9 +44,9 @@ const NAV_ICONS: Record<string, LucideIcon> = {
 };
 
 const SOCIALS: SocialLinkItem[] = [
-  { label: "GitHub", href: "https://github.com/SauelAlmonte", icon: Github, accent: "#A8DADC" },
-  { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte", icon: Linkedin, accent: "#B39CD0" },
-  { label: "YouTube", href: YOUTUBE_CHANNEL_URL, icon: Youtube, accent: "#FFC1CC" },
+  { label: "GitHub", href: "https://github.com/SauelAlmonte", icon: Github, accent: BRAND.fullstack },
+  { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte", icon: Linkedin, accent: BRAND.backend },
+  { label: "YouTube", href: YOUTUBE_CHANNEL_URL, icon: Youtube, accent: BRAND.cloud },
 ];
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -83,7 +84,7 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
       <SheetTrigger asChild>
         <button
           aria-label="Open navigation menu"
-          className="grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-[#ECECF2] transition-colors duration-200 hover:border-[#A8DADC]/40 hover:text-[#A8DADC] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8DADC]/60 md:hidden"
+          className="grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-ink transition-colors duration-200 hover:border-primary/40 hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 md:hidden"
         >
           {/* Quarter-turn while the glyph swaps reads as a hamburger↔close morph. */}
           <m.span
@@ -101,21 +102,21 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
         side="right"
         showCloseButton={false}
         aria-describedby={undefined} // nav links are self-describing; silences Radix's missing-Description warning
-        className="flex w-[86vw] max-w-[21rem] flex-col gap-0 overflow-hidden border-l border-white/10 bg-[#080711]/45 p-0 text-[#ECECF2] shadow-[-24px_0_60px_-30px_rgba(0,0,0,0.9)] backdrop-blur-2xl sm:max-w-[21rem]"
+        className="flex w-[86vw] max-w-[21rem] flex-col gap-0 overflow-hidden border-l border-white/10 bg-stage/45 p-0 text-ink shadow-[-24px_0_60px_-30px_rgba(0,0,0,0.9)] backdrop-blur-2xl sm:max-w-[21rem]"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
         {/* faint instrument grid, masked toward the glowing corner */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[linear-gradient(rgba(168,218,220,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(168,218,220,0.7)_1px,transparent_1px)] bg-size-[36px_36px] mask-[radial-gradient(120%_90%_at_100%_0%,black,transparent_75%)]"
+          className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[linear-gradient(color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px)] bg-size-[36px_36px] mask-[radial-gradient(120%_90%_at_100%_0%,black,transparent_75%)]"
         />
 
         {/* top sheen + faint corner accent (the only glow, kept restrained) */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(168,218,220,0.10),transparent_70%)]"
+          className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--primary)_10%,transparent),transparent_70%)]"
         />
 
         {/* Minimal header — just a close affordance, like the reference's clean top. */}
@@ -125,11 +126,11 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
           transition={{ duration: 0.4, ease: EASE }}
           className="flex items-center justify-between px-6 pt-6"
         >
-          <span className="text-xs font-medium uppercase tracking-[0.22em] text-[#7e7e8c]">Menu</span>
+          <span className="text-xs font-medium uppercase tracking-[0.22em] text-ink-muted">Menu</span>
           <button
             onClick={() => handleOpenChange(false)}
             aria-label="Close navigation menu"
-            className="grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-[#C4C4D0] transition-colors duration-200 hover:border-[#A8DADC]/40 hover:text-[#A8DADC] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8DADC]/60"
+            className="grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-ink-secondary transition-colors duration-200 hover:border-primary/40 hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
           >
             <X className="h-[18px] w-[18px]" />
           </button>
@@ -155,13 +156,13 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "group flex w-full cursor-pointer items-center gap-4 border-b border-white/[0.07] py-[18px] text-left transition-colors duration-200 last:border-b-0",
-                  isActive ? "text-[#A8DADC]" : "text-[#E6E6EE]",
+                  isActive ? "text-primary" : "text-ink",
                 )}
               >
                 <Icon
                   className={cn(
                     "h-[26px] w-[26px] shrink-0 transition-colors duration-200",
-                    isActive ? "text-[#A8DADC]" : "text-[#9ea0ad] group-hover:text-[#ECECF2]",
+                    isActive ? "text-primary" : "text-ink-muted group-hover:text-ink",
                   )}
                   strokeWidth={1.75}
                   aria-hidden
@@ -173,7 +174,7 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
                   className={cn(
                     "ml-auto h-4 w-4 shrink-0 transition-all duration-200",
                     isActive
-                      ? "translate-x-0 text-[#A8DADC] opacity-100"
+                      ? "translate-x-0 text-primary opacity-100"
                       : "-translate-x-1.5 opacity-0 group-hover:translate-x-0 group-hover:opacity-50",
                   )}
                   aria-hidden
@@ -190,7 +191,7 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
           transition={{ duration: 0.5, ease: EASE, delay: 0.4 }}
           className="mt-auto border-t border-white/10 px-6 pb-7 pt-5"
         >
-          <p className="text-xs font-medium tracking-wide text-[#7e7e8c]">Connect</p>
+          <p className="text-xs font-medium tracking-wide text-ink-muted">Connect</p>
           <div className="mt-3 flex items-center gap-2.5">
             {SOCIALS.map((item) => (
               <SocialLink key={item.label} item={item} tone="dark" size={40} />
@@ -198,7 +199,7 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
           </div>
           <button
             onClick={() => go("#contact")}
-            className="mt-5 flex h-12 w-full cursor-pointer items-center justify-center rounded-full border border-[#8fcfd1]/60 bg-[linear-gradient(180deg,#c7ecee,#A8DADC_46%,#8ccfd1)] text-sm font-semibold text-[#06232b] shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_6px_16px_-8px_rgba(168,218,220,0.25)] transition-shadow duration-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_10px_24px_-10px_rgba(168,218,220,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8DADC] focus-visible:ring-offset-2 focus-visible:ring-offset-[#080711]"
+            className="cta-dome mt-5 flex h-12 w-full cursor-pointer items-center justify-center rounded-full text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-stage"
           >
             Get in touch
           </button>

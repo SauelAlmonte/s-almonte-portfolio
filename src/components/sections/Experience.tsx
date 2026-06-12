@@ -112,7 +112,7 @@ export function Experience({ experiences, pdfChoices }: ExperienceSectionProps) 
             className="relative shrink-0 self-stretch"
             style={{ width: "var(--exp-rail)" }}
           >
-            <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-gradient-to-b from-primary via-accent to-secondary opacity-30" />
+            <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-gradient-to-b from-cat-fullstack via-cat-backend to-cat-cloud opacity-30" />
           </div>
 
           <div className="grid min-w-0 flex-1 grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">

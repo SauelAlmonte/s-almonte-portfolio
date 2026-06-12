@@ -8,6 +8,7 @@ import { SectionHeading } from "@/components/common/SectionHeading";
 import { cn } from "@/lib/utils";
 import { CATEGORY_META, type ProjectCategory } from "@/config/projects";
 import { SKILL_SECTION_SUBTITLE } from "@/config/skills";
+import { BRAND } from "@/config/tokens";
 
 export type SkillsSectionProps = {
   skillsByCategory: Record<
@@ -41,26 +42,26 @@ const SKILL_CARD_SHELL: Omit<SkillCard, "skills" | "title" | "subtitle">[] = (
     {
       category: "fullstack",
       icon: Code2,
-      accentLight: "#2b7a78",
+      accentLight: BRAND.fullstackDeep,
       borderClass:
-        "border-[#A8DADC]/30 hover:border-[#A8DADC]/80 hover:shadow-[#A8DADC]/10",
-      glowClass: "group-hover:shadow-[0_8px_40px_rgba(168,218,220,0.2)]",
+        "border-cat-fullstack/30 hover:border-cat-fullstack/80 hover:shadow-cat-fullstack/10",
+      glowClass: "group-hover:shadow-[0_8px_40px_color-mix(in_srgb,var(--cat-fullstack)_20%,transparent)]",
     },
     {
       category: "backend",
       icon: BrainCircuit,
-      accentLight: "#5a4a7a",
+      accentLight: BRAND.backendDeep,
       borderClass:
-        "border-[#B39CD0]/30 hover:border-[#B39CD0]/80 hover:shadow-[#B39CD0]/10",
-      glowClass: "group-hover:shadow-[0_8px_40px_rgba(179,156,208,0.2)]",
+        "border-cat-backend/30 hover:border-cat-backend/80 hover:shadow-cat-backend/10",
+      glowClass: "group-hover:shadow-[0_8px_40px_color-mix(in_srgb,var(--cat-backend)_20%,transparent)]",
     },
     {
       category: "cloud",
       icon: Cloud,
-      accentLight: "#b84a5f",
+      accentLight: BRAND.cloudDeep,
       borderClass:
-        "border-[#FFC1CC]/30 hover:border-[#FFC1CC]/80 hover:shadow-[#FFC1CC]/10",
-      glowClass: "group-hover:shadow-[0_8px_40px_rgba(255,193,204,0.2)]",
+        "border-cat-cloud/30 hover:border-cat-cloud/80 hover:shadow-cat-cloud/10",
+      glowClass: "group-hover:shadow-[0_8px_40px_color-mix(in_srgb,var(--cat-cloud)_20%,transparent)]",
     },
   ] as const
 ).map(({ category, icon, accentLight, borderClass, glowClass }) => ({
@@ -182,8 +183,8 @@ export function Skills({ skillsByCategory }: SkillsSectionProps) {
       className="relative py-fl-section px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
       <div aria-hidden="true" className="absolute inset-0 -z-10">
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 rounded-full bg-[#B39CD0]/10 blur-[100px]" />
-        <div className="absolute top-1/3 right-0 w-64 h-64 rounded-full bg-[#FFC1CC]/10 blur-[80px]" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 rounded-full bg-cat-backend/10 blur-[100px]" />
+        <div className="absolute top-1/3 right-0 w-64 h-64 rounded-full bg-cat-cloud/10 blur-[80px]" />
       </div>
 
       <div className="max-w-6xl mx-auto space-y-fl-y-lg">
