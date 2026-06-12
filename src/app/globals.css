@@ -361,27 +361,6 @@
   --sidebar-ring: #a8dadc;
 }
 
-/*
- * About section: heading uses .about-animate-initial as fallback if GSAP never runs.
- * Bio block is always visible (no GSAP animation).
- */
-#about .about-animate-initial {
-  clip-path: inset(0);
-  opacity: 1;
-}
-
-/* Force bio block visible — overrides any GSAP inline styles */
-#about [data-bio-block] {
-  opacity: 1 !important;
-  visibility: visible !important;
-  clip-path: none !important;
-}
-#about [data-bio-block] [data-bio-para],
-#about [data-bio-block] [data-download-btn] {
-  opacity: 1 !important;
-  visibility: visible !important;
-  clip-path: none !important;
-}
 
 @layer base {
   * {

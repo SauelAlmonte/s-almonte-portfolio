@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
+import { m, useReducedMotion, type Variants } from "motion/react";
 import { gsap, ScrollTrigger, SCROLL_MEDIA } from "@/lib/scroll/gsap";
-import { Download, MapPin, Languages, GraduationCap, ExternalLink } from "lucide-react";
+import { useScrollSection } from "@/lib/scroll/useScrollSection";
+import { Download, GraduationCap, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/common/SectionHeading";
+import { PortraitCard } from "@/components/about/PortraitCard";
 import { formatCredentialPeriod } from "@/lib/resume/format-credential-period";
 
 import { ResumeDownloadChoiceModal } from "@/components/resume/ResumeDownloadChoiceModal";
@@ -18,6 +21,9 @@ const STATS = [
   { value: 2, suffix: "", label: "Languages" },
 ];
 
+/** Cinematic ease for every Motion reveal in this section. */
+const EASE = [0.16, 1, 0.3, 1] as const;
+
 type AboutProps = {
   professionalSummary: string;
   credentialCards: LandingCredentialCard[];
@@ -25,18 +31,18 @@ type AboutProps = {
 };
 
 export function About({ professionalSummary, credentialCards, pdfChoices }: AboutProps) {
-  const sectionRef    = useRef<HTMLElement>(null);
-  const headingRef    = useRef<HTMLDivElement>(null);
-  const photoColRef   = useRef<HTMLDivElement>(null);
-  const photoCardRef  = useRef<HTMLDivElement>(null);
-  const badge1Ref     = useRef<HTMLDivElement>(null);
-  const badge2Ref     = useRef<HTMLDivElement>(null);
-  const contentRef    = useRef<HTMLDivElement>(null);
-  const statsRef      = useRef<HTMLDivElement>(null);
-  const educationRef  = useRef<HTMLDivElement>(null);
-  const blob1Ref      = useRef<HTMLDivElement>(null);
-  const blob2Ref      = useRef<HTMLDivElement>(null);
-  const statValueRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const sectionRef       = useRef<HTMLElement>(null);
+  const gridRef          = useRef<HTMLDivElement>(null);
+  const blob1Ref         = useRef<HTMLDivElement>(null);
+  const blob2Ref         = useRef<HTMLDivElement>(null);
+  const portraitDriftRef = useRef<HTMLDivElement>(null);
+  const bioColRef        = useRef<HTMLDivElement>(null);
+  const statsRef         = useRef<HTMLDivElement>(null);
+  const statValueRefs    = useRef<(HTMLSpanElement | null)[]>([]);
+
+  /* `useReducedMotion()` is null until the media query resolves (SSR-safe);
+     treat "unknown" as "animate" so the first paint matches the common case. */
+  const reduceMotion = useReducedMotion() ?? false;
 
   const cmsBioParagraphs = useMemo(() => {
     const t = professionalSummary.trim();
@@ -48,21 +54,9 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
     return parts.length > 0 ? parts : null;
   }, [professionalSummary]);
 
-  useEffect(() => {
-    const mm = gsap.matchMedia();
-
-    /* ─── DESKTOP + REDUCED MOTION: show content immediately, no animations ─── */
-    mm.add(SCROLL_MEDIA.desktopReduced, () => {
-      gsap.set(headingRef.current, { clipPath: "inset(0% 0 0 0)", opacity: 1, y: 0 });
-      gsap.set(photoCardRef.current, { opacity: 1, scale: 1, rotation: 0, y: 0 });
-      gsap.set([badge1Ref.current, badge2Ref.current], { opacity: 1, scale: 1, y: 0 });
-      gsap.set(gsap.utils.toArray<HTMLElement>("[data-bio-para], [data-download-btn]"), { opacity: 1 });
-      gsap.utils.toArray<HTMLElement>("[data-stat-card]").forEach((c) => {
-        gsap.set(c, { opacity: 1 });
-      });
-      gsap.utils.toArray<HTMLElement>("[data-edu-card]").forEach((c) => {
-        gsap.set(c, { opacity: 1 });
-      });
+  /* ─── GSAP: scroll-driven work only (parallax depth + count-up) ─── */
+  useScrollSection(sectionRef, (mm) => {
+    const startCounters = () => {
       ScrollTrigger.create({
         trigger: statsRef.current,
         start: "top 80%",
@@ -70,16 +64,36 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
         onEnter: () => {
           STATS.forEach((stat, i) => {
             const el = statValueRefs.current[i];
-            if (el) el.textContent = stat.value.toString();
+            if (!el) return;
+            // Tween a proxy object and write the rounded value into the
+            // DOM — the animated property must live in the to-vars.
+            const counter = { val: 0 };
+            gsap.to(counter, {
+              val: stat.value,
+              duration: 1.8,
+              ease: "power2.out",
+              delay: i * 0.12,
+              onUpdate: () => {
+                el.textContent = Math.round(counter.val).toString();
+              },
+            });
           });
         },
       });
-    });
+    };
 
-    /* ─── DESKTOP (≥1024 px) + NO REDUCED MOTION ─── */
     mm.add(SCROLL_MEDIA.desktop, () => {
-
-      /* --- Background parallax blobs --- */
+      /* Layered depth — each layer scrubs at a different speed. */
+      gsap.to(gridRef.current, {
+        yPercent: -8,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 2.5,
+        },
+      });
       gsap.to(blob1Ref.current, {
         y: -180,
         ease: "none",
@@ -101,279 +115,74 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
           scrub: 2,
         },
       });
-
-      /* --- Heading clip-path wipe up --- */
-      gsap.fromTo(
-        headingRef.current,
-        { clipPath: "inset(100% 0 0 0)", opacity: 0, y: 30 },
-        {
-          clipPath: "inset(0% 0 0 0)",
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          ease: "power4.out",
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: "top 85%",
-            toggleActions: "play none none none",
-          },
-        }
-      );
-
-      /* --- Photo card entrance (scale + slight rotate) --- */
-      gsap.fromTo(
-        photoCardRef.current,
-        { opacity: 0, scale: 0.75, rotation: -6 },
-        {
-          opacity: 1,
-          scale: 1,
-          rotation: 0,
-          duration: 1.1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: photoColRef.current,
-            start: "top 75%",
-            toggleActions: "play none none none",
-          },
-        }
-      );
-
-      /* --- Floating badges pop in with bounce --- */
-      gsap.fromTo(
-        [badge1Ref.current, badge2Ref.current],
-        { opacity: 0, scale: 0, y: 20 },
-        {
-          opacity: 1,
-          scale: 1,
-          y: 0,
-          duration: 0.6,
-          ease: "back.out(2)",
-          stagger: 0.2,
-          delay: 0.4,
-          scrollTrigger: {
-            trigger: photoCardRef.current,
-            start: "top 75%",
-            toggleActions: "play none none none",
-          },
-        }
-      );
-
-      /* --- Photo subtle parallax while bio scrolls alongside --- */
-      gsap.to(photoCardRef.current, {
+      /* Portrait drifts upward while the bio scrolls alongside. The drift
+         wrapper is GSAP-owned; PortraitCard's Motion transforms live on
+         separate nodes inside it. */
+      gsap.to(portraitDriftRef.current, {
         y: -60,
         ease: "none",
         scrollTrigger: {
-          trigger: contentRef.current,
+          trigger: bioColRef.current,
           start: "top center",
           end: "bottom center",
           scrub: 1.2,
         },
       });
 
-      /* --- Bio paragraphs + Download button: Hero-style timeline (power3.out, y: 20, overlapping) --- */
-      const bioParas = gsap.utils.toArray<HTMLElement>("[data-bio-para]");
-      const downloadBtnEl = document.querySelector<HTMLElement>("[data-download-btn]");
-      const bioTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: contentRef.current,
-          start: "top 85%",
-          toggleActions: "play none none none",
-        },
-        defaults: { ease: "power3.out" },
-      });
-      bioParas.forEach((para, i) => {
-        if (i === 0) {
-          bioTl.fromTo(para, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 });
-        } else {
-          bioTl.fromTo(para, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3");
-        }
-      });
-      if (downloadBtnEl) bioTl.fromTo(downloadBtnEl, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2");
-
-      /* --- Stats: fade-in + counter --- */
-      const statCards = gsap.utils.toArray<HTMLElement>("[data-stat-card]");
-      statCards.forEach((card, i) => {
-        gsap.fromTo(
-          card,
-          { opacity: 0 },
-          {
-            opacity: 1,
-            duration: 0.6,
-            ease: "power2.out",
-            delay: i * 0.1,
-            scrollTrigger: {
-              trigger: statsRef.current,
-              start: "top 80%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
-      });
-
-      /* --- Stats counter (fires once on entry) --- */
-      ScrollTrigger.create({
-        trigger: statsRef.current,
-        start: "top 80%",
-        once: true,
-        onEnter: () => {
-          STATS.forEach((stat, i) => {
-            const el = statValueRefs.current[i];
-            if (!el) return;
-            // Tween a proxy object and write the rounded value into the DOM.
-            // (The animated property must live in the to-vars — the old
-            // fromTo call had it in the from slot, so nothing ever animated
-            // and the stats sat at 0.)
-            const counter = { val: 0 };
-            gsap.to(counter, {
-              val: stat.value,
-              duration: 1.8,
-              ease: "power2.out",
-              delay: i * 0.12,
-              onUpdate: () => {
-                el.textContent = Math.round(counter.val).toString();
-              },
-            });
-          });
-        },
-      });
-
-      /* --- Education cards: fade-in --- */
-      const eduCards = gsap.utils.toArray<HTMLElement>("[data-edu-card]");
-      eduCards.forEach((card, i) => {
-        gsap.fromTo(
-          card,
-          { opacity: 0 },
-          {
-            opacity: 1,
-            duration: 0.6,
-            ease: "power2.out",
-            delay: i * 0.1,
-            scrollTrigger: {
-              trigger: educationRef.current,
-              start: "top 82%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
-      });
+      startCounters();
     });
 
-    /* ─── MOBILE / TABLET (< 1024 px) ─── */
     mm.add(SCROLL_MEDIA.mobile, () => {
-      const prefersReducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      if (prefersReducedMotion) {
-        /* Show all content immediately, no animations */
-        gsap.set(headingRef.current, { clearProps: "clipPath,opacity,y" });
-        gsap.set(photoCardRef.current, { opacity: 1, scale: 1, y: 0 });
-        gsap.set([badge1Ref.current, badge2Ref.current], { opacity: 1, scale: 1 });
-        gsap.set(gsap.utils.toArray<HTMLElement>("[data-bio-para], [data-download-btn]"), { opacity: 1 });
-        gsap.utils.toArray<HTMLElement>("[data-stat-card]").forEach((c) => {
-          gsap.set(c, { opacity: 1 });
-        });
-        gsap.utils.toArray<HTMLElement>("[data-edu-card]").forEach((c) => {
-          gsap.set(c, { opacity: 1 });
-        });
-        ScrollTrigger.create({
-          trigger: statsRef.current,
-          start: "top 85%",
-          once: true,
-          onEnter: () => {
-            STATS.forEach((stat, i) => {
-              const el = statValueRefs.current[i];
-              if (el) el.textContent = stat.value.toString();
-            });
-          },
-        });
-        return () => {};
-      }
-
-      /* Run animations */
-      const ctx = gsap.context(() => {
-        /* Blob parallax (subtle on mobile) */
-        gsap.to(blob1Ref.current, {
-          y: -80,
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 2,
-          },
-        });
-
-        /* Heading — skip animation on mobile; .about-animate-initial keeps it visible */
-        gsap.set(headingRef.current, { clearProps: "clipPath,opacity" });
-
-        /* Photo */
-        gsap.fromTo(photoCardRef.current, { opacity: 0, scale: 0.85, y: 30 }, {
-          opacity: 1, scale: 1, y: 0, duration: 0.8, ease: "power3.out",
-          scrollTrigger: { trigger: photoCardRef.current, start: "top 82%" },
-        });
-        gsap.fromTo([badge1Ref.current, badge2Ref.current], { opacity: 0, scale: 0 }, {
-          opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)", stagger: 0.15, delay: 0.3,
-          scrollTrigger: { trigger: photoCardRef.current, start: "top 82%" },
-        });
-
-        /* Bio paragraphs + Download: Hero-style timeline */
-        const bioParas = gsap.utils.toArray<HTMLElement>("[data-bio-para]");
-        const downloadBtnEl = document.querySelector<HTMLElement>("[data-download-btn]");
-        const bioTl = gsap.timeline({
-          scrollTrigger: { trigger: contentRef.current, start: "top 85%" },
-          defaults: { ease: "power3.out" },
-        });
-        bioParas.forEach((para, i) => {
-          if (i === 0) {
-            bioTl.fromTo(para, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 });
-          } else {
-            bioTl.fromTo(para, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3");
-          }
-        });
-        if (downloadBtnEl) bioTl.fromTo(downloadBtnEl, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2");
-
-        /* Stats */
-        const statCards = gsap.utils.toArray<HTMLElement>("[data-stat-card]");
-        statCards.forEach((card, i) => {
-          gsap.fromTo(card, { opacity: 0 }, {
-            opacity: 1, duration: 0.6, ease: "power2.out", delay: i * 0.1,
-            scrollTrigger: { trigger: statsRef.current, start: "top 85%" },
-          });
-        });
-        ScrollTrigger.create({
-          trigger: statsRef.current,
-          start: "top 85%",
-          once: true,
-          onEnter: () => {
-            STATS.forEach((stat, i) => {
-              const el = statValueRefs.current[i];
-              if (!el) return;
-              // Same proxy-object count-up as the desktop clause above.
-              const counter = { val: 0 };
-              gsap.to(counter, {
-                val: stat.value, duration: 1.8, ease: "power2.out", delay: i * 0.1,
-                onUpdate: () => {
-                  el.textContent = Math.round(counter.val).toString();
-                },
-              });
-            });
-          },
-        });
-
-        /* Education */
-        const eduCards = gsap.utils.toArray<HTMLElement>("[data-edu-card]");
-        eduCards.forEach((card, i) => {
-          gsap.fromTo(card, { opacity: 0 }, {
-            opacity: 1, duration: 0.6, ease: "power2.out", delay: i * 0.1,
-            scrollTrigger: { trigger: educationRef.current, start: "top 85%" },
-          });
-        });
-      }, sectionRef);
-
-      return () => ctx.revert();
+      // No parallax below the desktop breakpoint — reveals + count-up only.
+      // Reduced-motion users are handled by the clause below.
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      startCounters();
     });
 
-    return () => mm.revert();
-  }, []);
+    mm.add(SCROLL_MEDIA.reduced, () => {
+      STATS.forEach((stat, i) => {
+        const el = statValueRefs.current[i];
+        if (el) el.textContent = stat.value.toString();
+      });
+    });
+  });
+
+  /* ─── Motion variants (component-state reveals) ─── */
+  const rise: Variants = {
+    hidden: { opacity: 0, y: 32 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: reduceMotion ? 0 : 0.9, ease: EASE },
+    },
+  };
+
+  const staggerGroup: Variants = {
+    hidden: {},
+    visible: {
+      transition: reduceMotion
+        ? { staggerChildren: 0 }
+        : { staggerChildren: 0.16, delayChildren: 0.1 },
+    },
+  };
+
+  const staggerItem: Variants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: reduceMotion ? 0 : 0.7, ease: EASE },
+    },
+  };
+
+  const cardGroup: Variants = {
+    hidden: {},
+    visible: {
+      transition: reduceMotion
+        ? { staggerChildren: 0 }
+        : { staggerChildren: 0.09 },
+    },
+  };
 
   return (
     <section
@@ -382,91 +191,67 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       aria-label="About Me"
       className="relative py-fl-section px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
-      {/* Parallax background blobs */}
+      {/* Layered parallax backdrop: instrument grid (slow) + glow blobs */}
       <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
         <div
+          ref={gridRef}
+          className="absolute inset-x-0 -inset-y-24 opacity-[0.05] bg-[linear-gradient(color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px)] bg-size-[44px_44px] mask-[radial-gradient(85%_70%_at_50%_30%,black,transparent_80%)]"
+        />
+        <div
           ref={blob1Ref}
-          className="absolute -top-20 right-[-5%] w-[500px] h-[500px] rounded-full bg-cat-fullstack/10 blur-[100px]"
+          className="absolute -top-20 right-[-5%] w-125 h-125 rounded-full bg-cat-fullstack/10 blur-[100px]"
         />
         <div
           ref={blob2Ref}
-          className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-cat-backend/8 blur-[90px]"
+          className="absolute bottom-[-10%] left-[-5%] w-100 h-100 rounded-full bg-cat-backend/8 blur-[90px]"
         />
       </div>
 
       <div className="max-w-6xl mx-auto space-y-fl-y-xl">
 
         {/* Heading */}
-        <div ref={headingRef} className="about-animate-initial">
+        <m.div
+          variants={rise}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.4 }}
+        >
           <SectionHeading
             label="About Me"
             title="Who I Am"
             subtitle="A passionate engineer who loves solving real problems through clean code, thoughtful design, and continuous learning."
           />
-        </div>
+        </m.div>
 
-        {/* Photo + Bio */}
+        {/* Portrait + Bio */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-fl-gap-cols items-start">
 
-          {/* Photo — sticky on desktop */}
-          <div ref={photoColRef} className="flex justify-center lg:justify-end lg:sticky lg:top-[15vh]">
-            <div ref={photoCardRef} className="relative opacity-0">
-              {/* Decorative rings */}
-              <div className="absolute -inset-4 rounded-full border border-primary/20 motion-safe:animate-pulse" />
-              <div className="absolute -inset-8 rounded-full border border-cat-backend/10" />
-
-              {/* Avatar */}
-              <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full bg-linear-to-br from-cat-fullstack/30 via-cat-backend/20 to-cat-cloud/30 flex items-center justify-center shadow-2xl ring-4 ring-primary/20">
-                <span className="text-6xl font-extrabold text-primary tracking-tight select-none">
-                  SA
-                </span>
-              </div>
-
-              {/* Floating badge — location */}
-              <div
-                ref={badge1Ref}
-                className="absolute -bottom-4 -right-4 bg-background border border-border rounded-2xl px-4 py-2 shadow-lg flex items-center gap-2"
-                style={{ opacity: 0, scale: 0 }}
-              >
-                <MapPin className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium text-foreground">Boston, MA</span>
-              </div>
-
-              {/* Floating badge — languages */}
-              <div
-                ref={badge2Ref}
-                className="absolute -top-4 -left-4 bg-background border border-border rounded-2xl px-4 py-2 shadow-lg flex items-center gap-2"
-                style={{ opacity: 0, scale: 0 }}
-              >
-                <Languages className="h-4 w-4 text-cat-backend" />
-                <span className="text-sm font-medium text-foreground">EN / ES</span>
-              </div>
+          {/* Portrait — sticky on desktop; outer div is the GSAP parallax layer */}
+          <div className="flex justify-center lg:justify-end lg:sticky lg:top-[15vh]">
+            <div ref={portraitDriftRef}>
+              <PortraitCard reduceMotion={reduceMotion} />
             </div>
           </div>
 
           {/* Bio */}
-          <div
-            ref={contentRef}
-            data-bio-block
+          <m.div
+            ref={bioColRef}
+            variants={staggerGroup}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
             className="space-y-6"
           >
             <div className="space-y-5 text-muted-foreground leading-relaxed">
               {cmsBioParagraphs ? (
                 cmsBioParagraphs.map((text, i) => (
-                  <p
-                    key={i}
-                    data-bio-para
-                    className="text-lg opacity-0"
-                  >
+                  <m.p key={i} variants={staggerItem} className="text-lg">
                     {text}
-                  </p>
+                  </m.p>
                 ))
               ) : (
                 <>
-                  <p
-                    data-bio-para
-                    className="text-lg opacity-0"
-                  >
+                  <m.p variants={staggerItem} className="text-lg">
                     I&apos;m a{" "}
                     <span className="text-foreground font-semibold">Full-Stack Software Engineer</span>{" "}
                     specializing in building scalable cloud applications and AI-powered workflow
@@ -474,30 +259,24 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
                     <span className="text-foreground font-medium">Wayfair</span> and{" "}
                     <span className="text-foreground font-medium">North Light AI</span>, I bring both
                     startup agility and enterprise-level engineering discipline to every project.
-                  </p>
-                  <p
-                    data-bio-para
-                    className="text-lg opacity-0"
-                  >
+                  </m.p>
+                  <m.p variants={staggerItem} className="text-lg">
                     Beyond coding, I&apos;m deeply committed to community. I&apos;ve{" "}
                     <span className="text-foreground font-semibold">mentored 50+ early-career engineers</span>{" "}
                     through the Urban League of Eastern Massachusetts, leading bootcamps and mock
                     interviews that helped technologists break into the industry.
-                  </p>
-                  <p
-                    data-bio-para
-                    className="text-lg opacity-0"
-                  >
+                  </m.p>
+                  <m.p variants={staggerItem} className="text-lg">
                     I&apos;m currently pursuing my{" "}
                     <span className="text-foreground font-medium">A.S. in Computer Science</span> at
                     Bunker Hill Community College while continuing to build and ship real-world
                     projects.
-                  </p>
+                  </m.p>
                 </>
               )}
             </div>
 
-            <div data-download-btn className="opacity-0">
+            <m.div variants={staggerItem}>
               <ResumeDownloadChoiceModal choices={pdfChoices}>
                 <Button
                   size="lg"
@@ -509,38 +288,67 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
                   Download Resume
                 </Button>
               </ResumeDownloadChoiceModal>
-            </div>
-          </div>
+            </m.div>
+          </m.div>
         </div>
 
-        {/* Stats */}
-        <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 min-w-0">
+        {/* Stats — instrument readout */}
+        <m.div
+          ref={statsRef}
+          variants={cardGroup}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 min-w-0"
+        >
           {STATS.map((stat, i) => (
-            <div
+            <m.div
               key={stat.label}
-              data-stat-card
-              className="relative group flex flex-col items-center justify-center p-4 sm:p-6 rounded-2xl border border-border bg-card shadow-sm shadow-foreground/10 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 min-w-0"
-              style={{ opacity: 0 }}
+              variants={staggerItem}
+              className="group relative flex min-w-0 flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-surface-raised/50 p-4 shadow-sm shadow-foreground/10 backdrop-blur-sm transition-colors duration-300 hover:border-primary/40 sm:p-6"
             >
-              <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <p className="text-4xl font-extrabold text-primary">
+              <span
+                aria-hidden
+                className="absolute inset-x-6 top-0 h-px bg-linear-to-r from-transparent via-primary/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              />
+              <p className="font-mono text-4xl font-bold tabular-nums text-primary">
                 <span ref={(el) => { statValueRefs.current[i] = el; }}>0</span>
                 {stat.suffix}
               </p>
               <p className="mt-1 text-sm text-muted-foreground font-medium text-center">{stat.label}</p>
-            </div>
+            </m.div>
           ))}
-        </div>
+        </m.div>
 
         {/* Education & Certifications */}
         <div className="space-y-6">
-          <h3 className="text-xl font-bold text-foreground">Education &amp; Certifications</h3>
-          <div ref={educationRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-w-0">
+          <m.h3
+            variants={rise}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.6 }}
+            className="text-xl font-bold text-foreground"
+          >
+            Education &amp; Certifications
+          </m.h3>
+          <m.div
+            variants={cardGroup}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-w-0"
+          >
             {credentialCards.map((edu) => {
               const cardKey = `${edu.institution}-${edu.degree}`;
+              const cardClass =
+                "group relative flex gap-4 min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-surface-raised/50 p-5 shadow-sm shadow-foreground/10 backdrop-blur-sm transition-colors duration-300 hover:border-primary/40";
               const inner = (
                 <>
-                  <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 shadow-sm shadow-foreground/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <span
+                    aria-hidden
+                    className="absolute inset-x-6 top-0 h-px bg-linear-to-r from-transparent via-primary/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  />
+                  <div className="shrink-0 w-10 h-10 rounded-xl border border-primary/20 bg-primary/10 flex items-center justify-center transition-colors group-hover:bg-primary/20">
                     <GraduationCap className="h-5 w-5 text-primary" />
                   </div>
                   <div className="space-y-1 min-w-0 flex-1">
@@ -551,7 +359,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground leading-snug">{edu.degree}</p>
-                    <p className="text-xs text-primary font-medium">
+                    <p className="font-mono text-[11px] tracking-wide text-primary">
                       {formatCredentialPeriod(edu.period)}
                     </p>
                     {edu.description ? (
@@ -562,29 +370,24 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
               );
 
               return edu.credentialUrl ? (
-                <a
+                <m.a
                   key={cardKey}
                   href={edu.credentialUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  data-edu-card
-                  className="group flex gap-4 p-5 rounded-2xl border border-border bg-card shadow-sm shadow-foreground/10 hover:border-primary/40 hover:shadow-md transition-all duration-300 min-w-0"
-                  style={{ opacity: 0 }}
+                  variants={staggerItem}
+                  whileHover={reduceMotion ? undefined : { y: -5 }}
+                  className={`${cardClass} hover:shadow-lg hover:shadow-primary/10`}
                 >
                   {inner}
-                </a>
+                </m.a>
               ) : (
-                <div
-                  key={cardKey}
-                  data-edu-card
-                  className="group flex gap-4 p-5 rounded-2xl border border-border bg-card shadow-sm shadow-foreground/10 hover:border-primary/40 hover:shadow-md transition-all duration-300 min-w-0"
-                  style={{ opacity: 0 }}
-                >
+                <m.div key={cardKey} variants={staggerItem} className={cardClass}>
                   {inner}
-                </div>
+                </m.div>
               );
             })}
-          </div>
+          </m.div>
         </div>
 
       </div>
