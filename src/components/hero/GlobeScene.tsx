@@ -218,6 +218,12 @@ export function GlobeScene({ onSettled }: { onSettled?: () => void }) {
   }, []);
 
   useFrame((state, delta) => {
+    // Clamp the frame delta: when the hero scrolls back into view after a
+    // frameloop="demand" pause, the first frames carry spiked/garbage deltas
+    // that make the damp() easing below diverge — the globe visibly inflates
+    // and re-enters from the right. 100ms cap = anything slower than 10fps
+    // is treated as one 100ms step.
+    const dt = Math.min(Math.max(delta, 0), 0.1);
     const t = state.clock.elapsedTime;
     pointMat.uniforms.uTime.value = t;
     particleMat.uniforms.uTime.value = t;
@@ -230,7 +236,7 @@ export function GlobeScene({ onSettled }: { onSettled?: () => void }) {
 
     const g = group.current;
     if (!g) return;
-    if (!reduced) g.rotation.y += delta * 0.045;
+    if (!reduced) g.rotation.y += dt * 0.045;
     // frame-rate-independent exponential ease-out (smooth slide-in + resize follow)
     const dampF = THREE.MathUtils.damp;
 
@@ -238,12 +244,12 @@ export function GlobeScene({ onSettled }: { onSettled?: () => void }) {
     // never fights) the globe's own rotation/position easing below.
     const tl = tilt.current;
     if (tl && !reduced) {
-      tl.rotation.x = dampF(tl.rotation.x, pointer.current.y * 0.045, 2.5, delta);
-      tl.rotation.y = dampF(tl.rotation.y, pointer.current.x * 0.08, 2.5, delta);
+      tl.rotation.x = dampF(tl.rotation.x, pointer.current.y * 0.045, 2.5, dt);
+      tl.rotation.y = dampF(tl.rotation.y, pointer.current.x * 0.08, 2.5, dt);
     }
-    g.scale.setScalar(dampF(g.scale.x, target.scale, 3, delta));
-    g.position.x = dampF(g.position.x, target.x, 2.4, delta);
-    g.position.y = dampF(g.position.y, target.y, 3, delta);
+    g.scale.setScalar(dampF(g.scale.x, target.scale, 3, dt));
+    g.position.x = dampF(g.position.x, target.x, 2.4, dt);
+    g.position.y = dampF(g.position.y, target.y, 3, dt);
 
     // Once the globe has converged on its resting spot, tell Hero so the brand
     // glow can fade in behind it. Gating on "settled" (not "started") keeps the

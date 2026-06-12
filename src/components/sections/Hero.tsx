@@ -99,9 +99,11 @@ export function Hero() {
         ease: "none",
         scrollTrigger,
       });
+      // Translate/opacity only — never scale this wrapper: R3F's resize
+      // observer measures the transformed rect, so a scaled canvas parent
+      // forces WebGL buffer resizes on every scrub tick.
       gsap.to(sceneRef.current, {
         yPercent: 6,
-        scale: 0.95,
         opacity: 0.3,
         ease: "none",
         scrollTrigger,
