@@ -1,18 +1,24 @@
 "use client";
 
 import { useMemo, useRef } from "react";
+import dynamic from "next/dynamic";
 import { m, useReducedMotion, type Variants } from "motion/react";
 import { gsap, ScrollTrigger, SCROLL_MEDIA } from "@/lib/scroll/gsap";
 import { useScrollSection } from "@/lib/scroll/useScrollSection";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Download, GraduationCap, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SectionHeading } from "@/components/common/SectionHeading";
 import { PortraitCard } from "@/components/about/PortraitCard";
 import { formatCredentialPeriod } from "@/lib/resume/format-credential-period";
 
 import { ResumeDownloadChoiceModal } from "@/components/resume/ResumeDownloadChoiceModal";
 import type { LandingCredentialCard } from "@/config/resume";
 import type { LandingResumePdfChoice } from "@/config/experience";
+
+const PortraitHalo = dynamic(
+  () => import("@/components/about/PortraitHalo"),
+  { ssr: false },
+);
 
 const STATS = [
   { value: 4, suffix: "+", label: "Years Experience" },
@@ -35,14 +41,19 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
   const gridRef          = useRef<HTMLDivElement>(null);
   const blob1Ref         = useRef<HTMLDivElement>(null);
   const blob2Ref         = useRef<HTMLDivElement>(null);
+  const headerDriftRef   = useRef<HTMLDivElement>(null);
+  const stageRef         = useRef<HTMLDivElement>(null);
   const portraitDriftRef = useRef<HTMLDivElement>(null);
-  const bioColRef        = useRef<HTMLDivElement>(null);
+  const statsDriftRef    = useRef<HTMLDivElement>(null);
   const statsRef         = useRef<HTMLDivElement>(null);
   const statValueRefs    = useRef<(HTMLSpanElement | null)[]>([]);
 
   /* `useReducedMotion()` is null until the media query resolves (SSR-safe);
      treat "unknown" as "animate" so the first paint matches the common case. */
   const reduceMotion = useReducedMotion() ?? false;
+  /* WebGL halo is desktop-only — `useMediaQuery` is false during SSR/hydration
+     so the lazy chunk never loads on phones. */
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   const cmsBioParagraphs = useMemo(() => {
     const t = professionalSummary.trim();
@@ -54,7 +65,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
     return parts.length > 0 ? parts : null;
   }, [professionalSummary]);
 
-  /* ─── GSAP: scroll-driven work only (parallax depth + count-up) ─── */
+  /* ─── GSAP: scroll-driven work only (pin sequence, parallax, count-up) ─── */
   useScrollSection(sectionRef, (mm) => {
     const startCounters = () => {
       ScrollTrigger.create({
@@ -82,23 +93,49 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       });
     };
 
-    mm.add(SCROLL_MEDIA.desktop, () => {
-      /* Layered depth — each layer scrubs at a different speed. */
+    const gridDrift = (travel: number) => {
       gsap.to(gridRef.current, {
-        yPercent: -8,
+        y: travel,
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top bottom",
           end: "bottom top",
-          scrub: 2.5,
+          scrub: 1.5,
         },
       });
+    };
+
+    const headerDrift = (travel: number) => {
+      gsap.fromTo(
+        headerDriftRef.current,
+        { y: -travel },
+        {
+          y: travel,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1,
+          },
+        },
+      );
+    };
+
+    mm.add(SCROLL_MEDIA.desktop, () => {
+      const section = sectionRef.current;
+      if (!section) return;
+
+      /* Background plane (slowest): the instrument grid drifts visibly. */
+      gridDrift(-120);
+
+      /* Ambient color — not a depth plane, just alive. */
       gsap.to(blob1Ref.current, {
         y: -180,
         ease: "none",
         scrollTrigger: {
-          trigger: sectionRef.current,
+          trigger: section,
           start: "top bottom",
           end: "bottom top",
           scrub: 1.5,
@@ -109,33 +146,92 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
         x: -40,
         ease: "none",
         scrollTrigger: {
-          trigger: sectionRef.current,
+          trigger: section,
           start: "top bottom",
           end: "bottom top",
           scrub: 2,
         },
       });
-      /* Portrait drifts upward while the bio scrolls alongside. The drift
-         wrapper is GSAP-owned; PortraitCard's Motion transforms live on
-         separate nodes inside it. */
-      gsap.to(portraitDriftRef.current, {
-        y: -60,
-        ease: "none",
-        scrollTrigger: {
-          trigger: bioColRef.current,
-          start: "top center",
-          end: "bottom center",
-          scrub: 1.2,
+
+      /* Midground plane: the display header lags the page by ~32px. */
+      headerDrift(16);
+
+      /* Foreground: pinned stage. The bio paragraphs play as a scrubbed
+         sequence while the portrait drifts against them — GSAP owns the
+         [data-bio-stage]/[data-cta-stage] WRAPPERS; Motion only ever
+         touches the inner elements, so no node is shared. */
+      const stages = Array.from(
+        section.querySelectorAll<HTMLElement>("[data-bio-stage]"),
+      );
+      const cta = section.querySelector<HTMLElement>("[data-cta-stage]");
+
+      if (stages.length > 1) {
+        gsap.set(stages.slice(1), { autoAlpha: 0, y: 48 });
+        if (cta) gsap.set(cta, { autoAlpha: 0, y: 24 });
+
+        const seq = gsap.timeline({
+          scrollTrigger: {
+            trigger: stageRef.current,
+            start: "center center",
+            end: `+=${stages.length * 55}%`,
+            pin: true,
+            scrub: 0.6,
+            anticipatePin: 1,
+          },
+          defaults: { ease: "none" },
+        });
+
+        stages.forEach((stage, i) => {
+          if (i === 0) return;
+          seq
+            .to(stages[i - 1], { autoAlpha: 0, y: -48, duration: 1 })
+            .fromTo(
+              stage,
+              { autoAlpha: 0, y: 48 },
+              { autoAlpha: 1, y: 0, duration: 1 },
+              "<35%",
+            );
+        });
+        if (cta) seq.to(cta, { autoAlpha: 1, y: 0, duration: 0.7 }, ">-0.25");
+        seq.to({}, { duration: 0.5 }); // hold the last beat before release
+
+        /* Portrait slow counter-drift across the whole pin — the visible
+           rate differential while the text swaps. */
+        seq.fromTo(
+          portraitDriftRef.current,
+          { y: 56 },
+          { y: -56, duration: seq.duration() },
+          0,
+        );
+      }
+
+      /* Stats band gets extra travel as it passes center. */
+      gsap.fromTo(
+        statsDriftRef.current,
+        { y: 48 },
+        {
+          y: -36,
+          ease: "none",
+          scrollTrigger: {
+            trigger: statsDriftRef.current,
+            start: "top bottom",
+            end: "top 30%",
+            scrub: 1,
+          },
         },
-      });
+      );
 
       startCounters();
     });
 
-    mm.add(SCROLL_MEDIA.mobile, () => {
-      // No parallax below the desktop breakpoint — reveals + count-up only.
-      // Reduced-motion users are handled by the clause below.
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    mm.add(SCROLL_MEDIA.tablet, () => {
+      /* Reduced offsets, fewer planes, no pin. */
+      gridDrift(-60);
+      headerDrift(10);
+      startCounters();
+    });
+
+    mm.add(SCROLL_MEDIA.phone, () => {
       startCounters();
     });
 
@@ -184,6 +280,30 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
     },
   };
 
+  const bioParagraphs = cmsBioParagraphs ?? [
+    <>
+      I&apos;m a{" "}
+      <span className="text-foreground font-semibold">Full-Stack Software Engineer</span>{" "}
+      specializing in building scalable cloud applications and AI-powered workflow
+      automation. With hands-on experience at companies like{" "}
+      <span className="text-foreground font-medium">Wayfair</span> and{" "}
+      <span className="text-foreground font-medium">North Light AI</span>, I bring both
+      startup agility and enterprise-level engineering discipline to every project.
+    </>,
+    <>
+      Beyond coding, I&apos;m deeply committed to community. I&apos;ve{" "}
+      <span className="text-foreground font-semibold">mentored 50+ early-career engineers</span>{" "}
+      through the Urban League of Eastern Massachusetts, leading bootcamps and mock
+      interviews that helped technologists break into the industry.
+    </>,
+    <>
+      I&apos;m currently pursuing my{" "}
+      <span className="text-foreground font-medium">A.S. in Computer Science</span> at
+      Bunker Hill Community College while continuing to build and ship real-world
+      projects.
+    </>,
+  ];
+
   return (
     <section
       ref={sectionRef}
@@ -191,11 +311,11 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       aria-label="About Me"
       className="relative py-fl-section px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
-      {/* Layered parallax backdrop: instrument grid (slow) + glow blobs */}
+      {/* Layered parallax backdrop: instrument grid (slow plane) + glow blobs */}
       <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
         <div
           ref={gridRef}
-          className="absolute inset-x-0 -inset-y-24 opacity-[0.05] bg-[linear-gradient(color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px)] bg-size-[44px_44px] mask-[radial-gradient(85%_70%_at_50%_30%,black,transparent_80%)]"
+          className="absolute inset-x-0 -inset-y-32 opacity-[0.08] bg-[linear-gradient(color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px)] bg-size-[44px_44px] mask-[radial-gradient(85%_70%_at_50%_30%,black,transparent_80%)]"
         />
         <div
           ref={blob1Ref}
@@ -209,116 +329,119 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
 
       <div className="max-w-6xl mx-auto space-y-fl-y-xl">
 
-        {/* Heading */}
-        <m.div
-          variants={rise}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.4 }}
+        {/* Editorial header — midground parallax plane */}
+        <div ref={headerDriftRef}>
+          <m.div
+            variants={staggerGroup}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.4 }}
+          >
+            <m.div variants={staggerItem} className="flex items-center gap-4">
+              <span aria-hidden className="h-px w-12 bg-primary/60" />
+              <span className="font-mono text-xs uppercase tracking-[0.3em] text-primary">
+                About Me
+              </span>
+            </m.div>
+            <m.h2
+              variants={staggerItem}
+              className="mt-5 text-[clamp(2.75rem,7.5vw,6.25rem)] font-bold leading-[0.95] tracking-[-0.03em] text-ink-bright"
+            >
+              Who I Am<span className="text-primary">.</span>
+            </m.h2>
+            <m.p
+              variants={staggerItem}
+              className="mt-6 max-w-md text-lg leading-relaxed text-muted-foreground lg:ml-auto lg:text-right"
+            >
+              A passionate engineer who loves solving real problems through clean
+              code, thoughtful design, and continuous learning.
+            </m.p>
+          </m.div>
+        </div>
+
+        {/* Pinned stage: asymmetric portrait + sequenced bio */}
+        <div
+          ref={stageRef}
+          className="relative grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center lg:gap-8"
         >
-          <SectionHeading
-            label="About Me"
-            title="Who I Am"
-            subtitle="A passionate engineer who loves solving real problems through clean code, thoughtful design, and continuous learning."
-          />
-        </m.div>
-
-        {/* Portrait + Bio */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-fl-gap-cols items-start">
-
-          {/* Portrait — sticky on desktop; outer div is the GSAP parallax layer */}
-          <div className="flex justify-center lg:justify-end lg:sticky lg:top-[15vh]">
-            <div ref={portraitDriftRef}>
+          {/* Portrait — pulled up into the header's space on desktop */}
+          <div className="flex justify-center lg:col-span-5 lg:-mt-20 lg:justify-start lg:pl-6">
+            <div ref={portraitDriftRef} className="relative">
+              {isDesktop && !reduceMotion && (
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute -inset-24 -z-10"
+                >
+                  <PortraitHalo />
+                </div>
+              )}
               <PortraitCard reduceMotion={reduceMotion} />
             </div>
           </div>
 
-          {/* Bio */}
+          {/* Bio — narrow measure; wrappers are GSAP's, inner elements Motion's */}
           <m.div
-            ref={bioColRef}
             variants={staggerGroup}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="space-y-6"
+            className="lg:col-span-6 lg:col-start-7"
           >
-            <div className="space-y-5 text-muted-foreground leading-relaxed">
-              {cmsBioParagraphs ? (
-                cmsBioParagraphs.map((text, i) => (
-                  <m.p key={i} variants={staggerItem} className="text-lg">
-                    {text}
+            <div className="space-y-5 text-muted-foreground leading-relaxed lg:grid lg:items-center lg:space-y-0">
+              {bioParagraphs.map((content, i) => (
+                <div key={i} data-bio-stage className="lg:[grid-area:1/1]">
+                  <m.p variants={staggerItem} className="max-w-prose text-lg">
+                    {content}
                   </m.p>
-                ))
-              ) : (
-                <>
-                  <m.p variants={staggerItem} className="text-lg">
-                    I&apos;m a{" "}
-                    <span className="text-foreground font-semibold">Full-Stack Software Engineer</span>{" "}
-                    specializing in building scalable cloud applications and AI-powered workflow
-                    automation. With hands-on experience at companies like{" "}
-                    <span className="text-foreground font-medium">Wayfair</span> and{" "}
-                    <span className="text-foreground font-medium">North Light AI</span>, I bring both
-                    startup agility and enterprise-level engineering discipline to every project.
-                  </m.p>
-                  <m.p variants={staggerItem} className="text-lg">
-                    Beyond coding, I&apos;m deeply committed to community. I&apos;ve{" "}
-                    <span className="text-foreground font-semibold">mentored 50+ early-career engineers</span>{" "}
-                    through the Urban League of Eastern Massachusetts, leading bootcamps and mock
-                    interviews that helped technologists break into the industry.
-                  </m.p>
-                  <m.p variants={staggerItem} className="text-lg">
-                    I&apos;m currently pursuing my{" "}
-                    <span className="text-foreground font-medium">A.S. in Computer Science</span> at
-                    Bunker Hill Community College while continuing to build and ship real-world
-                    projects.
-                  </m.p>
-                </>
-              )}
+                </div>
+              ))}
             </div>
 
-            <m.div variants={staggerItem}>
-              <ResumeDownloadChoiceModal choices={pdfChoices}>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  type="button"
-                  className="rounded-full px-8 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold shadow-sm shadow-foreground/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-105 group cursor-pointer"
-                >
-                  <Download className="mr-2 h-4 w-4 motion-safe:group-hover:animate-bounce" />
-                  Download Resume
-                </Button>
-              </ResumeDownloadChoiceModal>
-            </m.div>
+            <div data-cta-stage className="mt-8">
+              <m.div variants={staggerItem}>
+                <ResumeDownloadChoiceModal choices={pdfChoices}>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    type="button"
+                    className="rounded-full px-8 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold shadow-sm shadow-foreground/10 hover:shadow-md hover:shadow-foreground/15 transition-all duration-200 hover:scale-105 group cursor-pointer"
+                  >
+                    <Download className="mr-2 h-4 w-4 motion-safe:group-hover:animate-bounce" />
+                    Download Resume
+                  </Button>
+                </ResumeDownloadChoiceModal>
+              </m.div>
+            </div>
           </m.div>
         </div>
 
-        {/* Stats — instrument readout */}
-        <m.div
-          ref={statsRef}
-          variants={cardGroup}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 min-w-0"
-        >
-          {STATS.map((stat, i) => (
-            <m.div
-              key={stat.label}
-              variants={staggerItem}
-              className="group relative flex min-w-0 flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-surface-raised/50 p-4 shadow-sm shadow-foreground/10 backdrop-blur-sm transition-colors duration-300 hover:border-primary/40 sm:p-6"
-            >
-              <span
-                aria-hidden
-                className="absolute inset-x-6 top-0 h-px bg-linear-to-r from-transparent via-primary/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              />
-              <p className="font-mono text-4xl font-bold tabular-nums text-primary">
-                <span ref={(el) => { statValueRefs.current[i] = el; }}>0</span>
-                {stat.suffix}
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground font-medium text-center">{stat.label}</p>
-            </m.div>
-          ))}
-        </m.div>
+        {/* Stats — HUD readout band, no boxes */}
+        <div ref={statsDriftRef}>
+          <m.div
+            ref={statsRef}
+            variants={cardGroup}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            className="grid grid-cols-2 gap-y-10 border-y border-white/10 py-10 md:grid-cols-4 md:gap-y-0 md:divide-x md:divide-white/10"
+          >
+            {STATS.map((stat, i) => (
+              <m.div
+                key={stat.label}
+                variants={staggerItem}
+                className="flex min-w-0 flex-col items-center justify-center px-2"
+              >
+                <p className="font-mono text-5xl font-bold tabular-nums text-primary sm:text-6xl lg:text-7xl">
+                  <span ref={(el) => { statValueRefs.current[i] = el; }}>0</span>
+                  <span className="text-primary/60">{stat.suffix}</span>
+                </p>
+                <p className="mt-3 text-center font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-ink-muted">
+                  {stat.label}
+                </p>
+              </m.div>
+            ))}
+          </m.div>
+        </div>
 
         {/* Education & Certifications */}
         <div className="space-y-6">

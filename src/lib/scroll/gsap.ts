@@ -23,6 +23,11 @@ if (typeof window !== "undefined") {
 export const SCROLL_MEDIA = {
   desktop: "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
   desktopReduced: "(min-width: 1024px) and (prefers-reduced-motion: reduce)",
+  /** Mid tier for sections that scale parallax down instead of off. */
+  tablet:
+    "(min-width: 768px) and (max-width: 1023px) and (prefers-reduced-motion: no-preference)",
+  /** Smallest tier — reveals and counters only, no parallax or pinning. */
+  phone: "(max-width: 767px) and (prefers-reduced-motion: no-preference)",
   mobile: "(max-width: 1023px)",
   reduced: "(prefers-reduced-motion: reduce)",
 } as const;
