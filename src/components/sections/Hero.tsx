@@ -67,7 +67,13 @@ export function Hero() {
   const [roleIndex, setRoleIndex] = useState(0);
   const [globeSettled, setGlobeSettled] = useState(false);
   const [revealed, setRevealed] = useState(false);
-  const reduceMotion = useReducedMotion();
+  /* `useReducedMotion()` is null until the media query resolves (SSR-safe).
+     We deliberately default null → false so the cinematic entrance is never
+     blocked waiting on the hook: the global `MotionConfig reducedMotion="user"`
+     already strips transform animation for reduced-motion visitors during any
+     brief null window, and the reveal effect below re-runs with delay 0 the
+     moment the hook resolves to true. */
+  const reduceMotion = useReducedMotion() ?? false;
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);

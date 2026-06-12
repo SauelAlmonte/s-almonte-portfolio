@@ -44,14 +44,28 @@ export default function GlobeCanvas({ onSettled }: { onSettled?: () => void }) {
   const [ready, setReady] = useState(false);
 
   // This component is client-only (`ssr: false`), so `window` is safe in lazy
-  // initializers — decide once at first render: real scene, or poster forever.
-  const [mode] = useState<"webgl" | "poster">(() => {
+  // initializers — decide at first render: real scene, or the still poster.
+  const [mode, setMode] = useState<"webgl" | "poster">(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     return !reduce && supportsWebGL() ? "webgl" : "poster";
   });
   const [maxDpr, setMaxDpr] = useState(() =>
     window.innerWidth < 768 ? 1.5 : 2,
   );
+
+  // Follow the OS reduced-motion toggle live: flipping it on swaps the canvas
+  // out for the poster (and resets `ready` so the poster is actually visible);
+  // flipping it off brings the scene back.
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => {
+      const webgl = !mq.matches && supportsWebGL();
+      setMode(webgl ? "webgl" : "poster");
+      if (!webgl) setReady(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   // Keep the latest callback without retriggering the mount-only effects
   // (Hero passes an inline arrow, so its identity changes every render).

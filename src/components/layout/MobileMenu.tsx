@@ -127,7 +127,7 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
         >
           <span className="text-xs font-medium uppercase tracking-[0.22em] text-[#7e7e8c]">Menu</span>
           <button
-            onClick={() => setOpen(false)}
+            onClick={() => handleOpenChange(false)}
             aria-label="Close navigation menu"
             className="grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-[#C4C4D0] transition-colors duration-200 hover:border-[#A8DADC]/40 hover:text-[#A8DADC] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8DADC]/60"
           >
