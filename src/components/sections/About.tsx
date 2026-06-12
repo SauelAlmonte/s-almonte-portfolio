@@ -1,8 +1,15 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { m, useReducedMotion, type Variants } from "motion/react";
+import {
+  m,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+  type Variants,
+} from "motion/react";
 import { gsap, ScrollTrigger, SCROLL_MEDIA } from "@/lib/scroll/gsap";
 import { useScrollSection } from "@/lib/scroll/useScrollSection";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -46,6 +53,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
   const portraitDriftRef = useRef<HTMLDivElement>(null);
   const statsDriftRef    = useRef<HTMLDivElement>(null);
   const statsRef         = useRef<HTMLDivElement>(null);
+  const eduDriftRef      = useRef<HTMLDivElement>(null);
   const statValueRefs    = useRef<(HTMLSpanElement | null)[]>([]);
 
   /* `useReducedMotion()` is null until the media query resolves (SSR-safe);
@@ -205,17 +213,35 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
         );
       }
 
-      /* Stats band gets extra travel as it passes center. */
+      /* Stats band gets extra travel as it passes center (ends near 0 so
+         the resting layout keeps its designed spacing). */
       gsap.fromTo(
         statsDriftRef.current,
         { y: 48 },
         {
-          y: -36,
+          y: -12,
           ease: "none",
           scrollTrigger: {
             trigger: statsDriftRef.current,
             start: "top bottom",
             end: "top 30%",
+            scrub: 1,
+          },
+        },
+      );
+
+      /* Credentials ride a slightly faster plane than the stats above
+         them, so the two blocks visibly converge as they enter. */
+      gsap.fromTo(
+        eduDriftRef.current,
+        { y: 72 },
+        {
+          y: -16,
+          ease: "none",
+          scrollTrigger: {
+            trigger: eduDriftRef.current,
+            start: "top bottom",
+            end: "top 25%",
             scrub: 1,
           },
         },
@@ -437,8 +463,9 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
           </m.div>
         </div>
 
-        {/* Education & Certifications — same editorial/HUD language as the rest */}
-        <div className="space-y-8">
+        {/* Education & Certifications — editorial/HUD language, its own
+            parallax plane, tucked closer to the stats band on desktop */}
+        <div ref={eduDriftRef} className="space-y-8 lg:-mt-12">
           <m.div
             variants={staggerGroup}
             initial="hidden"
@@ -465,80 +492,150 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             viewport={{ once: true, amount: 0.15 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-w-0"
           >
-            {credentialCards.map((edu, index) => {
-              const cardKey = `${edu.institution}-${edu.degree}`;
-              const cardClass =
-                "group relative flex gap-4 min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-surface-raised/50 p-5 shadow-sm shadow-foreground/10 backdrop-blur-sm transition-colors duration-300 hover:border-primary/40";
-              const inner = (
-                <>
-                  {/* persistent hairline, brightens on hover */}
-                  <span
-                    aria-hidden
-                    className="absolute inset-x-6 top-0 h-px bg-linear-to-r from-transparent via-primary/25 to-transparent transition-opacity duration-300 group-hover:via-primary/70"
-                  />
-                  {/* HUD corner brackets, revealed on hover */}
-                  <span
-                    aria-hidden
-                    className="absolute left-2 top-2 h-2.5 w-2.5 border-l border-t border-primary/0 transition-colors duration-300 group-hover:border-primary/60"
-                  />
-                  <span
-                    aria-hidden
-                    className="absolute bottom-2 right-2 h-2.5 w-2.5 border-b border-r border-primary/0 transition-colors duration-300 group-hover:border-primary/60"
-                  />
-                  <div className="shrink-0 w-10 h-10 rounded-xl border border-primary/20 bg-primary/10 flex items-center justify-center transition-all duration-300 group-hover:bg-primary/20 group-hover:shadow-[0_0_18px_-4px_var(--primary)]">
-                    <GraduationCap className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="space-y-1 min-w-0 flex-1">
-                    <div className="flex items-start gap-2">
-                      <p className="font-semibold text-foreground text-sm leading-snug flex-1 min-w-0">{edu.institution}</p>
-                      {edu.credentialUrl && (
-                        <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-all duration-300 shrink-0 mt-0.5 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                      )}
-                      {/* mono index, instrument-style */}
-                      <span
-                        aria-hidden
-                        className="shrink-0 font-mono text-[11px] leading-snug tracking-[0.2em] text-ink-faint transition-colors duration-300 group-hover:text-primary/70"
-                      >
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground leading-snug">{edu.degree}</p>
-                    <p className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-primary">
-                      <span
-                        aria-hidden
-                        className="h-1 w-1 rounded-full bg-primary motion-safe:group-hover:animate-pulse"
-                      />
-                      {formatCredentialPeriod(edu.period)}
-                    </p>
-                    {edu.description ? (
-                      <p className="text-xs text-muted-foreground leading-snug line-clamp-3">{edu.description}</p>
-                    ) : null}
-                  </div>
-                </>
-              );
-
-              return edu.credentialUrl ? (
-                <m.a
-                  key={cardKey}
-                  href={edu.credentialUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+            {credentialCards.map((edu, index) => (
+              <div
+                key={`${edu.institution}-${edu.degree}`}
+                className="perspective-midrange min-w-0"
+              >
+                <CredentialCard
+                  edu={edu}
+                  index={index}
+                  reduceMotion={reduceMotion}
                   variants={staggerItem}
-                  whileHover={reduceMotion ? undefined : { y: -5 }}
-                  className={`${cardClass} hover:shadow-lg hover:shadow-primary/10`}
-                >
-                  {inner}
-                </m.a>
-              ) : (
-                <m.div key={cardKey} variants={staggerItem} className={cardClass}>
-                  {inner}
-                </m.div>
-              );
-            })}
+                />
+              </div>
+            ))}
           </m.div>
         </div>
 
       </div>
     </section>
+  );
+}
+
+type CredentialCardProps = {
+  edu: LandingCredentialCard;
+  index: number;
+  reduceMotion: boolean;
+  variants: Variants;
+};
+
+/**
+ * Credential card with a real 3D pointer tilt — same engine as the
+ * portrait (sprung motion values → rotateX/rotateY inside a per-card
+ * perspective wrapper). Motion owns every transform on the card node
+ * (tilt + hover lift + reveal); the icon chip sits at +z via a static
+ * class, so it floats above the surface as the card tilts.
+ */
+function CredentialCard({ edu, index, reduceMotion, variants }: CredentialCardProps) {
+  /* (pointer: fine) never changes mid-session; server renders `false`
+     but markup is identical either way — only the no-op handlers differ. */
+  const [finePointer] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(pointer: fine)").matches,
+  );
+  const tiltEnabled = finePointer && !reduceMotion;
+
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const sx = useSpring(mx, { stiffness: 220, damping: 18 });
+  const sy = useSpring(my, { stiffness: 220, damping: 18 });
+  const rotateX = useTransform(sy, [-0.5, 0.5], [6, -6]);
+  const rotateY = useTransform(sx, [-0.5, 0.5], [-6, 6]);
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLElement>) => {
+    if (!tiltEnabled) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    mx.set((event.clientX - rect.left) / rect.width - 0.5);
+    my.set((event.clientY - rect.top) / rect.height - 0.5);
+  };
+
+  const resetTilt = () => {
+    mx.set(0);
+    my.set(0);
+  };
+
+  const cardClass =
+    "group relative flex h-full gap-4 min-w-0 rounded-2xl border border-white/10 bg-surface-raised/50 p-5 shadow-lg shadow-black/40 backdrop-blur-sm transition-colors duration-300 hover:border-primary/40 transform-3d";
+
+  const inner = (
+    <>
+      {/* top light — gives the surface a beveled, lit-from-above read */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-2xl bg-linear-to-b from-white/5 to-transparent"
+      />
+      {/* persistent hairline, brightens on hover */}
+      <span
+        aria-hidden
+        className="absolute inset-x-6 top-0 h-px bg-linear-to-r from-transparent via-primary/25 to-transparent transition-opacity duration-300 group-hover:via-primary/70"
+      />
+      {/* HUD corner brackets, revealed on hover */}
+      <span
+        aria-hidden
+        className="absolute left-2 top-2 h-2.5 w-2.5 border-l border-t border-primary/0 transition-colors duration-300 group-hover:border-primary/60"
+      />
+      <span
+        aria-hidden
+        className="absolute bottom-2 right-2 h-2.5 w-2.5 border-b border-r border-primary/0 transition-colors duration-300 group-hover:border-primary/60"
+      />
+      <div className="shrink-0 w-10 h-10 translate-z-6 rounded-xl border border-primary/20 bg-primary/10 flex items-center justify-center transition-all duration-300 group-hover:bg-primary/20 group-hover:shadow-[0_0_18px_-4px_var(--primary)]">
+        <GraduationCap className="h-5 w-5 text-primary" />
+      </div>
+      <div className="space-y-1 min-w-0 flex-1">
+        <div className="flex items-start gap-2">
+          <p className="font-semibold text-foreground text-sm leading-snug flex-1 min-w-0">{edu.institution}</p>
+          {edu.credentialUrl && (
+            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-all duration-300 shrink-0 mt-0.5 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+          )}
+          {/* mono index, instrument-style */}
+          <span
+            aria-hidden
+            className="shrink-0 font-mono text-[11px] leading-snug tracking-[0.2em] text-ink-faint transition-colors duration-300 group-hover:text-primary/70"
+          >
+            {String(index + 1).padStart(2, "0")}
+          </span>
+        </div>
+        <p className="text-xs text-muted-foreground leading-snug">{edu.degree}</p>
+        <p className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-primary">
+          <span
+            aria-hidden
+            className="h-1 w-1 rounded-full bg-primary motion-safe:group-hover:animate-pulse"
+          />
+          {formatCredentialPeriod(edu.period)}
+        </p>
+        {edu.description ? (
+          <p className="text-xs text-muted-foreground leading-snug line-clamp-3">{edu.description}</p>
+        ) : null}
+      </div>
+    </>
+  );
+
+  return edu.credentialUrl ? (
+    <m.a
+      href={edu.credentialUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      variants={variants}
+      whileHover={reduceMotion ? undefined : { y: -5 }}
+      style={{ rotateX, rotateY }}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={resetTilt}
+      className={`${cardClass} hover:shadow-primary/10`}
+    >
+      {inner}
+    </m.a>
+  ) : (
+    <m.div
+      variants={variants}
+      whileHover={reduceMotion ? undefined : { y: -5 }}
+      style={{ rotateX, rotateY }}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={resetTilt}
+      className={`${cardClass} hover:shadow-primary/10`}
+    >
+      {inner}
+    </m.div>
   );
 }
