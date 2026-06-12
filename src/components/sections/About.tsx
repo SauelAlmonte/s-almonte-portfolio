@@ -244,15 +244,6 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
   });
 
   /* ─── Motion variants (component-state reveals) ─── */
-  const rise: Variants = {
-    hidden: { opacity: 0, y: 32 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: reduceMotion ? 0 : 0.9, ease: EASE },
-    },
-  };
-
   const staggerGroup: Variants = {
     hidden: {},
     visible: {
@@ -446,17 +437,27 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
           </m.div>
         </div>
 
-        {/* Education & Certifications */}
-        <div className="space-y-6">
-          <m.h3
-            variants={rise}
+        {/* Education & Certifications — same editorial/HUD language as the rest */}
+        <div className="space-y-8">
+          <m.div
+            variants={staggerGroup}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.6 }}
-            className="text-xl font-bold text-foreground"
           >
-            Education &amp; Certifications
-          </m.h3>
+            <m.div variants={staggerItem} className="flex items-center gap-4">
+              <span aria-hidden className="h-px w-12 bg-primary/60" />
+              <span className="font-mono text-xs uppercase tracking-[0.3em] text-primary">
+                Credentials
+              </span>
+            </m.div>
+            <m.h3
+              variants={staggerItem}
+              className="mt-4 text-2xl font-bold tracking-tight text-ink-bright sm:text-3xl"
+            >
+              Education &amp; Certifications
+            </m.h3>
+          </m.div>
           <m.div
             variants={cardGroup}
             initial="hidden"
@@ -464,28 +465,49 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             viewport={{ once: true, amount: 0.15 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-w-0"
           >
-            {credentialCards.map((edu) => {
+            {credentialCards.map((edu, index) => {
               const cardKey = `${edu.institution}-${edu.degree}`;
               const cardClass =
                 "group relative flex gap-4 min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-surface-raised/50 p-5 shadow-sm shadow-foreground/10 backdrop-blur-sm transition-colors duration-300 hover:border-primary/40";
               const inner = (
                 <>
+                  {/* persistent hairline, brightens on hover */}
                   <span
                     aria-hidden
-                    className="absolute inset-x-6 top-0 h-px bg-linear-to-r from-transparent via-primary/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    className="absolute inset-x-6 top-0 h-px bg-linear-to-r from-transparent via-primary/25 to-transparent transition-opacity duration-300 group-hover:via-primary/70"
                   />
-                  <div className="shrink-0 w-10 h-10 rounded-xl border border-primary/20 bg-primary/10 flex items-center justify-center transition-colors group-hover:bg-primary/20">
+                  {/* HUD corner brackets, revealed on hover */}
+                  <span
+                    aria-hidden
+                    className="absolute left-2 top-2 h-2.5 w-2.5 border-l border-t border-primary/0 transition-colors duration-300 group-hover:border-primary/60"
+                  />
+                  <span
+                    aria-hidden
+                    className="absolute bottom-2 right-2 h-2.5 w-2.5 border-b border-r border-primary/0 transition-colors duration-300 group-hover:border-primary/60"
+                  />
+                  <div className="shrink-0 w-10 h-10 rounded-xl border border-primary/20 bg-primary/10 flex items-center justify-center transition-all duration-300 group-hover:bg-primary/20 group-hover:shadow-[0_0_18px_-4px_var(--primary)]">
                     <GraduationCap className="h-5 w-5 text-primary" />
                   </div>
                   <div className="space-y-1 min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-1">
-                      <p className="font-semibold text-foreground text-sm leading-snug">{edu.institution}</p>
+                    <div className="flex items-start gap-2">
+                      <p className="font-semibold text-foreground text-sm leading-snug flex-1 min-w-0">{edu.institution}</p>
                       {edu.credentialUrl && (
-                        <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0 mt-0.5" />
+                        <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-all duration-300 shrink-0 mt-0.5 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                       )}
+                      {/* mono index, instrument-style */}
+                      <span
+                        aria-hidden
+                        className="shrink-0 font-mono text-[11px] leading-snug tracking-[0.2em] text-ink-faint transition-colors duration-300 group-hover:text-primary/70"
+                      >
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
                     </div>
                     <p className="text-xs text-muted-foreground leading-snug">{edu.degree}</p>
-                    <p className="font-mono text-[11px] tracking-wide text-primary">
+                    <p className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-primary">
+                      <span
+                        aria-hidden
+                        className="h-1 w-1 rounded-full bg-primary motion-safe:group-hover:animate-pulse"
+                      />
                       {formatCredentialPeriod(edu.period)}
                     </p>
                     {edu.description ? (
