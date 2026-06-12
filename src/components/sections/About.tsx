@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger, SCROLL_MEDIA } from "@/lib/scroll/gsap";
 import { Download, MapPin, Languages, GraduationCap, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/common/SectionHeading";
@@ -11,8 +10,6 @@ import { formatCredentialPeriod } from "@/lib/resume/format-credential-period";
 import { ResumeDownloadChoiceModal } from "@/components/resume/ResumeDownloadChoiceModal";
 import type { LandingCredentialCard } from "@/config/resume";
 import type { LandingResumePdfChoice } from "@/config/experience";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const STATS = [
   { value: 4, suffix: "+", label: "Years Experience" },
@@ -55,7 +52,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
     const mm = gsap.matchMedia();
 
     /* ─── DESKTOP + REDUCED MOTION: show content immediately, no animations ─── */
-    mm.add("(min-width: 1024px) and (prefers-reduced-motion: reduce)", () => {
+    mm.add(SCROLL_MEDIA.desktopReduced, () => {
       gsap.set(headingRef.current, { clipPath: "inset(0% 0 0 0)", opacity: 1, y: 0 });
       gsap.set(photoCardRef.current, { opacity: 1, scale: 1, rotation: 0, y: 0 });
       gsap.set([badge1Ref.current, badge2Ref.current], { opacity: 1, scale: 1, y: 0 });
@@ -80,7 +77,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
     });
 
     /* ─── DESKTOP (≥1024 px) + NO REDUCED MOTION ─── */
-    mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
+    mm.add(SCROLL_MEDIA.desktop, () => {
 
       /* --- Background parallax blobs --- */
       gsap.to(blob1Ref.current, {
@@ -222,18 +219,20 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
           STATS.forEach((stat, i) => {
             const el = statValueRefs.current[i];
             if (!el) return;
-            gsap.fromTo(
-              { val: 0 },
-              { val: stat.value },
-              {
-                duration: 1.8,
-                ease: "power2.out",
-                delay: i * 0.12,
-                onUpdate: function () {
-                  el.textContent = Math.round(this.targets()[0].val).toString();
-                },
-              }
-            );
+            // Tween a proxy object and write the rounded value into the DOM.
+            // (The animated property must live in the to-vars — the old
+            // fromTo call had it in the from slot, so nothing ever animated
+            // and the stats sat at 0.)
+            const counter = { val: 0 };
+            gsap.to(counter, {
+              val: stat.value,
+              duration: 1.8,
+              ease: "power2.out",
+              delay: i * 0.12,
+              onUpdate: () => {
+                el.textContent = Math.round(counter.val).toString();
+              },
+            });
           });
         },
       });
@@ -260,7 +259,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
     });
 
     /* ─── MOBILE / TABLET (< 1024 px) ─── */
-    mm.add("(max-width: 1023px)", () => {
+    mm.add(SCROLL_MEDIA.mobile, () => {
       const prefersReducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       if (prefersReducedMotion) {
@@ -348,10 +347,12 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             STATS.forEach((stat, i) => {
               const el = statValueRefs.current[i];
               if (!el) return;
-              gsap.fromTo({ val: 0 }, { val: stat.value }, {
-                duration: 1.8, ease: "power2.out", delay: i * 0.1,
-                onUpdate: function () {
-                  el.textContent = Math.round(this.targets()[0].val).toString();
+              // Same proxy-object count-up as the desktop clause above.
+              const counter = { val: 0 };
+              gsap.to(counter, {
+                val: stat.value, duration: 1.8, ease: "power2.out", delay: i * 0.1,
+                onUpdate: () => {
+                  el.textContent = Math.round(counter.val).toString();
                 },
               });
             });

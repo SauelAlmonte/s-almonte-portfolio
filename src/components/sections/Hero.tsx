@@ -1,15 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { m, AnimatePresence, useReducedMotion } from "motion/react";
 import { Github, Linkedin, Mail, Youtube, ArrowDown } from "lucide-react";
 import { SocialLink, type SocialLinkItem } from "@/components/common/SocialLink";
 import { markHeroSettled } from "@/lib/heroSettle";
+import { HeroPoster } from "@/components/hero/HeroPoster";
+import { gsap, SCROLL_MEDIA } from "@/lib/scroll/gsap";
+import { useScrollSection } from "@/lib/scroll/useScrollSection";
+import { YOUTUBE_CHANNEL_URL } from "@/config/site";
 
 // 3D globe is heavy + browser-only: lazy, client-only, out of the initial bundle.
+// The poster fills the slot while the chunk loads — no layout shift, no flash.
 const GlobeCanvas = dynamic(() => import("@/components/hero/GlobeCanvas"), {
   ssr: false,
+  loading: () => <HeroPoster />,
 });
 
 const ROLES = [
@@ -22,7 +28,7 @@ const ROLES = [
 const SOCIAL_LINKS: SocialLinkItem[] = [
   { label: "GitHub", href: "https://github.com/SauelAlmonte", icon: Github, accent: "#A8DADC", external: true },
   { label: "LinkedIn", href: "https://linkedin.com/in/sauel-almonte", icon: Linkedin, accent: "#B39CD0", external: true },
-  { label: "YouTube", href: "https://youtube.com/@yourchannel", icon: Youtube, accent: "#FFC1CC", external: true },
+  { label: "YouTube", href: YOUTUBE_CHANNEL_URL, icon: Youtube, accent: "#FFC1CC", external: true },
   { label: "Contact", href: "#contact", icon: Mail, accent: "#A8DADC", external: false },
 ];
 
@@ -62,6 +68,39 @@ export function Hero() {
   const [globeSettled, setGlobeSettled] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const reduceMotion = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
+
+  /* Hero → About hand-off: as the visitor scrolls past the hero, the copy
+     recedes upward and fades while the globe sinks slightly and dims — a
+     scrubbed exit that hands the stage to About's own scroll entrance.
+     Desktop only, never under reduced motion, no pinning (mobile keeps plain
+     scrolling). GSAP touches only these two wrapper divs; Motion owns the
+     elements inside them, so no property is ever driven by both libraries. */
+  useScrollSection(sectionRef, (mm) => {
+    mm.add(SCROLL_MEDIA.desktop, () => {
+      const scrollTrigger = {
+        trigger: sectionRef.current,
+        start: "top top",
+        end: "bottom 25%",
+        scrub: true,
+      };
+      gsap.to(contentRef.current, {
+        yPercent: -12,
+        opacity: 0,
+        ease: "none",
+        scrollTrigger,
+      });
+      gsap.to(sceneRef.current, {
+        yPercent: 6,
+        scale: 0.95,
+        opacity: 0.3,
+        ease: "none",
+        scrollTrigger,
+      });
+    });
+  });
 
   /* Reveal the copy once the globe has settled into place, so the lines
      cascade in after the dots land — not while they're still travelling.
@@ -88,6 +127,7 @@ export function Hero() {
 
   return (
     <section
+      ref={sectionRef}
       id="home"
       aria-label="Hero"
       className="relative isolate min-h-[100svh] overflow-hidden bg-[#080711] text-[#ECECF2]"
@@ -103,13 +143,15 @@ export function Hero() {
         transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
       />
 
-      {/* The dotted earth. */}
-      <GlobeCanvas
-        onSettled={() => {
-          setGlobeSettled(true);
-          markHeroSettled(); // let the global navbar glide in after the globe lands
-        }}
-      />
+      {/* The dotted earth. The wrapper div is the GSAP scroll-out target. */}
+      <div ref={sceneRef} className="absolute inset-0">
+        <GlobeCanvas
+          onSettled={() => {
+            setGlobeSettled(true);
+            markHeroSettled(); // let the global navbar glide in after the globe lands
+          }}
+        />
+      </div>
 
       {/* Legibility scrim: darken the left/bottom where the copy sits. */}
       <div
@@ -121,8 +163,12 @@ export function Hero() {
         className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#080711] to-transparent"
       />
 
-      {/* Content. */}
-      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-24 sm:px-8">
+      {/* Content. The wrapper div is the GSAP scroll-out target; Motion only
+          ever animates its children. */}
+      <div
+        ref={contentRef}
+        className="relative z-10 mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-6 py-24 sm:px-8"
+      >
         <m.div
           className="max-w-2xl"
           variants={copyVariants}

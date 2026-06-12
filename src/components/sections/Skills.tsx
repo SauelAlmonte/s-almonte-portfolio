@@ -2,15 +2,12 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap } from "@/lib/scroll/gsap";
 import { ArrowUpRight, Code2, BrainCircuit, Cloud, type LucideIcon } from "lucide-react";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { cn } from "@/lib/utils";
 import { CATEGORY_META, type ProjectCategory } from "@/config/projects";
 import { SKILL_SECTION_SUBTITLE } from "@/config/skills";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export type SkillsSectionProps = {
   skillsByCategory: Record<
