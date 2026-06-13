@@ -46,7 +46,7 @@ export const RESUME_SEED_EDUCATION: ResumeSeedEducation[] = [
     degree: "Front-End Developer Professional Certificate",
     year: "Completed Jan 2025",
     credentialUrl:
-      "https://www.credly.com/badges/66608cd0-d62f-4d81-8b27-36664aec10bb/public_url",
+      "https://www.credly.com/badges/66608cd0-d62f-4d81-8b27-36664aec10bb/linked_in_profile",
   },
 ];
 
