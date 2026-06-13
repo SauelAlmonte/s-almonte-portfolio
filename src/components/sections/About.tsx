@@ -28,8 +28,8 @@ const PortraitHalo = dynamic(
 const STATS = [
   { value: 4, suffix: "+", label: "Years Experience" },
   { value: 50, suffix: "+", label: "Engineers Mentored" },
-  { value: 3, suffix: "", label: "Companies" },
-  { value: 2, suffix: "", label: "Languages" },
+  { value: 4, suffix: "", label: "Companies" },
+  { value: 4, suffix: "", label: "Languages" },
 ];
 
 /** Cinematic ease for every Motion reveal in this section. */
@@ -47,10 +47,9 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
   const gridRef          = useRef<HTMLDivElement>(null);
   const blob1Ref         = useRef<HTMLDivElement>(null);
   const blob2Ref         = useRef<HTMLDivElement>(null);
-  const headerDriftRef   = useRef<HTMLDivElement>(null);
+  const pinWrapRef       = useRef<HTMLDivElement>(null);
   const stageRef         = useRef<HTMLDivElement>(null);
   const stackRef         = useRef<HTMLDivElement>(null);
-  const portraitDriftRef = useRef<HTMLDivElement>(null);
   const statsDriftRef    = useRef<HTMLDivElement>(null);
   const statsRef         = useRef<HTMLDivElement>(null);
   const eduDriftRef      = useRef<HTMLDivElement>(null);
@@ -108,43 +107,22 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       });
     };
 
-    const gridDrift = (travel: number) => {
-      gsap.to(gridRef.current, {
-        y: travel,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1.5,
-        },
-      });
-    };
-
-    const headerDrift = (travel: number) => {
-      gsap.fromTo(
-        headerDriftRef.current,
-        { y: -travel },
-        {
-          y: travel,
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-          },
-        },
-      );
-    };
-
     /* All parallax planes, scaled by `k` so smaller screens get the same
        depth at gentler offsets. */
     const buildPlanes = (k: number) => {
       const section = sectionRef.current;
 
       /* Background plane (slowest): the instrument grid drifts visibly. */
-      gridDrift(-120 * k);
+      gsap.to(gridRef.current, {
+        y: -120 * k,
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.5,
+        },
+      });
 
       /* Ambient color — not a depth plane, just alive. */
       gsap.to(blob1Ref.current, {
@@ -168,9 +146,6 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
           scrub: 2,
         },
       });
-
-      /* Midground plane: the display header lags the page. */
-      headerDrift(16 * k);
 
       /* Stats band gets extra travel as it passes center (ends near 0 so
          the resting layout keeps its designed spacing). */
@@ -213,7 +188,10 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
        elements, so no node is shared. The overlap stacking (display:grid +
        grid-area 1/1) is applied HERE rather than via classes, so
        reduced-motion and no-pin states keep the natural stacked flow. */
-    const buildStage = (portraitTravel: number) => {
+    /* The pinned block holds still while the bio paragraphs sequence —
+       ONLY the paragraphs and CTA move (the portrait, halo, header and
+       tagline stay planted). */
+    const buildStage = (pinHeader: boolean) => {
       const section = sectionRef.current;
       if (!section) return;
       const stages = Array.from(
@@ -227,12 +205,18 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       gsap.set(stages.slice(1), { autoAlpha: 0, y: 48 });
       if (cta) gsap.set(cta, { autoAlpha: 0, y: 24 });
 
+      /* Where the viewport allows, the pin includes the header + tagline
+         wrapper so they hold still while the paragraphs sequence ("top
+         96px" clears the fixed navbar). On phones the stacked column is
+         taller than the viewport, so only the stage pins (centered) and
+         the header scrolls away naturally. */
+      const pinTarget = pinHeader ? pinWrapRef.current : stageRef.current;
       const seq = gsap.timeline({
         scrollTrigger: {
-          trigger: stageRef.current,
-          start: "center center",
+          trigger: pinTarget,
+          start: pinHeader ? "top 96px" : "center center",
           end: `+=${stages.length * 55}%`,
-          pin: true,
+          pin: pinTarget,
           scrub: 0.6,
           anticipatePin: 1,
         },
@@ -241,48 +225,38 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
 
       stages.forEach((stage, i) => {
         if (i === 0) return;
+        /* The incoming paragraph waits until the outgoing one is 85%
+           gone — both share grid cell 1/1, so any real overlap window
+           reads as two paragraphs printed on top of each other. */
         seq
           .to(stages[i - 1], { autoAlpha: 0, y: -48, duration: 1 })
           .fromTo(
             stage,
             { autoAlpha: 0, y: 48 },
             { autoAlpha: 1, y: 0, duration: 1 },
-            "<35%",
+            "<85%",
           );
       });
       if (cta) seq.to(cta, { autoAlpha: 1, y: 0, duration: 0.7 }, ">-0.25");
       seq.to({}, { duration: 0.5 }); // hold the last beat before release
-
-      /* Portrait slow counter-drift across the whole pin — the visible
-         rate differential while the text swaps. Disabled (0) in the
-         1-column tiers: there the portrait sits directly above the text,
-         and the +y start would shove it into the paragraphs. */
-      if (portraitTravel > 0) {
-        seq.fromTo(
-          portraitDriftRef.current,
-          { y: portraitTravel },
-          { y: -portraitTravel, duration: seq.duration() },
-          0,
-        );
-      }
     };
 
     /* Same experience on every tier — only the plane offsets scale down. */
     mm.add(SCROLL_MEDIA.desktop, () => {
       buildPlanes(1);
-      buildStage(56);
+      buildStage(true);
       startCounters();
     });
 
     mm.add(SCROLL_MEDIA.tablet, () => {
       buildPlanes(0.7);
-      buildStage(0);
+      buildStage(true);
       startCounters();
     });
 
     mm.add(SCROLL_MEDIA.phone, () => {
       buildPlanes(0.45);
-      buildStage(0);
+      buildStage(false);
       startCounters();
     });
 
@@ -371,8 +345,15 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
 
       <div className="max-w-6xl mx-auto space-y-fl-y-xl">
 
-        {/* Editorial header — midground parallax plane */}
-        <div ref={headerDriftRef}>
+        {/* Header + stage share one pin wrapper: on desktop/tablet the
+            whole block holds still while the bio paragraphs sequence —
+            only the paragraphs and CTA move. (space-y INSIDE the wrapper
+            keeps the original header→stage rhythm; the wrapper itself
+            takes the header's slot in the outer space-y flow.) */}
+        <div ref={pinWrapRef} className="space-y-fl-y-xl">
+
+        {/* Editorial header — static while pinned */}
+        <div>
           <m.div
             variants={staggerGroup}
             initial="hidden"
@@ -413,7 +394,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
               Bottom padding below lg clears the Boston badge + halo ring
               from the stacked bio text. */}
           <div className="flex justify-center pb-6 lg:col-span-5 lg:-mt-20 lg:pb-0">
-            <div ref={portraitDriftRef} className="relative">
+            <div className="relative">
               {showPortraitHalo && (
                 <div
                   aria-hidden
@@ -461,6 +442,8 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             </div>
           </m.div>
         </div>
+
+        </div>{/* /pin wrapper */}
 
         {/* Stats — HUD readout band, no boxes */}
         <div ref={statsDriftRef}>
