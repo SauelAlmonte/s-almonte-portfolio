@@ -28,8 +28,8 @@ const PortraitHalo = dynamic(
 const STATS = [
   { value: 4, suffix: "+", label: "Years Experience" },
   { value: 50, suffix: "+", label: "Engineers Mentored" },
-  { value: 3, suffix: "", label: "Companies" },
-  { value: 2, suffix: "", label: "Languages" },
+  { value: 4, suffix: "", label: "Companies" },
+  { value: 4, suffix: "", label: "Languages" },
 ];
 
 /** Cinematic ease for every Motion reveal in this section. */
