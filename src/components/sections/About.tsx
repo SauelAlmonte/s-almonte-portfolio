@@ -13,7 +13,6 @@ import {
 import { gsap, ScrollTrigger, SCROLL_MEDIA } from "@/lib/scroll/gsap";
 import { useScrollSection } from "@/lib/scroll/useScrollSection";
 import { Download, GraduationCap, ExternalLink } from "lucide-react";
-import { AboutBackdrop, AboutDial } from "@/components/about/AboutBackdrop";
 import { PortraitCard } from "@/components/about/PortraitCard";
 import { formatCredentialPeriod } from "@/lib/resume/format-credential-period";
 
@@ -48,11 +47,9 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
   const gridRef          = useRef<HTMLDivElement>(null);
   const blob1Ref         = useRef<HTMLDivElement>(null);
   const blob2Ref         = useRef<HTMLDivElement>(null);
-  const dialDriftRef     = useRef<HTMLDivElement>(null);
-  const headerDriftRef   = useRef<HTMLDivElement>(null);
+  const pinWrapRef       = useRef<HTMLDivElement>(null);
   const stageRef         = useRef<HTMLDivElement>(null);
   const stackRef         = useRef<HTMLDivElement>(null);
-  const portraitDriftRef = useRef<HTMLDivElement>(null);
   const statsDriftRef    = useRef<HTMLDivElement>(null);
   const statsRef         = useRef<HTMLDivElement>(null);
   const eduDriftRef      = useRef<HTMLDivElement>(null);
@@ -110,43 +107,22 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       });
     };
 
-    const gridDrift = (travel: number) => {
-      gsap.to(gridRef.current, {
-        y: travel,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1.5,
-        },
-      });
-    };
-
-    const headerDrift = (travel: number) => {
-      gsap.fromTo(
-        headerDriftRef.current,
-        { y: -travel },
-        {
-          y: travel,
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-          },
-        },
-      );
-    };
-
     /* All parallax planes, scaled by `k` so smaller screens get the same
        depth at gentler offsets. */
     const buildPlanes = (k: number) => {
       const section = sectionRef.current;
 
       /* Background plane (slowest): the instrument grid drifts visibly. */
-      gridDrift(-120 * k);
+      gsap.to(gridRef.current, {
+        y: -120 * k,
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.5,
+        },
+      });
 
       /* Ambient color — not a depth plane, just alive. */
       gsap.to(blob1Ref.current, {
@@ -170,21 +146,6 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
           scrub: 2,
         },
       });
-
-      /* HUD dial rides its own slow plane between the grid and content. */
-      gsap.to(dialDriftRef.current, {
-        y: -70 * k,
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1.5,
-        },
-      });
-
-      /* Midground plane: the display header lags the page. */
-      headerDrift(16 * k);
 
       /* Stats band gets extra travel as it passes center (ends near 0 so
          the resting layout keeps its designed spacing). */
@@ -227,7 +188,10 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
        elements, so no node is shared. The overlap stacking (display:grid +
        grid-area 1/1) is applied HERE rather than via classes, so
        reduced-motion and no-pin states keep the natural stacked flow. */
-    const buildStage = (portraitTravel: number) => {
+    /* The pinned block holds still while the bio paragraphs sequence —
+       ONLY the paragraphs and CTA move (the portrait, halo, header and
+       tagline stay planted). */
+    const buildStage = (pinHeader: boolean) => {
       const section = sectionRef.current;
       if (!section) return;
       const stages = Array.from(
@@ -241,12 +205,18 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       gsap.set(stages.slice(1), { autoAlpha: 0, y: 48 });
       if (cta) gsap.set(cta, { autoAlpha: 0, y: 24 });
 
+      /* Where the viewport allows, the pin includes the header + tagline
+         wrapper so they hold still while the paragraphs sequence ("top
+         96px" clears the fixed navbar). On phones the stacked column is
+         taller than the viewport, so only the stage pins (centered) and
+         the header scrolls away naturally. */
+      const pinTarget = pinHeader ? pinWrapRef.current : stageRef.current;
       const seq = gsap.timeline({
         scrollTrigger: {
-          trigger: stageRef.current,
-          start: "center center",
+          trigger: pinTarget,
+          start: pinHeader ? "top 96px" : "center center",
           end: `+=${stages.length * 55}%`,
-          pin: true,
+          pin: pinTarget,
           scrub: 0.6,
           anticipatePin: 1,
         },
@@ -269,37 +239,24 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       });
       if (cta) seq.to(cta, { autoAlpha: 1, y: 0, duration: 0.7 }, ">-0.25");
       seq.to({}, { duration: 0.5 }); // hold the last beat before release
-
-      /* Portrait slow counter-drift across the whole pin — the visible
-         rate differential while the text swaps. Disabled (0) in the
-         1-column tiers: there the portrait sits directly above the text,
-         and the +y start would shove it into the paragraphs. */
-      if (portraitTravel > 0) {
-        seq.fromTo(
-          portraitDriftRef.current,
-          { y: portraitTravel },
-          { y: -portraitTravel, duration: seq.duration() },
-          0,
-        );
-      }
     };
 
     /* Same experience on every tier — only the plane offsets scale down. */
     mm.add(SCROLL_MEDIA.desktop, () => {
       buildPlanes(1);
-      buildStage(56);
+      buildStage(true);
       startCounters();
     });
 
     mm.add(SCROLL_MEDIA.tablet, () => {
       buildPlanes(0.7);
-      buildStage(0);
+      buildStage(true);
       startCounters();
     });
 
     mm.add(SCROLL_MEDIA.phone, () => {
       buildPlanes(0.45);
-      buildStage(0);
+      buildStage(false);
       startCounters();
     });
 
@@ -370,28 +327,33 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       aria-label="About Me"
       className="relative py-fl-section px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
-      {/* Layered parallax backdrop: instrument grid (slow plane) + HUD
-          dials/glyphs + glow blobs. GSAP owns scroll-y on the ref'd
-          wrappers; the autonomous breathe/spin/twinkle animations live
-          on inner nodes so the transforms never collide. */}
+      {/* Layered parallax backdrop: instrument grid (slow plane) + glow blobs */}
       <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
         <div
           ref={gridRef}
           className="absolute inset-x-0 -inset-y-32 opacity-[0.08] bg-[linear-gradient(color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px)] bg-size-[44px_44px] mask-[radial-gradient(85%_70%_at_50%_30%,black,transparent_80%)]"
         />
-        <AboutBackdrop />
-        <div ref={blob1Ref} className="absolute -top-20 right-[-5%] w-125 h-125">
-          <div className="h-full w-full rounded-full bg-cat-fullstack/10 blur-[100px] motion-safe:animate-[blob-breathe_18s_ease-in-out_infinite]" />
-        </div>
-        <div ref={blob2Ref} className="absolute bottom-[-10%] left-[-5%] w-100 h-100">
-          <div className="h-full w-full rounded-full bg-cat-backend/8 blur-[90px] motion-safe:animate-[blob-breathe_24s_ease-in-out_infinite_-9s]" />
-        </div>
+        <div
+          ref={blob1Ref}
+          className="absolute -top-20 right-[-5%] w-125 h-125 rounded-full bg-cat-fullstack/10 blur-[100px]"
+        />
+        <div
+          ref={blob2Ref}
+          className="absolute bottom-[-10%] left-[-5%] w-100 h-100 rounded-full bg-cat-backend/8 blur-[90px]"
+        />
       </div>
 
       <div className="max-w-6xl mx-auto space-y-fl-y-xl">
 
-        {/* Editorial header — midground parallax plane */}
-        <div ref={headerDriftRef}>
+        {/* Header + stage share one pin wrapper: on desktop/tablet the
+            whole block holds still while the bio paragraphs sequence —
+            only the paragraphs and CTA move. (space-y INSIDE the wrapper
+            keeps the original header→stage rhythm; the wrapper itself
+            takes the header's slot in the outer space-y flow.) */}
+        <div ref={pinWrapRef} className="space-y-fl-y-xl">
+
+        {/* Editorial header — static while pinned */}
+        <div>
           <m.div
             variants={staggerGroup}
             initial="hidden"
@@ -427,14 +389,12 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
           ref={stageRef}
           className="relative grid grid-cols-1 gap-12 lg:-mt-16 lg:grid-cols-12 lg:items-center lg:gap-8"
         >
-          {/* HUD dial rides the pin with the stage (see AboutDial). */}
-          <AboutDial dialRef={dialDriftRef} />
           {/* Portrait — pulled up into the header's space on desktop;
               centered in its column so the gutter stays balanced at 1024.
               Bottom padding below lg clears the Boston badge + halo ring
               from the stacked bio text. */}
           <div className="flex justify-center pb-6 lg:col-span-5 lg:-mt-20 lg:pb-0">
-            <div ref={portraitDriftRef} className="relative">
+            <div className="relative">
               {showPortraitHalo && (
                 <div
                   aria-hidden
@@ -482,6 +442,8 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             </div>
           </m.div>
         </div>
+
+        </div>{/* /pin wrapper */}
 
         {/* Stats — HUD readout band, no boxes */}
         <div ref={statsDriftRef}>
