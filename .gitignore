@@ -31,11 +31,17 @@
 .vscode/
 .idea/
 
-# Claude Code — local skills & settings, not for repo
-.claude/skills/
-.claude/settings.local.json
+# Claude Code — local agent dir (skills, settings, memory), not for repo
+/.claude/
 
+# Local agent / tooling memory & scratch
+/.remember/
 
+# Local AI/editor guidance docs — not for repo
+/AGENTS.md
+/CLAUDE.md
+/CURSOR.md
+/DESIGN-TOKENS.md
 
 # debug
 npm-debug.log*
@@ -43,12 +49,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files — local secrets never committed
+# env files — local secrets never committed (catch-all: every .env variant)
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+# (re-allow a committed template only if you ever add one)
+!.env.example
 
 # vercel
 .vercel
@@ -58,11 +63,19 @@ yarn-error.log*
 next-env.d.ts
 
 # playwright — test outputs & browser cache, not for repo
+/.playwright/
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
 /.playwright-mcp/
+
+# secrets / keys — never commit
+*.key
+*.p12
+*.pfx
+service-account*.json
+gha-creds-*.json
 
 # graphify — generated knowledge graph output, not for repo
 /graphify-out/
