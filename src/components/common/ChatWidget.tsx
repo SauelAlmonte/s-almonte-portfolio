@@ -4,6 +4,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { MessageCircle, Send, Sparkles, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 import { cn } from "@/lib/utils";
 
@@ -80,7 +81,7 @@ export default function ChatWidget() {
             // clears the bottom-right corner where floating browser extensions
             // (e.g. Acrobat) park. Same length — just shifted up.
             "inset-x-3 bottom-20 h-[min(72vh,560px)]",
-            "sm:inset-x-auto sm:bottom-auto sm:top-1/2 sm:right-4 sm:h-[min(72vh,560px)] sm:w-95 sm:-translate-y-1/2",
+            "sm:inset-x-auto sm:bottom-auto sm:top-1/2 sm:right-4 sm:h-[min(72vh,560px)] sm:w-[clamp(20rem,26vw,24rem)] sm:-translate-y-1/2",
             "motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-right-2",
           )}
         >
@@ -121,7 +122,8 @@ export default function ChatWidget() {
           <div
             ref={scrollRef}
             aria-live="polite"
-            className="flex-1 space-y-3 overflow-y-auto px-4 py-4"
+            data-lenis-prevent
+            className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4"
           >
             {messages.length === 0 ? (
               <div className="space-y-3">
@@ -153,13 +155,47 @@ export default function ChatWidget() {
                 >
                   <div
                     className={cn(
-                      "max-w-[85%] whitespace-pre-wrap rounded-2xl px-3.5 py-2 text-sm leading-relaxed",
+                      "max-w-[85%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed",
                       m.role === "user"
-                        ? "rounded-br-sm bg-primary text-primary-foreground"
+                        ? "whitespace-pre-wrap rounded-br-sm bg-primary text-primary-foreground"
                         : "rounded-bl-sm bg-secondary text-secondary-foreground",
                     )}
                   >
-                    {messageText(m.parts)}
+                    {m.role === "user" ? (
+                      messageText(m.parts)
+                    ) : (
+                      <ReactMarkdown
+                        components={{
+                          p: ({ children }) => <p className="not-first:mt-2">{children}</p>,
+                          ul: ({ children }) => (
+                            <ul className="my-1 list-disc space-y-2 pl-4 marker:text-muted-foreground">
+                              {children}
+                            </ul>
+                          ),
+                          ol: ({ children }) => (
+                            <ol className="my-1 list-decimal space-y-2 pl-4 marker:text-muted-foreground">
+                              {children}
+                            </ol>
+                          ),
+                          li: ({ children }) => <li className="leading-snug">{children}</li>,
+                          a: ({ href, children }) => (
+                            <a
+                              href={href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-medium break-words text-primary underline underline-offset-2 transition-opacity hover:opacity-80"
+                            >
+                              {children}
+                            </a>
+                          ),
+                          strong: ({ children }) => (
+                            <strong className="font-semibold text-foreground">{children}</strong>
+                          ),
+                        }}
+                      >
+                        {messageText(m.parts)}
+                      </ReactMarkdown>
+                    )}
                   </div>
                 </div>
               ))
