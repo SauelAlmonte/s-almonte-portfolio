@@ -77,9 +77,13 @@ function sanitizeName(value: string): string {
   return sanitizeText(value).replace(/[<>]/g, "").trim();
 }
 
-/** Phone = digits and dialing punctuation only. Everything else (markup, formula, letters) is dropped. */
+/**
+ * Phone = digits and dialing punctuation only. Everything else (markup, formula,
+ * letters) is dropped. A literal space is allowed but `\s` is NOT — that would
+ * keep tabs/newlines/CR and let a multiline value persist (log/CSV injection).
+ */
 function sanitizePhone(value: string): string {
-  return value.replace(/[^\d+()\-.\s]/g, "").trim();
+  return value.replace(/[^\d+()\-. ]/g, "").trim();
 }
 
 /**
@@ -150,14 +154,26 @@ function validate(body: unknown): { ok: true; messages: UIMessage[] } | { ok: fa
     return { ok: false, error: "Conversation too long." };
   }
 
+  // UIMessage roles we accept; anything else is a malformed/forged payload.
+  const VALID_ROLES = new Set(["user", "assistant", "system"]);
+
   let totalChars = 0;
-  for (const m of messages as UIMessage[]) {
-    if (!m || typeof m !== "object" || !Array.isArray(m.parts)) {
+  for (const m of messages) {
+    if (
+      !m ||
+      typeof m !== "object" ||
+      !VALID_ROLES.has((m as { role?: unknown }).role as string) ||
+      !Array.isArray((m as { parts?: unknown }).parts)
+    ) {
       return { ok: false, error: "Malformed message." };
     }
-    for (const part of m.parts) {
-      if (part.type === "text" && typeof part.text === "string") {
-        totalChars += part.text.length;
+    for (const part of (m as { parts: unknown[] }).parts) {
+      if (!part || typeof part !== "object" || typeof (part as { type?: unknown }).type !== "string") {
+        return { ok: false, error: "Malformed message part." };
+      }
+      const p = part as { type: string; text?: unknown };
+      if (p.type === "text" && typeof p.text === "string") {
+        totalChars += p.text.length;
       }
     }
   }
@@ -221,10 +237,11 @@ export async function POST(req: Request) {
 
   return stream.toUIMessageStreamResponse({
     headers: counterHeaders,
-    // The client only ever sees a generic message (don't leak internals), but we
-    // log the real cause server-side so failures are debuggable in the terminal.
+    // The client only ever sees a generic message (don't leak internals). Log
+    // ONLY the error message server-side, never the raw error object — provider
+    // /runtime errors can embed prompt or visitor-contact data in their payload.
     onError: (error) => {
-      console.error("[/api/chat] stream error:", error);
+      console.error("[/api/chat] stream error:", error instanceof Error ? error.message : "unknown_error");
       return "Something went wrong. Please try again in a moment.";
     },
   });

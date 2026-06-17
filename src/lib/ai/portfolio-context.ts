@@ -29,6 +29,15 @@ const WHITELIST = {
   // -_id excludes the Mongo id; only public, display-safe fields remain.
   project: "title description category techStack tags liveUrl repoUrl featured comingSoon -_id",
   skill: "name category proficiency -_id",
+  // Explicit sub-field projection so resumeFileUrl / resumeItFileUrl (and any
+  // future private field) are NEVER fetched — the wall holds at the DB layer,
+  // not just in renderContext. Mirrors LeanResume exactly.
+  resume:
+    "summary " +
+    "experience.company experience.role experience.period experience.location experience.description experience.bullets experience.tech " +
+    "education.school education.degree education.field education.year education.description education.credentialUrl " +
+    "certifications.name certifications.issuer certifications.year certifications.description certifications.credentialUrl " +
+    "-_id",
 } as const;
 
 type LeanProject = {
@@ -89,9 +98,9 @@ export async function buildPortfolioContext(): Promise<string> {
   const [projects, skills, resume] = await Promise.all([
     Project.find({}).select(WHITELIST.project).sort({ order: 1 }).lean<LeanProject[]>(),
     Skill.find({}).select(WHITELIST.skill).sort({ order: 1 }).lean<LeanSkill[]>(),
-    // Whole resume doc is fetched, but only allow-listed sub-fields are mapped
-    // out below — resumeFileUrl / resumeItFileUrl are intentionally dropped.
-    ResumeData.findOne({}).lean<LeanResume | null>(),
+    // Only allow-listed sub-fields are fetched — resumeFileUrl / resumeItFileUrl
+    // (which could embed phone/address) never leave the database.
+    ResumeData.findOne({}).select(WHITELIST.resume).lean<LeanResume | null>(),
   ]);
 
   const value = renderContext({ projects, skills, resume });

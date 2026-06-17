@@ -21,4 +21,18 @@ const LeadSchema = new Schema(
   { timestamps: true }
 );
 
+/**
+ * Enforce the "email or phone required" contract at the schema level so it holds
+ * for ANY write path, not just the chat route. Without this, a future/non-route
+ * caller could persist a contactless, unusable lead.
+ */
+LeadSchema.pre("validate", function () {
+  const hasEmail = typeof this.email === "string" && this.email.trim().length > 0;
+  const hasPhone = typeof this.phone === "string" && this.phone.trim().length > 0;
+  if (!hasEmail && !hasPhone) {
+    this.invalidate("email", "Either email or phone is required.");
+    this.invalidate("phone", "Either email or phone is required.");
+  }
+});
+
 export const Lead = models.Lead ?? model("Lead", LeadSchema);
