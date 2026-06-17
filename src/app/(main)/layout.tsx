@@ -1,5 +1,5 @@
 import { Navbar, Footer } from "@/components/layout";
-import ChatWidget from "@/components/common/ChatWidget";
+import ChatWidgetLoader from "@/components/common/ChatWidgetLoader";
 import { JsonLd } from "@/components/common/JsonLd";
 import { MotionProvider } from "@/components/common/MotionProvider";
 import { ScrollProvider } from "@/components/common/ScrollProvider";
@@ -25,7 +25,7 @@ export default function MainLayout({
           <Footer />
           {/* Public-only AI assistant — lives inside `.dark` so it inherits the
               hero token world; never mounted on /admin. */}
-          <ChatWidget />
+          <ChatWidgetLoader />
         </div>
       </ScrollProvider>
     </MotionProvider>
