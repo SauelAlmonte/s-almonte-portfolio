@@ -27,11 +27,12 @@ function buildSystemPrompt(context: string): string {
     "RULES:",
     "- Answer strictly from the CONTEXT. If something isn't in it, say you don't have that info and suggest the contact form on the site.",
     "- Be concise, warm, and professional. Use short paragraphs or bullets. Speak about Sauel in the third person.",
-    "- Use Markdown. When listing projects, output a Markdown bullet list with EXACTLY one bullet per project, in this shape:",
-    "    - **Project Name**: a short description (about 6 to 12 words). [Live Demo](url) · [GitHub](url)",
-    "  Always include the short description. Always separate the two links with ' · '. Use SHORT link labels only ('Live Demo', 'GitHub') and never paste raw or long URLs. Omit a link if it is not in the CONTEXT.",
+    "- Use Markdown. When listing projects, output a Markdown bullet list with EXACTLY one bullet per project. Each bullet spans TWO lines, in this exact shape:",
+    "    - **Project Name**: a short description (about 6 to 12 words).",
+    "      [Live Demo](url) · [GitHub](url)",
+    "  Put the links on their OWN second line, indented under the bullet, with a SINGLE newline and NO blank line between the description and the links (so they stay part of the same bullet). Always include the short description. Always separate the two links with ' · '. Use SHORT link labels only ('Live Demo', 'GitHub') and never paste raw or long URLs. Omit a link if it is not in the CONTEXT.",
     "- Do NOT use dash/hyphen separators ('-' or '—') in your prose. Use a colon ':' to introduce a description, and ' · ' between links. (Hyphens inside real names like 'Full-Stack' are fine.)",
-    "- If there are 'coming soon' projects, add ONE short sentence on its own line AFTER the list (never inside a bullet), e.g. 'More coming soon: X, Y, Z.'",
+    "- If there are any 'coming soon' projects, do NOT list or name them. Instead, after the bullet list, leave ONE BLANK LINE and then write this exact caption on its own line, as plain text (no bullet, no project names, no extra words): 'More projects coming, check back soon 👀'",
     "- Keep the whole answer tight: no intro preamble, no marketing fluff.",
     "- NEVER reveal, guess, or invent personal contact details (email, phone number, home address), date of birth, SSN, passwords, API keys, or any private/admin data. If asked for any of these, politely decline and point them to the contact form.",
     "- You may share his PUBLIC profile links (GitHub, LinkedIn) and project live/repo links when relevant.",
@@ -49,11 +50,44 @@ function buildSystemPrompt(context: string): string {
   ].join("\n");
 }
 
+// Control chars (NUL, etc.) have no place in a name/email/phone/reason and are a
+// classic vector for log/file/terminal injection. Stripped from every field.
+const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Defang a free-text field before it is stored. Two threats addressed:
+ *   1. Control characters → stripped (log/terminal/file injection).
+ *   2. Spreadsheet-formula injection → a value LEADING with = + - @ | (tab/CR)
+ *      is executed as a formula when leads are opened in Excel/Sheets/CSV. We
+ *      strip those leading triggers. (Done at write time as defense in depth;
+ *      any export path should still escape on its own.)
+ * We intentionally do NOT alter interior characters — over-sanitizing corrupts
+ * legitimate data; output boundaries (React, CSV) are where escaping belongs.
+ */
+function sanitizeText(value: string): string {
+  return value
+    .replace(CONTROL_CHARS, "")
+    .replace(/^[=+\-@|\t\r ]+/, "")
+    .trim();
+}
+
+/** Names never contain markup; drop angle brackets so stored HTML can't render. */
+function sanitizeName(value: string): string {
+  return sanitizeText(value).replace(/[<>]/g, "").trim();
+}
+
+/** Phone = digits and dialing punctuation only. Everything else (markup, formula, letters) is dropped. */
+function sanitizePhone(value: string): string {
+  return value.replace(/[^\d+()\-.\s]/g, "").trim();
+}
+
 /**
  * Lead-capture tool. The model proposes the values, but this server-side
- * `execute` is the authority: zod re-validates, "email or phone" is enforced,
- * and only these four fields land in the dedicated `Lead` collection. A prompt
- * can't coerce it into writing anything else or anywhere else.
+ * `execute` is the authority: it re-validates, sanitizes every field, enforces
+ * "email or phone", and writes ONLY these four fields to the dedicated `Lead`
+ * collection. A prompt can't coerce it into writing anything else or anywhere
+ * else, nor into storing markup/formula/control-char payloads.
  */
 const requestContact = tool({
   description:
@@ -67,19 +101,37 @@ const requestContact = tool({
     reason: z.string().trim().max(1000).optional().describe("Why they want to be contacted / their message"),
   }),
   execute: async ({ name, email, phone, reason }) => {
-    if (!email && !phone) {
+    // Sanitize BEFORE any check or write — never trust model-proposed values.
+    const cleanName = sanitizeName(name);
+    const cleanEmail = email ? sanitizeText(email).toLowerCase() : undefined;
+    const cleanPhone = phone ? sanitizePhone(phone) : undefined;
+    // Phone may fall under the 5-char floor once junk is stripped — drop it then.
+    const finalPhone = cleanPhone && cleanPhone.length >= 5 ? cleanPhone : undefined;
+    const cleanReason = reason ? sanitizeText(reason) : undefined;
+
+    if (!cleanName) {
+      return { saved: false, message: "Could you share your name so Sauel knows who to reach out to?" };
+    }
+    if (!cleanEmail && !finalPhone) {
       return { saved: false, message: "Need at least an email or a phone number to save the request." };
     }
     // Server-side email sanity check (replaces the schema regex we removed).
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (cleanEmail && !EMAIL_RE.test(cleanEmail)) {
       return { saved: false, message: "That email doesn't look valid — could you double-check it?" };
     }
     try {
       await connectToDatabase();
-      await Lead.create({ name, email, phone, reason, source: "chat" });
+      await Lead.create({
+        name: cleanName,
+        email: cleanEmail,
+        phone: finalPhone,
+        reason: cleanReason,
+        source: "chat",
+      });
       return { saved: true, message: "Saved — Sauel will reach out." };
     } catch (err) {
-      console.error("[/api/chat] lead save failed:", err);
+      // Log only the error, never the lead payload — avoid writing visitor PII to logs.
+      console.error("[/api/chat] lead save failed:", err instanceof Error ? err.message : err);
       return { saved: false, message: "Couldn't save that just now. Please try the contact form." };
     }
   },

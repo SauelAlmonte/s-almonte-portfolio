@@ -5,6 +5,7 @@ import { DefaultChatTransport } from "ai";
 import { MessageCircle, Send, Sparkles, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
 
 import { cn } from "@/lib/utils";
 
@@ -155,7 +156,7 @@ export default function ChatWidget() {
                 >
                   <div
                     className={cn(
-                      "max-w-[85%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed",
+                      "max-w-[85%] rounded-2xl px-3.5 py-2 text-[clamp(0.8125rem,0.78rem+0.2vw,0.9rem)] leading-relaxed",
                       m.role === "user"
                         ? "whitespace-pre-wrap rounded-br-sm bg-primary text-primary-foreground"
                         : "rounded-bl-sm bg-secondary text-secondary-foreground",
@@ -165,6 +166,10 @@ export default function ChatWidget() {
                       messageText(m.parts)
                     ) : (
                       <ReactMarkdown
+                        // Single newlines → <br>, so the model can put a project's
+                        // links on their OWN line within the same bullet without a
+                        // blank-line paragraph break (which would split the list item).
+                        remarkPlugins={[remarkBreaks]}
                         components={{
                           p: ({ children }) => <p className="not-first:mt-2">{children}</p>,
                           ul: ({ children }) => (

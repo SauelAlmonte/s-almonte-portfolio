@@ -63,12 +63,18 @@ function sweep(now: number): void {
 }
 
 /**
- * Derive a client IP from proxy headers. Vercel sets `x-forwarded-for`; we take
- * the first hop. Falls back to a constant bucket if absent (still rate-limited,
- * just shared — safe-by-default rather than fail-open per-request).
+ * Derive a client IP from proxy headers, preferring the one a client CAN'T
+ * forge. On Vercel, `x-real-ip` is set by the platform to the true client IP,
+ * whereas the left-most entry of `x-forwarded-for` can be spoofed by a
+ * client-supplied header to rotate past the per-IP limit — so we trust
+ * `x-real-ip` first and only fall back to `x-forwarded-for` (e.g. local dev or
+ * other proxies). Falls back to a shared constant bucket if both are absent
+ * (still rate-limited — safe-by-default rather than fail-open per request).
  */
 export function getClientIp(headers: Headers): string {
+  const real = headers.get("x-real-ip")?.trim();
+  if (real) return real;
   const fwd = headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0]!.trim();
-  return headers.get("x-real-ip")?.trim() || "unknown";
+  return "unknown";
 }
