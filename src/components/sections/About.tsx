@@ -417,13 +417,25 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
           >
             {/* Natural stacked flow by default; the pin clauses switch this
                 to an overlap grid via GSAP so paragraphs can sequence. */}
-            <div ref={stackRef} className="space-y-5 text-muted-foreground leading-relaxed">
+            {/* Visual crossfade — decorative scroll motion. Hidden from assistive
+                tech (the static copy below carries the bio), so screen readers
+                never get the paragraphs gated behind scroll, and axe never samples
+                a paragraph mid-fade. GSAP/Motion only touch this layer. */}
+            <div ref={stackRef} aria-hidden="true" className="space-y-5 text-muted-foreground leading-relaxed">
               {bioParagraphs.map((content, i) => (
                 <div key={i} data-bio-stage>
                   <m.p variants={staggerItem} className="max-w-prose text-lg">
                     {content}
                   </m.p>
                 </div>
+              ))}
+            </div>
+
+            {/* Accessible bio for assistive tech: full text, always present, full
+                contrast, never animated. Mirrors the crossfade content above. */}
+            <div className="sr-only">
+              {bioParagraphs.map((content, i) => (
+                <p key={i}>{content}</p>
               ))}
             </div>
 
