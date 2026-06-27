@@ -108,7 +108,7 @@ export function Navbar() {
     <>
       <a
         href="#home"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:font-medium focus:text-accent-ink"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-100 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:font-medium focus:text-accent-ink"
       >
         Skip to content
       </a>
@@ -125,12 +125,12 @@ export function Navbar() {
           <div className="group/brand relative z-10 flex items-center gap-1">
             <button
               onClick={() => handleNavClick("#home")}
-              aria-label="Go to top"
+              aria-label="SA, go to top"
               className="group/logo flex cursor-pointer items-center focus:outline-none"
             >
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/12 bg-[linear-gradient(160deg,rgba(255,255,255,0.12),rgba(255,255,255,0.02))] text-sm font-bold text-primary shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.22),0_4px_12px_-4px_rgba(0,0,0,0.7)] transition-transform duration-300 group-hover/logo:-translate-y-0.5">
                 {/* ink-centered SA (caps sit high in the line box) */}
-                <span className="block leading-none [text-indent:0.5px] [transform:translateY(-0.01em)]">SA</span>
+                <span className="block leading-none indent-[0.5px] transform-[translateY(-0.01em)]">SA</span>
               </span>
             </button>
 
@@ -154,7 +154,7 @@ export function Navbar() {
                 animate={{ x: indicator.x, opacity: indicator.visible ? 1 : 0 }}
                 transition={{ type: "spring", stiffness: 320, damping: 30 }}
                 style={{ width: INDICATOR_W }}
-                className="absolute bottom-[3px] left-0 h-[2px] rounded-full bg-primary shadow-[0_0_10px_color-mix(in_srgb,var(--primary)_85%,transparent)]"
+                className="absolute bottom-0.75 left-0 h-0.5 rounded-full bg-primary shadow-[0_0_10px_color-mix(in_srgb,var(--primary)_85%,transparent)]"
               />
             </li>
             {NAV_LINKS.map((item) => {
@@ -174,7 +174,7 @@ export function Navbar() {
                     )}
                   >
                     <span className="block h-[1.3em] overflow-hidden">
-                      <span className="block transition-transform duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/flip:-translate-y-1/2">
+                      <span className="block transition-transform duration-420 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/flip:-translate-y-1/2">
                         <span className="block h-[1.3em] leading-[1.3em]">{item.label}</span>
                         <span className="block h-[1.3em] leading-[1.3em] text-primary">{item.label}</span>
                       </span>

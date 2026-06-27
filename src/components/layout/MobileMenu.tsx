@@ -84,7 +84,7 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
       <SheetTrigger asChild>
         <button
           aria-label="Open navigation menu"
-          className="grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-ink transition-colors duration-200 hover:border-primary/40 hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 md:hidden"
+          className="grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/4 text-ink transition-colors duration-200 hover:border-primary/40 hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 md:hidden"
         >
           {/* Quarter-turn while the glyph swaps reads as a hamburger↔close morph. */}
           <m.span
@@ -102,7 +102,7 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
         side="right"
         showCloseButton={false}
         aria-describedby={undefined} // nav links are self-describing; silences Radix's missing-Description warning
-        className="flex w-[86vw] max-w-[21rem] flex-col gap-0 overflow-hidden border-l border-white/10 bg-stage/45 p-0 text-ink shadow-[-24px_0_60px_-30px_rgba(0,0,0,0.9)] backdrop-blur-2xl sm:max-w-[21rem]"
+        className="flex w-[86vw] max-w-84 flex-col gap-0 overflow-hidden border-l border-white/10 bg-stage/45 p-0 text-ink shadow-[-24px_0_60px_-30px_rgba(0,0,0,0.9)] backdrop-blur-2xl sm:max-w-84"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
@@ -113,7 +113,7 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
         />
 
         {/* top sheen + faint corner accent (the only glow, kept restrained) */}
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/20 to-transparent" />
         <div
           aria-hidden
           className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--primary)_10%,transparent),transparent_70%)]"
@@ -130,9 +130,9 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
           <button
             onClick={() => handleOpenChange(false)}
             aria-label="Close navigation menu"
-            className="grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-ink-secondary transition-colors duration-200 hover:border-primary/40 hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+            className="grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/4 text-ink-secondary transition-colors duration-200 hover:border-primary/40 hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
           >
-            <X className="h-[18px] w-[18px]" />
+            <X className="h-4.5 w-4.5" />
           </button>
         </m.div>
 
@@ -155,13 +155,13 @@ export function MobileMenu({ navItems, activeSection }: MobileMenuProps) {
                 whileTap={{ scale: 0.99 }}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "group flex w-full cursor-pointer items-center gap-4 border-b border-white/[0.07] py-[18px] text-left transition-colors duration-200 last:border-b-0",
+                  "group flex w-full cursor-pointer items-center gap-4 border-b border-white/[0.07] py-4.5 text-left transition-colors duration-200 last:border-b-0",
                   isActive ? "text-primary" : "text-ink",
                 )}
               >
                 <Icon
                   className={cn(
-                    "h-[26px] w-[26px] shrink-0 transition-colors duration-200",
+                    "h-6.5 w-6.5 shrink-0 transition-colors duration-200",
                     isActive ? "text-primary" : "text-ink-muted group-hover:text-ink",
                   )}
                   strokeWidth={1.75}
