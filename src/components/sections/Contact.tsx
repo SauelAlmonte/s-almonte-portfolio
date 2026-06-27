@@ -368,7 +368,7 @@ export function Contact() {
             </p>
           </div>
 
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-primary/30 to-transparent mb-6" />
+          <div className="h-px w-full bg-linear-to-r from-transparent via-primary/30 to-transparent mb-6" />
 
           <div className="flex flex-col gap-3">
             <Button
@@ -423,7 +423,7 @@ export function Contact() {
             </p>
           </div>
 
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-primary/40 to-transparent mb-6" />
+          <div className="h-px w-full bg-linear-to-r from-transparent via-primary/40 to-transparent mb-6" />
 
           <Button
             onClick={() => setModalState("idle")}
