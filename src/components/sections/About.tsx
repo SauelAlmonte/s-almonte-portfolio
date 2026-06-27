@@ -425,7 +425,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="lg:col-span-7 lg:col-start-6 xl:col-span-6 xl:col-start-7"
+            className="lg:col-span-7 lg:col-start-6 xl:col-span-6 xl:col-start-7 lg:-mt-4"
           >
             {/* Natural stacked flow by default; the pin clauses switch this
                 to an overlap grid via GSAP so paragraphs can sequence. */}
