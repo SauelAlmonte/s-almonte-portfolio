@@ -378,7 +378,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             </m.h2>
             <m.p
               variants={staggerItem}
-              className="mt-6 max-w-md text-lg leading-relaxed text-muted-foreground lg:ml-auto lg:text-right"
+              className="mt-6 max-w-md text-lg leading-relaxed text-balance text-muted-foreground lg:ml-auto lg:text-right"
             >
               A passionate engineer who loves solving real problems through clean
               code, thoughtful design, and continuous learning.
