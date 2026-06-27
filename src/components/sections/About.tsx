@@ -301,8 +301,9 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       I&apos;m a full-stack and AI engineer. At{" "}
       <span className="text-foreground font-medium">Inrupt</span> I worked with{" "}
       <span className="text-foreground font-medium">Claude Code</span> every day. I
-      design the systems that make AI agents reliable: the context they run in and
-      the evaluation gates that flag a bad answer before it ships. Before that, I
+      designed the systems that made AI agents reliable: the context they ran in
+      and the evaluation gates that flagged a bad answer before it shipped. Before
+      that, I
       built cloud applications and AI automation at{" "}
       <span className="text-foreground font-medium">North Light AI</span> and{" "}
       <span className="text-foreground font-medium">Wayfair</span>, where I learned
