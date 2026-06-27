@@ -298,25 +298,29 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
 
   const bioParagraphs = cmsBioParagraphs ?? [
     <>
-      I&apos;m a{" "}
-      <span className="text-foreground font-semibold">Full-Stack Software Engineer</span>{" "}
-      specializing in building scalable cloud applications and AI-powered workflow
-      automation. With hands-on experience at companies like{" "}
-      <span className="text-foreground font-medium">Wayfair</span> and{" "}
-      <span className="text-foreground font-medium">North Light AI</span>, I bring both
-      startup agility and enterprise-level engineering discipline to every project.
+      I&apos;m a full-stack and AI engineer. At{" "}
+      <span className="text-foreground font-medium">Inrupt</span> I worked with{" "}
+      <span className="text-foreground font-medium">Claude Code</span> every day. I
+      designed the systems that made AI agents reliable: the context they ran in
+      and the evaluation gates that flagged a bad answer before it shipped. Before
+      that, I
+      built cloud applications and AI automation at{" "}
+      <span className="text-foreground font-medium">North Light AI</span> and{" "}
+      <span className="text-foreground font-medium">Wayfair</span>, where I learned
+      to move fast without making a mess.
     </>,
     <>
-      Beyond coding, I&apos;m deeply committed to community. I&apos;ve{" "}
-      <span className="text-foreground font-semibold">mentored 50+ early-career engineers</span>{" "}
-      through the Urban League of Eastern Massachusetts, leading bootcamps and mock
-      interviews that helped technologists break into the industry.
+      Mentoring is the part I care about most. Through the Urban League of Eastern
+      Massachusetts, I&apos;ve coached{" "}
+      <span className="text-foreground font-semibold">50+ early-career engineers</span>{" "}
+      with bootcamps and mock interviews, and plenty have landed their first tech
+      jobs since.
     </>,
     <>
-      I&apos;m currently pursuing my{" "}
+      I&apos;m finishing my{" "}
       <span className="text-foreground font-medium">A.S. in Computer Science</span> at
-      Bunker Hill Community College while continuing to build and ship real-world
-      projects.
+      Bunker Hill Community College, and I build AI tools in my own time, including
+      the assistant you can chat with on this site.
     </>,
   ];
 
