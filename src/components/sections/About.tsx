@@ -203,7 +203,15 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       gsap.set(stackRef.current, { display: "grid", alignItems: "start" });
       gsap.set(stages, { gridArea: "1 / 1", marginBottom: 0 });
       gsap.set(stages.slice(1), { autoAlpha: 0, y: 48 });
-      if (cta) gsap.set(cta, { autoAlpha: 0, y: 24 });
+      if (cta) {
+        /* All stages overlap in one grid cell sized to the TALLEST paragraph,
+           so the CTA (below the stack) otherwise sits far beneath the shorter
+           final paragraph. Pull it up by the slack between the cell height and
+           the last stage, keeping ~the original 32px gap, so it hugs the bio. */
+        const last = stages[stages.length - 1];
+        const slack = (stackRef.current?.offsetHeight ?? 0) - last.offsetHeight;
+        gsap.set(cta, { autoAlpha: 0, y: 24, marginTop: 32 - Math.max(slack, 0) });
+      }
 
       /* Where the viewport allows, the pin includes the header + tagline
          wrapper so they hold still while the paragraphs sequence ("top
@@ -378,7 +386,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             </m.h2>
             <m.p
               variants={staggerItem}
-              className="mt-6 max-w-md text-lg leading-relaxed text-balance text-muted-foreground lg:ml-auto lg:text-right"
+              className="mt-6 max-w-xl text-lg leading-relaxed text-balance text-muted-foreground lg:ml-auto lg:text-right"
             >
               A passionate engineer who loves solving real problems through clean
               code, thoughtful design, and continuous learning.
