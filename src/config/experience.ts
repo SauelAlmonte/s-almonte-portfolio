@@ -18,6 +18,25 @@ export type LandingExperienceCard = {
 export const DEFAULT_LANDING_EXPERIENCES: LandingExperienceCard[] = [
   {
     id: "01",
+    role: "Software Engineer Intern",
+    company: "Inrupt",
+    location: "Boston, MA (Hybrid)",
+    period: "April 2026 – Present",
+    duration: "Present",
+    accent: "#A8DADC",
+    accentClass: "from-[#A8DADC]/20 to-[#A8DADC]/5",
+    borderClass: "border-[#A8DADC]/30 hover:border-[#A8DADC]/70",
+    tagClass: "bg-[#A8DADC]/15 text-[#5aacae] dark:text-[#A8DADC]",
+    dotClass: "bg-[#A8DADC]",
+    achievements: [
+      "Collaborated with the engineering team to ship React and CSS features via code review",
+      "Use Claude Code daily to automate Jira tickets, PRs, and debugging across TypeScript and Python",
+      "Designed a CLAUDE.md system with subagents, eval gates, and hooks for repeatable AI output",
+    ],
+    tech: ["TypeScript", "Python", "React", "Claude Code", "Playwright", "GitHub Actions", "Git", "CSS", "Jira"],
+  },
+  {
+    id: "02",
     role: "Full-Stack Developer & Mentor",
     company: "Urban League of Eastern Massachusetts",
     location: "Boston, MA",
@@ -36,7 +55,7 @@ export const DEFAULT_LANDING_EXPERIENCES: LandingExperienceCard[] = [
     tech: ["React", "TypeScript", "Tailwind CSS", "JavaScript"],
   },
   {
-    id: "02",
+    id: "03",
     role: "AI Engineer Intern",
     company: "North Light AI",
     location: "Remote",
@@ -55,7 +74,7 @@ export const DEFAULT_LANDING_EXPERIENCES: LandingExperienceCard[] = [
     tech: ["Python", "GPT-4", "Whisper", "Docker", "LangChain"],
   },
   {
-    id: "03",
+    id: "04",
     role: "IT Support/Travel Expert",
     company: "Overseas Adventure Travel",
     location: "Boston, MA",
@@ -74,7 +93,7 @@ export const DEFAULT_LANDING_EXPERIENCES: LandingExperienceCard[] = [
     tech: ["Bash", "Azure CLI", "CRM", "IT Support"],
   },
   {
-    id: "04",
+    id: "05",
     role: "Software Engineer Intern",
     company: "Wayfair",
     location: "Boston, MA",
