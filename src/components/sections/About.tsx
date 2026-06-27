@@ -200,7 +200,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       const cta = section.querySelector<HTMLElement>("[data-cta-stage]");
       if (stages.length <= 1) return;
 
-      gsap.set(stackRef.current, { display: "grid", alignItems: "center" });
+      gsap.set(stackRef.current, { display: "grid", alignItems: "start" });
       gsap.set(stages, { gridArea: "1 / 1", marginBottom: 0 });
       gsap.set(stages.slice(1), { autoAlpha: 0, y: 48 });
       if (cta) gsap.set(cta, { autoAlpha: 0, y: 24 });
