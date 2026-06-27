@@ -188,7 +188,7 @@ export default function ChatWidget() {
                               href={href}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="font-medium break-words text-primary underline underline-offset-2 transition-opacity hover:opacity-80"
+                              className="font-medium wrap-break-word text-primary underline underline-offset-2 transition-opacity hover:opacity-80"
                             >
                               {children}
                             </a>
