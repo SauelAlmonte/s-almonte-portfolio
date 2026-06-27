@@ -112,7 +112,7 @@ export function Experience({ experiences, pdfChoices }: ExperienceSectionProps) 
             className="relative shrink-0 self-stretch"
             style={{ width: "var(--exp-rail)" }}
           >
-            <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-gradient-to-b from-cat-fullstack via-cat-backend to-cat-cloud opacity-30" />
+            <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-linear-to-b from-cat-fullstack via-cat-backend to-cat-cloud opacity-30" />
           </div>
 
           <div className="grid min-w-0 flex-1 grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
@@ -142,7 +142,7 @@ export function Experience({ experiences, pdfChoices }: ExperienceSectionProps) 
                   <div
                     aria-hidden="true"
                     className={cn(
-                      "absolute top-6 z-[1] h-3 w-3 rounded-full ring-4 ring-background",
+                      "absolute top-6 z-1 h-3 w-3 rounded-full ring-4 ring-background",
                       "left-[calc(-1*var(--dot-pull))]",
                       isRightColDesktop &&
                         "lg:left-[calc(-0.5*var(--grid-gap))] lg:-translate-x-1/2",
