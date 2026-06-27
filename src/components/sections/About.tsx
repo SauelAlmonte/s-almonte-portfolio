@@ -299,7 +299,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
   const bioParagraphs = cmsBioParagraphs ?? [
     <>
       I&apos;m a full-stack and AI engineer. At{" "}
-      <span className="text-foreground font-medium">Inrupt</span> I work with{" "}
+      <span className="text-foreground font-medium">Inrupt</span> I worked with{" "}
       <span className="text-foreground font-medium">Claude Code</span> every day. I
       design the systems that make AI agents reliable: the context they run in and
       the evaluation gates that flag a bad answer before it ships. Before that, I
