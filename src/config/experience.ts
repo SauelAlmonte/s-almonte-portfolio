@@ -33,7 +33,7 @@ export const DEFAULT_LANDING_EXPERIENCES: LandingExperienceCard[] = [
       "Use Claude Code daily to automate Jira tickets, PRs, and debugging across TypeScript and Python",
       "Designed a CLAUDE.md system with subagents, eval gates, and hooks for repeatable AI output",
     ],
-    tech: ["TypeScript", "Python", "React", "Claude Code"],
+    tech: ["TypeScript", "Python", "React", "Claude Code", "Playwright", "GitHub Actions", "Git", "CSS", "Jira"],
   },
   {
     id: "02",
