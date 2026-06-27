@@ -68,7 +68,6 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
-/.playwright-mcp/
 
 # secrets / keys — never commit
 *.key
