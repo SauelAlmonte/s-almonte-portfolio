@@ -172,7 +172,10 @@ export function Experience({ experiences, pdfChoices }: ExperienceSectionProps) 
                         </div>
                       </div>
                     </div>
-                    <span className="text-3xl font-black text-border/40 leading-none tabular-nums">
+                    <span
+                      className="text-3xl font-black leading-none tabular-nums opacity-50"
+                      style={{ color: exp.accent }}
+                    >
                       {exp.id}
                     </span>
                   </div>
