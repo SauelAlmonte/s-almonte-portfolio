@@ -125,7 +125,7 @@ export function Navbar() {
           <div className="group/brand relative z-10 flex items-center gap-1">
             <button
               onClick={() => handleNavClick("#home")}
-              aria-label="Go to top"
+              aria-label="SA, go to top"
               className="group/logo flex cursor-pointer items-center focus:outline-none"
             >
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/12 bg-[linear-gradient(160deg,rgba(255,255,255,0.12),rgba(255,255,255,0.02))] text-sm font-bold text-primary shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.22),0_4px_12px_-4px_rgba(0,0,0,0.7)] transition-transform duration-300 group-hover/logo:-translate-y-0.5">
