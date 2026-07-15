@@ -24,7 +24,7 @@ export async function PUT(
     await connectToDatabase();
 
     const project = await Project.findByIdAndUpdate(
-      id,
+      String(id),
       { $set: patch },
       { new: true, runValidators: true }
     );
@@ -52,7 +52,7 @@ export async function DELETE(
   const { id } = await params;
   try {
     await connectToDatabase();
-    await Project.findByIdAndDelete(id);
+    await Project.findByIdAndDelete(String(id));
     revalidatePublicProjects();
     return NextResponse.json({ success: true });
   } catch (err) {
