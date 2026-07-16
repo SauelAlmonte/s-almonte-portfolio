@@ -11,7 +11,7 @@
 [![GSAP](https://img.shields.io/badge/GSAP-88CE02?style=for-the-badge&logo=greensock&logoColor=black)](https://greensock.com/gsap)
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-s--almonte.vercel.app-A8DADC?style=for-the-badge&logo=vercel&logoColor=black)](https://s-almonte.vercel.app)
-[![License: MIT](https://img.shields.io/badge/License-MIT-B39CD0?style=for-the-badge)](LICENSE)
+[![License: All%20Rights%20Reserved-B39CD0?style=for-the-badge)](LICENSE)
 
 ---
 
@@ -123,10 +123,9 @@ npm run test:e2e        # Playwright — auto-starts the dev server
 
 ## 📄 License
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+Copyright © 2025 Sauel Almonte. **All rights reserved.**
 
-> You are free to use this project as inspiration or a template for your own portfolio.
-> Please do not copy the content (bio, experience, projects) — that's my story. ✌️
+This portfolio, including its source code, design, content, biography, experience, and project materials, is the intellectual property of Sauel Almonte. No permission is granted to copy, modify, distribute, publish, sublicense, or use this work without prior written permission. See the [LICENSE](LICENSE) file for details.
 
 ---
 
