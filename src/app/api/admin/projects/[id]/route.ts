@@ -4,6 +4,7 @@ import { Project } from "@/lib/models/Project";
 import { auth } from "@/auth";
 import { buildProjectPartialUpdate } from "@/lib/projects/admin-project-write";
 import { revalidatePublicProjects } from "@/lib/cache/revalidate-public";
+import { parseObjectId } from "@/lib/db/object-id";
 
 export async function PUT(
   req: Request,
@@ -13,6 +14,11 @@ export async function PUT(
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
+  const objectId = parseObjectId(id);
+  if (!objectId) {
+    return NextResponse.json({ error: "Invalid project ID." }, { status: 400 });
+  }
+
   const body = await req.json();
 
   const patch = buildProjectPartialUpdate(body);
@@ -23,8 +29,8 @@ export async function PUT(
   try {
     await connectToDatabase();
 
-    const project = await Project.findByIdAndUpdate(
-      id,
+    const project = await Project.findOneAndUpdate(
+      { _id: { $eq: objectId } },
       { $set: patch },
       { new: true, runValidators: true }
     );
@@ -50,9 +56,14 @@ export async function DELETE(
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
+  const objectId = parseObjectId(id);
+  if (!objectId) {
+    return NextResponse.json({ error: "Invalid project ID." }, { status: 400 });
+  }
+
   try {
     await connectToDatabase();
-    await Project.findByIdAndDelete(id);
+    await Project.findOneAndDelete({ _id: { $eq: objectId } });
     revalidatePublicProjects();
     return NextResponse.json({ success: true });
   } catch (err) {

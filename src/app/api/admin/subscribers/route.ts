@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { Subscriber } from "@/lib/models/Subscriber";
 import { auth } from "@/auth";
+import { parseObjectId } from "@/lib/db/object-id";
 
 export async function GET() {
   const session = await auth();
@@ -31,9 +32,32 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = await req.json();
-  await connectToDatabase();
-  await Subscriber.findByIdAndDelete(id);
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+  }
+
+  const objectId = parseObjectId(
+    typeof body === "object" && body !== null && "id" in body
+      ? body.id
+      : undefined
+  );
+  if (!objectId) {
+    return NextResponse.json({ error: "Invalid subscriber ID." }, { status: 400 });
+  }
+
+  try {
+    await connectToDatabase();
+    await Subscriber.findOneAndDelete({ _id: { $eq: objectId } });
+  } catch (err) {
+    console.error("[admin/subscribers DELETE]", err);
+    return NextResponse.json(
+      { error: "Database unavailable. Check MONGODB_URI and Atlas network access." },
+      { status: 503 }
+    );
+  }
 
   return NextResponse.json({ success: true });
 }

@@ -4,6 +4,7 @@ import { Skill } from "@/lib/models/Skill";
 import { auth } from "@/auth";
 import { buildSkillPartialUpdate } from "@/lib/skills/admin-skill-write";
 import { revalidatePublicHome } from "@/lib/cache/revalidate-public";
+import { parseObjectId } from "@/lib/db/object-id";
 
 export async function PUT(
   req: Request,
@@ -13,6 +14,10 @@ export async function PUT(
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
+  const objectId = parseObjectId(id);
+  if (!objectId) {
+    return NextResponse.json({ error: "Invalid skill ID." }, { status: 400 });
+  }
 
   let body: unknown;
   try {
@@ -28,7 +33,11 @@ export async function PUT(
 
   try {
     await connectToDatabase();
-    const skill = await Skill.findByIdAndUpdate(id, { $set: patch }, { new: true, runValidators: true });
+    const skill = await Skill.findOneAndUpdate(
+      { _id: { $eq: objectId } },
+      { $set: patch },
+      { new: true, runValidators: true }
+    );
     if (!skill) {
       return NextResponse.json({ error: "Skill not found." }, { status: 404 });
     }
@@ -51,10 +60,14 @@ export async function DELETE(
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
+  const objectId = parseObjectId(id);
+  if (!objectId) {
+    return NextResponse.json({ error: "Invalid skill ID." }, { status: 400 });
+  }
 
   try {
     await connectToDatabase();
-    const removed = await Skill.findByIdAndDelete(id);
+    const removed = await Skill.findOneAndDelete({ _id: { $eq: objectId } });
     if (!removed) {
       return NextResponse.json({ error: "Skill not found." }, { status: 404 });
     }
