@@ -33,7 +33,7 @@ export async function DELETE(req: Request) {
 
   const { id } = await req.json();
   await connectToDatabase();
-  await Subscriber.findByIdAndDelete(id);
+  await Subscriber.findOneAndDelete({ _id: { $eq: id } });
 
   return NextResponse.json({ success: true });
 }
