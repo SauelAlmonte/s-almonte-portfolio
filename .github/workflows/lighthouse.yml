@@ -21,9 +21,10 @@ jobs:
     # - NEXT_PUBLIC_SITE_URL is the production origin so canonical/OG/JSON-LD
     #   URLs are audited as they ship (the pages are still SERVED at localhost).
     # - mongoose.ts throws at module load if MONGODB_URI is unset, so a
-    #   placeholder is required for `next build`. The 127.0.0.1 host is refused
-    #   instantly (10s fail-fast), so the audited public pages fall back to
-    #   config data — no live DB needed.
+    #   placeholder is required for `next build`. The unreachable 127.0.0.1 host
+    #   costs one 10s server-selection timeout, then mongoose.ts fail-fast-caches
+    #   the failure and the audited public pages fall back to config data
+    #   immediately — no live DB needed.
     # - RESEND_API_KEY / AUTH_SECRET are placeholders; nothing is sent or
     #   authenticated during a Lighthouse run.
     env:
