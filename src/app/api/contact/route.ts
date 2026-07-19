@@ -88,7 +88,11 @@ export async function POST(req: NextRequest) {
         await connectToDatabase();
         console.log("💾 Saving subscriber:", email);
         const saved = await Subscriber.findOneAndUpdate(
-          { email: email.toLowerCase() },
+          // `$eq` forces string equality so a query-operator object can never reach
+          // the filter (NoSQL object injection). Zod already guarantees `email` is a
+          // string here; this is the explicit, scanner-legible defense the repo's
+          // CLAUDE.md mandates for identifier-keyed queries.
+          { email: { $eq: email.toLowerCase() } },
           { name, phone: phone || undefined, isActive: true },
           { upsert: true, new: true }
         );

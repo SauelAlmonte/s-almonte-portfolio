@@ -33,7 +33,7 @@ function buildSystemPrompt(context: string): string {
     "      [Live Demo](url) · [GitHub](url)",
     "  Put the links on their OWN second line, indented under the bullet, with a SINGLE newline and NO blank line between the description and the links (so they stay part of the same bullet). Always include the short description. Always separate the two links with ' · '. Use SHORT link labels only ('Live Demo', 'GitHub') and never paste raw or long URLs. Omit a link if it is not in the CONTEXT.",
     "- Do NOT use dash/hyphen separators ('-' or '—') in your prose. Use a colon ':' to introduce a description, and ' · ' between links. (Hyphens inside real names like 'Full-Stack' are fine.)",
-    "- If there are any 'coming soon' projects, do NOT list or name them. Instead, after the bullet list, leave ONE BLANK LINE and then write this exact caption on its own line, as plain text (no bullet, no project names, no extra words): 'More projects coming, check back soon 👀'",
+    "- If the CONTEXT includes an UPCOMING note, do NOT invent, guess, or name any upcoming project (their names are deliberately not provided). After the bullet list, leave ONE BLANK LINE and then write this exact caption on its own line, as plain text (no bullet, no project names, no extra words): 'More projects coming, check back soon 👀'",
     "- Keep the whole answer tight: no intro preamble, no marketing fluff.",
     "- NEVER reveal, guess, or invent personal contact details (email, phone number, home address), date of birth, SSN, passwords, API keys, or any private/admin data. If asked for any of these, politely decline and point them to the contact form.",
     "- You may share his PUBLIC profile links (GitHub, LinkedIn) and project live/repo links when relevant.",

@@ -21,13 +21,18 @@ import { Skill } from "@/lib/models/Skill";
  *   - email / phone / home address / DOB / SSN / passwords / secrets / env keys
  *   - resumeFileUrl / resumeItFileUrl (the PDF could embed phone/address)
  *   - imageBase64 (huge, useless to the model)
+ *   - `comingSoon` projects — filtered out of the query so an unreleased project's
+ *     name/details cannot be exfiltrated even by a full system-prompt dump; only a
+ *     count reaches the context
  *
  * If you add a field below, you are explicitly deciding the public can read it.
  */
 
 const WHITELIST = {
-  // -_id excludes the Mongo id; only public, display-safe fields remain.
-  project: "title description category techStack tags liveUrl repoUrl featured comingSoon -_id",
+  // -_id excludes the Mongo id; only public, display-safe fields remain. `comingSoon`
+  // is intentionally absent: unreleased projects are filtered out of the query below,
+  // so their fields must never be selected into the context in the first place.
+  project: "title description category techStack tags liveUrl repoUrl featured -_id",
   skill: "name category proficiency -_id",
   // Explicit sub-field projection so resumeFileUrl / resumeItFileUrl (and any
   // future private field) are NEVER fetched — the wall holds at the DB layer,
@@ -49,7 +54,6 @@ type LeanProject = {
   liveUrl?: string;
   repoUrl?: string;
   featured?: boolean;
-  comingSoon?: boolean;
 };
 
 type LeanSkill = { name: string; category: string; proficiency: number };
@@ -95,15 +99,25 @@ export async function buildPortfolioContext(): Promise<string> {
 
   await connectToDatabase();
 
-  const [projects, skills, resume] = await Promise.all([
-    Project.find({}).select(WHITELIST.project).sort({ order: 1 }).lean<LeanProject[]>(),
+  const [projects, skills, resume, comingSoonCount] = await Promise.all([
+    // `comingSoon` projects are EXCLUDED from the model's context entirely — not just
+    // hidden by a prompt instruction. Their names/descriptions/tech never leave the
+    // database, so no prompt-injection or system-prompt dump can reveal an unreleased
+    // project (an instruction to "not name them" is not a wall; this is). Only the
+    // COUNT is surfaced (below), so the bot can still say "more are coming" without
+    // naming anything.
+    Project.find({ comingSoon: { $ne: true } })
+      .select(WHITELIST.project)
+      .sort({ order: 1 })
+      .lean<LeanProject[]>(),
     Skill.find({}).select(WHITELIST.skill).sort({ order: 1 }).lean<LeanSkill[]>(),
     // Only allow-listed sub-fields are fetched — resumeFileUrl / resumeItFileUrl
     // (which could embed phone/address) never leave the database.
     ResumeData.findOne({}).select(WHITELIST.resume).lean<LeanResume | null>(),
+    Project.countDocuments({ comingSoon: true }),
   ]);
 
-  const value = renderContext({ projects, skills, resume });
+  const value = renderContext({ projects, skills, resume, comingSoonCount });
   cache = { value, expires: nowMs() + TTL_MS };
   return value;
 }
@@ -118,10 +132,12 @@ function renderContext({
   projects,
   skills,
   resume,
+  comingSoonCount,
 }: {
   projects: LeanProject[];
   skills: LeanSkill[];
   resume: LeanResume | null;
+  comingSoonCount: number;
 }): string {
   const { person, social } = siteConfig;
   const lines: string[] = [];
@@ -181,12 +197,21 @@ function renderContext({
       ]
         .filter(Boolean)
         .join(" · ");
-      lines.push(
-        `- ${p.title} [${p.category}]${p.comingSoon ? " (coming soon)" : ""}: ${p.description}`,
-      );
+      lines.push(`- ${p.title} [${p.category}]: ${p.description}`);
       if (p.techStack?.length) lines.push(`  Tech: ${p.techStack.join(", ")}`);
       if (links) lines.push(`  Links: ${links}`);
     }
+  }
+
+  // Surface only that MORE projects exist — never their names/details (those were
+  // filtered out of the query). Lets the bot render the "coming soon" caption
+  // without anything to leak.
+  if (comingSoonCount > 0) {
+    lines.push(
+      "",
+      "# UPCOMING",
+      `${comingSoonCount} more project${comingSoonCount === 1 ? " is" : "s are"} in progress but not yet public. Names and details are withheld until launch — never invent, guess, or name them.`,
+    );
   }
 
   return lines.join("\n");
