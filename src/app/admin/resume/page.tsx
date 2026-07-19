@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, RefreshCw, Save, Link as LinkIcon, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { safeHref } from "@/lib/security/safe-href";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -384,6 +385,11 @@ export default function AdminResumePage() {
     );
   }
 
+  // Typed PDF locations only become preview links once they pass the scheme
+  // guard — a `javascript:` URL in `href` would execute on click.
+  const softwarePreviewHref = safeHref(fileUrl);
+  const itPreviewHref = safeHref(fileUrlIt);
+
   return (
     <div className="admin-page-shell admin-page-shell--sm">
       <div>
@@ -635,15 +641,15 @@ export default function AdminResumePage() {
                 className="rounded-xl bg-muted"
               />
             </div>
-            {(fileUrl || fileUrlIt) && (
+            {(softwarePreviewHref || itPreviewHref) && (
               <p className="text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-1">
-                {fileUrl ? (
-                  <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
+                {softwarePreviewHref ? (
+                  <a href={softwarePreviewHref} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
                     <LinkIcon className="h-3.5 w-3.5" /> Preview software PDF
                   </a>
                 ) : null}
-                {fileUrlIt ? (
-                  <a href={fileUrlIt} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
+                {itPreviewHref ? (
+                  <a href={itPreviewHref} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
                     <LinkIcon className="h-3.5 w-3.5" /> Preview IT PDF
                   </a>
                 ) : null}
