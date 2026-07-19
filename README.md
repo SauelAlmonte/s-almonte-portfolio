@@ -11,7 +11,7 @@
 [![GSAP](https://img.shields.io/badge/GSAP-88CE02?style=for-the-badge&logo=greensock&logoColor=black)](https://greensock.com/gsap)
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-s--almonte.vercel.app-A8DADC?style=for-the-badge&logo=vercel&logoColor=black)](https://s-almonte.vercel.app)
-[![License: All%20Rights%20Reserved-B39CD0?style=for-the-badge)](LICENSE)
+[![License: All Rights Reserved](https://img.shields.io/badge/License-All%20Rights%20Reserved-B39CD0?style=for-the-badge)](LICENSE)
 
 ---
 
