@@ -19,15 +19,22 @@
 export function safeHref(raw: string): string | null {
   const value = raw.trim();
   if (!value) return null;
+
+  // Reject control characters/embedded whitespace obfuscation up front.
+  if (/[\u0000-\u001F\u007F\s]/.test(value)) return null;
+
   if (value.startsWith("/")) {
-    return "/" + value.replace(/^\/+/, "");
+    const normalizedPath = "/" + value.replace(/^\/+/, "");
+    return normalizedPath;
   }
+
   let url: URL;
   try {
     url = new URL(value);
   } catch {
     return null;
   }
+
   const rest = "//" + url.host + url.pathname + url.search + url.hash;
   if (url.protocol === "https:") return "https:" + rest;
   if (url.protocol === "http:") return "http:" + rest;
