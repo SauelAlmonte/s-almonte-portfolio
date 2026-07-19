@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/common/ThemeProvider";
 import { siteConfig } from "@/config/site";
@@ -66,7 +67,11 @@ export const metadata: Metadata = {
   // },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Forces dynamic rendering for every page: the CSP nonce (src/proxy.ts) is
+  // per-request, so cached/prerendered HTML would ship stale nonces and the
+  // browser would refuse to hydrate.
+  await headers();
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>

@@ -1,44 +1,9 @@
 import type { NextConfig } from "next";
 
-/**
- * Content-Security-Policy for the public site.
- *
- * The site loads NO third-party scripts (no analytics, self-hosted `next/font`,
- * and `three`/`drei` pull no external assets), so a STATIC policy locks the page
- * down while preserving static rendering — no per-request nonce, no forced dynamic
- * pages. `'unsafe-inline'` is required on `script-src`/`style-src` because Next.js
- * injects an inline hydration bootstrap and the animation libs (Motion, GSAP) set
- * inline styles; the residual XSS risk is negligible here because the site has no
- * reflected-HTML sink (its one `dangerouslySetInnerHTML` is JSON-LD, escaped by
- * `serializeJsonLd` and a non-executable data block). The high-value directives —
- * `frame-ancestors 'none'` (clickjacking), `object-src 'none'`, `base-uri 'self'`,
- * `form-action 'self'` — are all strict.
- */
-// Next.js dev (HMR / React Fast Refresh) evaluates modules via `eval()`, which a
-// strict `script-src` blocks — so `'unsafe-eval'` is added ONLY in development.
-// Production ships without it (the deployed CSP is verified to have no 'unsafe-eval').
-const scriptSrc =
-  process.env.NODE_ENV === "production"
-    ? "script-src 'self' 'unsafe-inline'"
-    : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
-
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  scriptSrc,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
-  "font-src 'self' data:",
-  "connect-src 'self'",
-  "worker-src 'self' blob:",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-  "upgrade-insecure-requests",
-].join("; ");
-
+// Content-Security-Policy is set per request with a nonce in src/proxy.ts —
+// a static header here would conflict (browsers enforce the intersection of
+// multiple CSP headers). Only nonce-independent headers live below.
 const securityHeaders = [
-  { key: "Content-Security-Policy", value: contentSecurityPolicy },
   // Vercel's edge already sends this on *.vercel.app, but the app must not
   // depend on platform defaults — set it explicitly with the same value so
   // HTTPS-only is guaranteed on any host (and visible to security scanners).

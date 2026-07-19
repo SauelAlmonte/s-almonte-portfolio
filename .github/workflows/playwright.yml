@@ -19,8 +19,10 @@ jobs:
 
     # Build-time placeholders only — no real secrets. mongoose.ts throws at
     # module load without MONGODB_URI and the Resend client without its key, so
-    # both need a non-empty value for `next build`. The 127.0.0.1 Mongo host is
-    # refused instantly, so pages fall back to config data — no live DB needed.
+    # both need a non-empty value for `next build`. The unreachable 127.0.0.1
+    # Mongo host costs one 10s server-selection timeout, then mongoose.ts
+    # fail-fast-caches the failure and pages fall back to config data
+    # immediately — no live DB needed.
     env:
       NEXT_PUBLIC_SITE_URL: "https://s-almonte.vercel.app"
       NEXT_PUBLIC_GITHUB_URL: "https://github.com/SauelAlmonte"

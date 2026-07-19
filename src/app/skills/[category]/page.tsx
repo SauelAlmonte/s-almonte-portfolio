@@ -6,21 +6,14 @@ import { loadPublishedProjectsByCategory } from "@/lib/projects/load-published-p
 import { serializeJsonLd } from "@/lib/seo/json-ld";
 import { ProjectsPageClient } from "./ProjectsPageClient";
 
-/**
- * ISR: pre-render the three categories as static HTML and refresh from Mongo
- * hourly. Crawlers get fast cached pages instead of a fresh SSR on every hit.
- */
-export const revalidate = 3600;
+// Rendered per request: the nonce-based CSP (src/proxy.ts) rules out cached
+// HTML, so ISR/generateStaticParams were removed with it.
 
 interface PageProps {
   params: Promise<{ category: string }>;
 }
 
 const VALID_CATEGORIES: ProjectCategory[] = ["fullstack", "backend", "cloud"];
-
-export async function generateStaticParams() {
-  return VALID_CATEGORIES.map((category) => ({ category }));
-}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { category } = await params;
