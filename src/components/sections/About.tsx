@@ -339,8 +339,16 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       aria-label="About Me"
       className="relative py-fl-section px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
-      {/* Layered parallax backdrop: instrument grid (slow plane) + glow blobs */}
-      <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
+      {/* Layered parallax backdrop: instrument grid (slow plane) + glow blobs.
+          The vertical mask is load-bearing: this wrapper clips at the section
+          edges, and without the fade the grid/blobs start at full strength on
+          a razor-straight line — visible as a faint full-width band at the
+          hero→About boundary whenever a refresh restores a scroll position
+          that puts that edge mid-viewport. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 overflow-hidden mask-[linear-gradient(to_bottom,transparent,black_10rem,black_calc(100%-10rem),transparent)]"
+      >
         <div
           ref={gridRef}
           className="absolute inset-x-0 -inset-y-32 opacity-[0.08] bg-[linear-gradient(color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_srgb,var(--primary)_70%,transparent)_1px,transparent_1px)] bg-size-[44px_44px] mask-[radial-gradient(85%_70%_at_50%_30%,black,transparent_80%)]"
