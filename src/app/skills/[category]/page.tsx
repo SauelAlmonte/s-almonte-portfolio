@@ -1,10 +1,20 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import DOMPurify from 'dompurify';
 import { CATEGORY_META, type ProjectCategory } from "@/config/projects";
 import { siteConfig } from "@/config/site";
 import { loadPublishedProjectsByCategory } from "@/lib/projects/load-published-projects";
 import { serializeJsonLd } from "@/lib/seo/json-ld";
 import { ProjectsPageClient } from "./ProjectsPageClient";
+
+function sanitizeHtml(html: string | null | undefined) {
+  return html
+    ? DOMPurify.sanitize(html, {
+        ALLOWED_TAGS: ['span', 'p'],
+        ALLOWED_ATTR: ['class'],
+      })
+    : '';
+}
 
 /**
  * ISR: pre-render the three categories as static HTML and refresh from Mongo
@@ -95,7 +105,7 @@ export default async function CategoryPage({ params }: PageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(serializeJsonLd(jsonLd)) }}
       />
       <ProjectsPageClient category={cat} projects={projects} meta={meta} />
     </>
