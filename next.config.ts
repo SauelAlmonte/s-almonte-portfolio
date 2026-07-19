@@ -12,7 +12,7 @@ import type { NextConfig } from "next";
  * reflected-HTML sink (its one `dangerouslySetInnerHTML` is JSON-LD, escaped by
  * `serializeJsonLd` and a non-executable data block). The high-value directives —
  * `frame-ancestors 'none'` (clickjacking), `object-src 'none'`, `base-uri 'self'`,
- * `form-action 'self'` — are all strict. HSTS is already set by Vercel at the edge.
+ * `form-action 'self'` — are all strict.
  */
 // Next.js dev (HMR / React Fast Refresh) evaluates modules via `eval()`, which a
 // strict `script-src` blocks — so `'unsafe-eval'` is added ONLY in development.
@@ -39,6 +39,13 @@ const contentSecurityPolicy = [
 
 const securityHeaders = [
   { key: "Content-Security-Policy", value: contentSecurityPolicy },
+  // Vercel's edge already sends this on *.vercel.app, but the app must not
+  // depend on platform defaults — set it explicitly with the same value so
+  // HTTPS-only is guaranteed on any host (and visible to security scanners).
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
   // Belt-and-suspenders clickjacking defense for pre-CSP browsers.
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
