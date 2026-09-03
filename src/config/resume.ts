@@ -44,7 +44,7 @@ export const RESUME_SEED_EDUCATION: ResumeSeedEducation[] = [
   {
     school: "Meta · Coursera",
     degree: "Front-End Developer Professional Certificate",
-    year: "Completed Jan 2025",
+    year: "2025-01-12",
     credentialUrl:
       "https://www.credly.com/badges/66608cd0-d62f-4d81-8b27-36664aec10bb/linked_in_profile",
   },
@@ -54,24 +54,21 @@ export const RESUME_SEED_CERTIFICATIONS: ResumeSeedCertification[] = [
   {
     name: "AWS Certified Cloud Practitioner",
     issuer: "Amazon Web Services",
-    year: "2024-06-15",
-    description: "Foundational AWS cloud concepts, billing, security, and core services.",
+    year: "2025-06-06",
     credentialUrl:
       "https://www.credly.com/badges/2c79f693-01e6-422c-b5a4-c3adcd374cdf/public_url",
   },
   {
     name: "C++ Essentials 1",
     issuer: "CISCO Network Academy",
-    year: "2023-08-01",
-    description: "Core C++ syntax, data types, and program structure.",
+    year: "2025-07-20",
     credentialUrl:
       "https://www.credly.com/badges/d5da802a-e6a3-448d-bcca-122cb94be261/public_url",
   },
   {
     name: "C++ Essentials 2",
     issuer: "CISCO Network Academy",
-    year: "2023-12-01",
-    description: "Pointers, memory, OOP foundations, and intermediate C++ patterns.",
+    year: "2025-07-22",
     credentialUrl:
       "https://www.credly.com/badges/db901e18-76ea-4ac7-ab69-112155b906db/public_url",
   },

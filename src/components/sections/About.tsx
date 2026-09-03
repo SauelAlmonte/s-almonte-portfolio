@@ -1,6 +1,12 @@
 "use client";
 
-import { useMemo, useRef, useState, useSyncExternalStore } from "react";
+import {
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import dynamic from "next/dynamic";
 import {
   m,
@@ -14,7 +20,7 @@ import { gsap, ScrollTrigger, SCROLL_MEDIA } from "@/lib/scroll/gsap";
 import { useScrollSection } from "@/lib/scroll/useScrollSection";
 import { Download, GraduationCap, ExternalLink } from "lucide-react";
 import { PortraitCard } from "@/components/about/PortraitCard";
-import { formatCredentialPeriod } from "@/lib/resume/format-credential-period";
+import { formatCredentialDateLine } from "@/lib/resume/format-credential-period";
 
 import { ResumeDownloadChoiceModal } from "@/components/resume/ResumeDownloadChoiceModal";
 import type { LandingCredentialCard } from "@/config/resume";
@@ -28,7 +34,7 @@ const PortraitHalo = dynamic(
 const STATS = [
   { value: 4, suffix: "+", label: "Years Experience" },
   { value: 50, suffix: "+", label: "Engineers Mentored" },
-  { value: 4, suffix: "", label: "Companies" },
+  { value: 5, suffix: "", label: "Companies" },
   { value: 4, suffix: "", label: "Languages" },
 ];
 
@@ -93,7 +99,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             // Tween a proxy object and write the rounded value into the
             // DOM — the animated property must live in the to-vars.
             const counter = { val: 0 };
-            gsap.to(counter, {
+            void gsap.to(counter, {
               val: stat.value,
               duration: 1.8,
               ease: "power2.out",
@@ -113,7 +119,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       const section = sectionRef.current;
 
       /* Background plane (slowest): the instrument grid drifts visibly. */
-      gsap.to(gridRef.current, {
+      void gsap.to(gridRef.current, {
         y: -120 * k,
         ease: "none",
         scrollTrigger: {
@@ -125,7 +131,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       });
 
       /* Ambient color — not a depth plane, just alive. */
-      gsap.to(blob1Ref.current, {
+      void gsap.to(blob1Ref.current, {
         y: -180 * k,
         ease: "none",
         scrollTrigger: {
@@ -135,7 +141,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
           scrub: 1.5,
         },
       });
-      gsap.to(blob2Ref.current, {
+      void gsap.to(blob2Ref.current, {
         y: 120 * k,
         x: -40 * k,
         ease: "none",
@@ -149,7 +155,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
 
       /* Stats band gets extra travel as it passes center (ends near 0 so
          the resting layout keeps its designed spacing). */
-      gsap.fromTo(
+      void gsap.fromTo(
         statsDriftRef.current,
         { y: 48 * k },
         {
@@ -166,7 +172,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
 
       /* Credentials ride a slightly faster plane than the stats above
          them, so the two blocks visibly converge as they enter. */
-      gsap.fromTo(
+      void gsap.fromTo(
         eduDriftRef.current,
         { y: 72 * k },
         {
@@ -200,9 +206,9 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
       const cta = section.querySelector<HTMLElement>("[data-cta-stage]");
       if (stages.length <= 1) return;
 
-      gsap.set(stackRef.current, { display: "grid", alignItems: "start" });
-      gsap.set(stages, { gridArea: "1 / 1", marginBottom: 0 });
-      gsap.set(stages.slice(1), { autoAlpha: 0, y: 48 });
+      void gsap.set(stackRef.current, { display: "grid", alignItems: "start" });
+      void gsap.set(stages, { gridArea: "1 / 1", marginBottom: 0 });
+      void gsap.set(stages.slice(1), { autoAlpha: 0, y: 48 });
       if (cta) {
         /* All stages overlap in one grid cell sized to the TALLEST paragraph,
            so the CTA (below the stack) otherwise sits far beneath the shorter
@@ -210,7 +216,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
            the last stage, keeping ~the original 32px gap, so it hugs the bio. */
         const last = stages[stages.length - 1];
         const slack = (stackRef.current?.offsetHeight ?? 0) - last.offsetHeight;
-        gsap.set(cta, { autoAlpha: 0, y: 24, marginTop: 32 - Math.max(slack, 0) });
+        void gsap.set(cta, { autoAlpha: 0, y: 24, marginTop: 32 - Math.max(slack, 0) });
       }
 
       /* Where the viewport allows, the pin includes the header + tagline
@@ -236,7 +242,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
         /* The incoming paragraph waits until the outgoing one is 85%
            gone — both share grid cell 1/1, so any real overlap window
            reads as two paragraphs printed on top of each other. */
-        seq
+        void seq
           .to(stages[i - 1], { autoAlpha: 0, y: -48, duration: 1 })
           .fromTo(
             stage,
@@ -245,8 +251,8 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
             "<85%",
           );
       });
-      if (cta) seq.to(cta, { autoAlpha: 1, y: 0, duration: 0.7 }, ">-0.25");
-      seq.to({}, { duration: 0.5 }); // hold the last beat before release
+      if (cta) void seq.to(cta, { autoAlpha: 1, y: 0, duration: 0.7 }, ">-0.25");
+      void seq.to({}, { duration: 0.5 }); // hold the last beat before release
     };
 
     /* Same experience on every tier — only the plane offsets scale down. */
@@ -497,7 +503,7 @@ export function About({ professionalSummary, credentialCards, pdfChoices }: Abou
                   <span ref={(el) => { statValueRefs.current[i] = el; }}>0</span>
                   <span className="text-primary/60">{stat.suffix}</span>
                 </p>
-                <p className="mt-3 text-center font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-ink-muted">
+                <p className="mt-3 text-center font-mono text-xs font-medium uppercase tracking-[0.2em] text-ink-muted">
                   {stat.label}
                 </p>
               </m.div>
@@ -586,7 +592,7 @@ function CredentialCard({ edu, index, reduceMotion, variants }: CredentialCardPr
   const rotateX = useTransform(sy, [-0.5, 0.5], [6, -6]);
   const rotateY = useTransform(sx, [-0.5, 0.5], [-6, 6]);
 
-  const handlePointerMove = (event: React.PointerEvent<HTMLElement>) => {
+  const handlePointerMove = (event: ReactPointerEvent<HTMLElement>) => {
     if (!tiltEnabled) return;
     const rect = event.currentTarget.getBoundingClientRect();
     mx.set((event.clientX - rect.left) / rect.width - 0.5);
@@ -634,22 +640,19 @@ function CredentialCard({ edu, index, reduceMotion, variants }: CredentialCardPr
           {/* mono index, instrument-style */}
           <span
             aria-hidden
-            className="shrink-0 font-mono text-[11px] leading-snug tracking-[0.2em] text-ink-faint transition-colors duration-300 group-hover:text-primary/70"
+            className="shrink-0 font-mono text-xs leading-snug tracking-[0.2em] text-ink-faint transition-colors duration-300 group-hover:text-primary/70"
           >
             {String(index + 1).padStart(2, "0")}
           </span>
         </div>
         <p className="text-xs text-muted-foreground leading-snug">{edu.degree}</p>
-        <p className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-primary">
+        <p className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.14em] text-primary">
           <span
             aria-hidden
             className="h-1 w-1 rounded-full bg-primary motion-safe:group-hover:animate-pulse"
           />
-          {formatCredentialPeriod(edu.period)}
+          {formatCredentialDateLine(edu.period)}
         </p>
-        {edu.description ? (
-          <p className="text-xs text-muted-foreground leading-snug line-clamp-3">{edu.description}</p>
-        ) : null}
       </div>
     </>
   );
