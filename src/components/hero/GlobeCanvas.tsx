@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { PerformanceMonitor } from "@react-three/drei";
+import "@/lib/three/suppress-clock-deprecation";
 import { GlobeScene } from "./GlobeScene";
 import { HeroPoster } from "./HeroPoster";
 
@@ -103,12 +104,10 @@ export default function GlobeCanvas({ onSettled }: { onSettled?: () => void }) {
         className={`transition-opacity duration-700 ${ready ? "opacity-0" : "opacity-100"}`}
       />
       {/*
-        Dev console shows "THREE.Clock: deprecated, use THREE.Timer" on mount.
-        It's upstream: R3F constructs one internal THREE.Clock per <Canvas> for
-        its render loop, and three r183 deprecated Clock. Our code never builds a
-        Clock (we only read state.clock in useFrame). Benign, no runtime impact;
-        resolves when R3F migrates to Timer. Nothing to fix here — don't suppress
-        or downgrade three over it.
+        R3F constructs an internal THREE.Clock per <Canvas>, which three r183
+        deprecated — that one warning is filtered via three's official console
+        hook in lib/three/suppress-clock-deprecation (imported above); drop the
+        import once R3F migrates to THREE.Timer.
       */}
       {mode === "webgl" && (
         <Canvas
