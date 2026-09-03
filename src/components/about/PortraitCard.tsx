@@ -119,6 +119,7 @@ export function PortraitCard({ reduceMotion }: PortraitCardProps) {
               src="/images/sauel-headshot.jpg"
               alt="Sauel Almonte"
               fill
+              loading="eager"
               sizes="(min-width: 640px) 18rem, 16rem"
               className="object-cover"
             />
@@ -138,7 +139,7 @@ export function PortraitCard({ reduceMotion }: PortraitCardProps) {
               className="flex items-center gap-2 rounded-full border border-primary/25 bg-stage/70 px-4 py-2 shadow-lg backdrop-blur-md"
             >
               <MapPin className="h-3.5 w-3.5 text-primary" />
-              <span className="font-mono text-[11px] tracking-[0.18em] uppercase text-ink">
+              <span className="font-mono text-xs tracking-[0.18em] uppercase text-ink">
                 Boston, MA
               </span>
               <span className="h-1.5 w-1.5 rounded-full bg-primary motion-safe:animate-pulse" />
@@ -151,7 +152,7 @@ export function PortraitCard({ reduceMotion }: PortraitCardProps) {
               className="flex items-center gap-2 rounded-full border border-primary/25 bg-stage/70 px-4 py-2 shadow-lg backdrop-blur-md"
             >
               <Languages className="h-3.5 w-3.5 text-primary" />
-              <span className="font-mono text-[11px] tracking-[0.18em] uppercase text-ink">
+              <span className="font-mono text-xs tracking-[0.18em] uppercase text-ink">
                 EN / ES
               </span>
             </m.div>
